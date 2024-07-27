@@ -4,7 +4,6 @@ template.innerHTML =
     <label for="radio">
         <input type="radio" id="radio" name="radio">
         <span>Label</span>
-        <span class="icon"></span>
     </label>
     `
     ;

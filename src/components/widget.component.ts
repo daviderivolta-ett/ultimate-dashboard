@@ -85,9 +85,6 @@ export default class WidgetComponent extends HTMLElement {
     }
 
     private setup(): void {
-        // const tools: WidgetToolsComponent | null = this.shadowRoot.querySelector('app-widget-tools');
-        // if (tools) tools.addEventListener('widget-resized', this.handleWidgetResize.bind(this));
-
         const resizeController: RadioGroup | null = this.shadowRoot.querySelector('radio-group');
         if (resizeController) resizeController.addEventListener('size-change', this.handleWidgetResize.bind(this));
     }
