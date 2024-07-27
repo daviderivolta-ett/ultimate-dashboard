@@ -1,13 +1,13 @@
 import { WidgetSize } from '../models/widget-size.model';
+import RadioButton from './radio-btn.component';
+import RadioGroup from './radio-group.component';
 import './tooltip.component';
-import './widget-tools.component';
-import { WidgetToolsComponent } from './widget-tools.component';
 
 const template: HTMLTemplateElement = document.createElement('template');
 template.innerHTML =
     `
     <app-tooltip>
-        <app-widget-tools slot="content"></app-widget-tools>
+        <radio-group slot="content" name="size"></radio-group>
     </app-tooltip>
     `
     ;
@@ -80,16 +80,36 @@ export default class WidgetComponent extends HTMLElement {
         this.setup();
     }
 
-    private render(): void { }
-
-    private setup(): void {
-        const tools: WidgetToolsComponent | null = this.shadowRoot.querySelector('app-widget-tools');
-        tools?.addEventListener('widget-resized', this.handleWidgetResize.bind(this));
+    private render(): void {
+        this.createResizeController();
     }
 
-    private handleWidgetResize(e: Event) {
-        const event: CustomEvent = e as CustomEvent;
-        this.resizeWidget(event.detail.size);
+    private setup(): void {
+        // const tools: WidgetToolsComponent | null = this.shadowRoot.querySelector('app-widget-tools');
+        // if (tools) tools.addEventListener('widget-resized', this.handleWidgetResize.bind(this));
+
+        const resizeController: RadioGroup | null = this.shadowRoot.querySelector('radio-group');
+        if (resizeController) resizeController.addEventListener('size-change', this.handleWidgetResize.bind(this));
+    }
+
+    private createResizeController(): void {
+        const radioGroup: RadioGroup | null = this.shadowRoot.querySelector('radio-group');
+        if (!radioGroup) return;
+
+        Object.values(WidgetSize).forEach((size: string) => {
+            const radioButton: RadioButton = new RadioButton();
+            radioButton.setAttribute('slot', 'radio-button');
+            radioButton.value = size;
+            radioButton.name = size;
+            radioButton.label = 'O';
+            radioGroup.appendChild(radioButton);
+            if (size === 'square-small') radioButton.checked = true;
+        });
+    }
+
+    private handleWidgetResize(event: Event) {
+        const e: CustomEvent = event as CustomEvent;
+        this.resizeWidget(e.detail);
     }
 
     private resizeWidget(size: string): void {
@@ -99,12 +119,6 @@ export default class WidgetComponent extends HTMLElement {
 
     private resetSize(): void {
         this.classList.remove(...Object.values(WidgetSize));
-    }
-
-    public disconnectedCallback(): void {
-        const tools = this.shadowRoot.querySelector('app-tooltip');
-        if (tools) tools.removeEventListener('widget-resized', this.handleWidgetResize.bind(this));
-
     }
 }
 
