@@ -22,6 +22,7 @@ style.innerHTML =
             background-color: azure;
             width: 100%;
             aspect-ratio: 1 / 1;
+            box-sizing: border-box;
         }
 
         :host(.square-small) {
@@ -98,7 +99,7 @@ export default class WidgetComponent extends HTMLElement {
             radioButton.setAttribute('slot', 'radio-button');
             radioButton.value = size;
             radioButton.name = size;
-            radioButton.label = 'O';
+            radioButton.label = size;
             radioGroup.appendChild(radioButton);
             if (size === 'square-small') radioButton.checked = true;
         });

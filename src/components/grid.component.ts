@@ -5,12 +5,7 @@ template.innerHTML =
     `
     <app-widget class="square-small" draggable="true"></app-widget>
     <app-widget class="square-small" draggable="true"></app-widget>
-    <app-widget class="square-large" draggable="true"></app-widget>
     <app-widget class="square-small" draggable="true"></app-widget>
-    <app-widget class="column-small" draggable="true"></app-widget>
-    <app-widget class="square-small" draggable="true"></app-widget>
-    <app-widget class="square-small" draggable="true"></app-widget>
-    <app-widget class="column-large" draggable="true"></app-widget>
     `
     ;
 
@@ -20,7 +15,7 @@ style.innerHTML =
         :host {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
-            grid-template-rows: auto;
+            grid-template-rows: 100% repeat(auto-fill, 100%) 100%;
             gap: 16px;
         }
 
