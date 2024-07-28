@@ -20,24 +20,13 @@ style.innerHTML =
             transform: translateX(-50%);
             background-color: black;
             opacity: 0;
-            animation: fadeOut .4s ease-in-out forwards;
+            transition: .4s ease-in-out;
             overflow: hidden;
         }
         
         :host(.visible) {
-            animation: fadeIn .4s ease-in-out forwards;
-        }
-
-        @keyframes fadeIn {
-            to {
-                opacity: 1;
-            }
-        }
-
-        @keyframes fadeOut {
-            to {
-                opacity: 0;
-            }
+            opacity: 1;
+            transition: .4s ease-in-out;
         }
     `
     ;
