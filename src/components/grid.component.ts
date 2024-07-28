@@ -22,21 +22,18 @@ style.innerHTML =
         @media (max-width: 1400px) {
             :host {
                 grid-template-columns: repeat(4, 1fr);
-                grid-template-rows: auto;
             }
         }                
 
         @media (max-width: 768px) {
             :host {
                 grid-template-columns: repeat(2, 1fr);
-                grid-template-rows: auto;
             }
         }
 
         @media (max-width: 576px) {
             :host {
                 grid-template-columns: repeat(1, 1fr);
-                grid-template-rows: auto;
             }
         }
     `

@@ -21,6 +21,7 @@ style.innerHTML =
             border-radius: 8px;
             background-color: azure;
             width: 100%;
+            height: auto;
             aspect-ratio: 1 / 1;
             box-sizing: border-box;
         }
