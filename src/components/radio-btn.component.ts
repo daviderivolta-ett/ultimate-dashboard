@@ -4,6 +4,11 @@ template.innerHTML =
     <label for="radio">
         <input type="radio" id="radio" name="radio">
         <span>Label</span>
+        <span class="icon">
+            <svg viewBox="0 0 24 24">
+                <use href="/icons/close.svg#close"></use>
+            </svg>
+        </span>
     </label>
     `
     ;
@@ -15,8 +20,7 @@ style.innerHTML =
             display: block;
             width: 24px;
             height: 24px;
-            background: url('/icons/close.svg') no-repeat center / contain;
-            filter: invert(22%) sepia(100%) saturate(7485%) hue-rotate(320deg) brightness(106%) contrast(104%);
+            color: white;
         }
     `
     ;
