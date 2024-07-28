@@ -24,9 +24,10 @@ style.innerHTML =
 export default class RadioButton extends HTMLElement {
     public shadowRoot: ShadowRoot;
 
-    public value: string = '';
-    public name: string = '';
-    public label: string = '';
+    private _value: string = '';
+    private _name: string = '';
+    private _label: string = '';
+    private _iconUrl: string = '';
 
     public input: HTMLInputElement = document.createElement('input');
 
@@ -37,6 +38,18 @@ export default class RadioButton extends HTMLElement {
         this.shadowRoot.appendChild(template.content.cloneNode(true));
         this.shadowRoot.appendChild(style.cloneNode(true));
     }
+
+    public get value(): string { return this._value }
+    public set value(value: string) { this._value = value }
+
+    public get name(): string { return this._name }
+    public set name(value: string) { this._name = value }
+
+    public get label(): string { return this._label }
+    public set label(value: string) { this._label = value }
+
+    public get iconUrl(): string { return this._iconUrl }
+    public set iconUrl(value: string) { this._iconUrl = value }
 
     get checked(): boolean { return this.input.checked }
     set checked(value: boolean) { this.input.checked = value }
