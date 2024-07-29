@@ -3,7 +3,7 @@ import RadioButton from "./radio-btn.component";
 const template: HTMLTemplateElement = document.createElement('template');
 template.innerHTML =
     `
-        <slot name="radio-button"></slot>
+        <slot></slot>
     `
     ;
 
@@ -44,17 +44,17 @@ export default class RadioGroup extends HTMLElement {
     private setup(): void {
         const radioButtons: RadioButton[] = Array.from(this.querySelectorAll('radio-button'));
 
-        radioButtons.forEach((radioButton: RadioButton) => {
+        radioButtons.forEach((radioButton: RadioButton) => {          
             radioButton.addEventListener('radio-change', (e) => this.handleRadioChange(e));
         });
     }
 
-    private handleRadioChange(event: Event): void {
-        const e: CustomEvent = event as CustomEvent;
+    private handleRadioChange(event: Event): void {          
+        const e: CustomEvent = event as CustomEvent;     
         const radioButtons: RadioButton[] = Array.from(this.querySelectorAll('radio-button'));
 
-        radioButtons.forEach((radioButton: RadioButton) => {
-            if (radioButton !== e.target) radioButton.checked = false;
+        radioButtons.forEach((radioButton: RadioButton) => {                    
+            if (radioButton.value !== e.detail) radioButton.checked = false;
         });
 
         this.dispatchEvent(new CustomEvent(`${this.name}-change`, { detail: e.detail }));

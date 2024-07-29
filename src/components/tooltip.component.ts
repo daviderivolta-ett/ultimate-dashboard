@@ -1,30 +1,32 @@
 const template: HTMLTemplateElement = document.createElement('template');
 template.innerHTML =
     `
-    <slot name="content">Default content</slot>
+        <div class="tooltip" part="base">
+            <slot>Default content</slot>
+        </div>
     `
     ;
 
 const style: HTMLStyleElement = document.createElement('style');
 style.innerHTML =
     `
-        :host {
+        .tooltip {
             color: white;
             display: flex;
             align-items: center;
-            position: absolute;
-            bottom: 16px;
-            left: 50%;
             padding: 8px;
             border-radius: 4px;
-            transform: translateX(-50%);
             background-color: black;
+            position: absolute;
+            bottom: 16px;
+            left: 50%;       
+            transform: translateX(-50%);
             opacity: 0;
             transition: .4s ease-in-out;
             overflow: hidden;
         }
         
-        :host(.visible) {
+        :host(.visible) .tooltip {
             opacity: 1;
             transition: .4s ease-in-out;
         }
@@ -50,20 +52,20 @@ export default class TooltipComponent extends HTMLElement {
     }
 
     public connectedCallback(): void {
-        this.setup();
+        this._setup();
     }
 
     public disconnectedCallback(): void {
-        const parentElement: HTMLElement | null = this.getParentElement();
-        if (parentElement) this.removeEventListeners(parentElement);
+        const parentElement: HTMLElement | null = this._getParentElement();
+        if (parentElement) this._removeEventListeners(parentElement);
     }
 
-    public setup(): void {
-        const parentElement: HTMLElement | null = this.getParentElement();
-        if (parentElement) this.addEventListeners(parentElement);
+    private _setup(): void {
+        const parentElement: HTMLElement | null = this._getParentElement();
+        if (parentElement) this._addEventListeners(parentElement);
     }
 
-    private getParentElement(): HTMLElement | null {
+    private _getParentElement(): HTMLElement | null {
         const parent: HTMLElement | null = this.parentElement;
         if (parent) return parent;
 
@@ -80,17 +82,17 @@ export default class TooltipComponent extends HTMLElement {
         return null;
     }
 
-    private addEventListeners(element: HTMLElement): void {
-        element.addEventListener('mouseover', () => this.toggleVisibility());
-        element.addEventListener('mouseleave', () => this.toggleVisibility());
+    private _addEventListeners(element: HTMLElement): void {
+        element.addEventListener('mouseover', this._toggleVisibility);
+        element.addEventListener('mouseleave', this._toggleVisibility);
     }
 
-    private removeEventListeners(element: HTMLElement): void {
-        element.removeEventListener('mouseover', () => this.toggleVisibility());
-        element.removeEventListener('mouseleave', () => this.toggleVisibility());
+    private _removeEventListeners(element: HTMLElement): void {
+        element.removeEventListener('mouseover', this._toggleVisibility);
+        element.removeEventListener('mouseleave', this._toggleVisibility);
     }
 
-    public toggleVisibility() {
+    private _toggleVisibility = (): void => {
         this.isVisible = !this.isVisible;
     }
 }

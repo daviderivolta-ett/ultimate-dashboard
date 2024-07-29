@@ -1,26 +1,46 @@
 const template: HTMLTemplateElement = document.createElement('template');
 template.innerHTML =
     `
-    <label for="radio">
-        <input type="radio" id="radio" name="radio">
-        <span>Label</span>
-        <span class="icon">
-            <svg viewBox="0 0 24 24">
-                <use href="/icons/close.svg#close"></use>
-            </svg>
-        </span>
-    </label>
+        <label class="label" for="radio">
+            <input class="input" type="radio" id="radio" name="radio">
+            <span class="icon">
+                <svg viewBox="0 0 24 24">
+                    <use href="/icons/square.svg#square"></use>
+                </svg>
+            </span>
+        </label>
     `
     ;
 
 const style: HTMLStyleElement = document.createElement('style');
 style.innerHTML =
     `
+        .label {
+            cursor: pointer;
+        }
+
+        .input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            opacity: 0;
+        }
+
         .icon {
             display: block;
             width: 24px;
             height: 24px;
             color: white;
+            border-radius: 4px;
+            transition: .2s ease-in-out;
+        }
+
+        .icon--checked {
+            background-color: white;
+            color: black;
+            transition: .2s ease-in-out;
         }
     `
     ;
@@ -30,9 +50,7 @@ export default class RadioButton extends HTMLElement {
 
     private _value: string = '';
     private _name: string = '';
-    private _label: string = '';
-    private _iconUrl: string = '';
-
+    private _iconUrl: string = '/icons/square.svg#square';
     public input: HTMLInputElement = document.createElement('input');
 
     constructor() {
@@ -44,55 +62,73 @@ export default class RadioButton extends HTMLElement {
     }
 
     public get value(): string { return this._value }
-    public set value(value: string) { this._value = value }
+    public set value(value: string) {
+        this._value = value;
+        this._updateInputValue();
+    }
 
     public get name(): string { return this._name }
-    public set name(value: string) { this._name = value }
-
-    public get label(): string { return this._label }
-    public set label(value: string) { this._label = value }
+    public set name(value: string) {
+        this._name = value;
+        this._updateInputName();
+    }
 
     public get iconUrl(): string { return this._iconUrl }
-    public set iconUrl(value: string) { this._iconUrl = value }
+    public set iconUrl(value: string) {
+        this._iconUrl = value;
+        this._updateIconUrl();
+    }
 
     get checked(): boolean { return this.input.checked }
-    set checked(value: boolean) { this.input.checked = value }
+    set checked(value: boolean) {    
+        this.input.checked = value;
+        const icon: HTMLSpanElement | null = this.shadowRoot.querySelector('.icon');
+        if (icon) value ? icon.classList.add('icon--checked') : icon.classList.remove('icon--checked');
+    }
 
     public connectedCallback(): void {
-        this.getCustomAttributes();
-        this.render();
-        this.setup();
+        this._render();
+        this._setup();
     }
 
-    private getCustomAttributes(): void {
-        const value: string | null = this.getAttribute('value');
-        const name: string | null = this.getAttribute('name');
-        const label: string | null = this.getAttribute('label');
-
-        if (value) this.value = value;
-        if (name) this.name = name;
-        if (label) this.label = label;
+    static observedAttributes: string[] = ['value', 'name', 'label', 'iconUrl'];
+    public attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
+        if (name === 'value') this.value = newValue;
+        if (name === 'name') this.name = newValue;
+        if (name === 'icon-url') this.iconUrl = newValue;
     }
 
-    private render(): void {
+    private _render(): void {
         const input: HTMLInputElement | null = this.shadowRoot.querySelector('input');
-        const label: HTMLSpanElement | null = this.shadowRoot.querySelector('span');
+        if (input) this.input = input;
 
-        if (input) {
-            input.value = this.value;
-            input.name = this.name;
-            this.input = input;
-        }
-
-        if (label) label.innerHTML = this.label;
+        this._updateInputValue();
+        this._updateInputName();
+        this._updateIconUrl();
     }
 
-    private setup(): void {
+    private _updateInputValue(): void {
         const input: HTMLInputElement | null = this.shadowRoot.querySelector('input');
-        if (input) input.addEventListener('change', this.handleChange.bind(this));
+        if (input) input.value = this.value;
     }
 
-    private handleChange(): void {
+    private _updateInputName(): void {
+        const input: HTMLInputElement | null = this.shadowRoot.querySelector('input');
+        if (input) input.name = this.name;
+    }
+
+    private _updateIconUrl(): void {
+        const icon: SVGUseElement | null = this.shadowRoot.querySelector('use');
+        if (icon) icon.href.baseVal = this.iconUrl;
+    }
+
+    private _setup(): void {
+        const input: HTMLInputElement | null = this.shadowRoot.querySelector('input');
+        if (input) input.addEventListener('change', this._handleChange.bind(this));
+    }
+
+    private _handleChange(): void {
+        this.checked = true;
         this.dispatchEvent(new CustomEvent('radio-change', { detail: this.value }));
     }
 }

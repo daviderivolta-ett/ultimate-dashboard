@@ -5,10 +5,11 @@ import './tooltip.component';
 
 const template: HTMLTemplateElement = document.createElement('template');
 template.innerHTML =
-    `
-    <app-tooltip>
-        <radio-group slot="content" name="size"></radio-group>
-    </app-tooltip>
+    `   
+        <div class="draggable"></div>
+        <app-tooltip>
+            <radio-group name="size"></radio-group>
+        </app-tooltip>
     `
     ;
 
@@ -24,6 +25,12 @@ style.innerHTML =
             height: auto;
             aspect-ratio: 1 / 1;
             box-sizing: border-box;
+        }
+
+        .draggable {
+            cursor: grab;
+            height: 50px;
+            background-color: red;
         }
 
         :host(.square-small) {
@@ -68,6 +75,7 @@ style.innerHTML =
 
 export default class WidgetComponent extends HTMLElement {
     public shadowRoot: ShadowRoot;
+    private _size: WidgetSize = WidgetSize.SquareSm;
 
     constructor() {
         super();
@@ -77,46 +85,50 @@ export default class WidgetComponent extends HTMLElement {
         this.shadowRoot.appendChild(style.cloneNode(true));
     }
 
+    public get size(): WidgetSize { return this._size }
+    public set size(value: WidgetSize) { this._size = value }
+
     public connectedCallback(): void {
-        this.render();
-        this.setup();
+        this._render();
+        this._setup();
     }
 
-    private render(): void {
-        this.createResizeController();
+    private _render(): void {
+        this._createResizeController();
     }
 
-    private setup(): void {
+    private _setup(): void {
         const resizeController: RadioGroup | null = this.shadowRoot.querySelector('radio-group');
-        if (resizeController) resizeController.addEventListener('size-change', this.handleWidgetResize.bind(this));
+        if (resizeController) resizeController.addEventListener('size-change', this._handleWidgetResize.bind(this));
     }
 
-    private createResizeController(): void {
+    private _createResizeController(): void {
         const radioGroup: RadioGroup | null = this.shadowRoot.querySelector('radio-group');
         if (!radioGroup) return;
+        radioGroup.innerHTML = '';
 
         Object.values(WidgetSize).forEach((size: string) => {
             const radioButton: RadioButton = new RadioButton();
-            radioButton.setAttribute('slot', 'radio-button');
             radioButton.value = size;
             radioButton.name = size;
-            radioButton.label = size;
+            radioButton.iconUrl = '/icons/square.svg#square';
             radioGroup.appendChild(radioButton);
-            if (size === 'square-small') radioButton.checked = true;
+            if (size === this.size) radioButton.checked = true;
         });
     }
 
-    private handleWidgetResize(event: Event) {
+    private _handleWidgetResize(event: Event) {
         const e: CustomEvent = event as CustomEvent;
-        this.resizeWidget(e.detail);
+        this.size = e.detail;
+        this._resizeWidget(e.detail);
     }
 
-    private resizeWidget(size: string): void {
-        this.resetSize();
+    private _resizeWidget(size: string): void {
+        this._resetSize();
         this.classList.add(size);
     }
 
-    private resetSize(): void {
+    private _resetSize(): void {
         this.classList.remove(...Object.values(WidgetSize));
     }
 }
