@@ -3,8 +3,10 @@ import './widget.component';
 const template: HTMLTemplateElement = document.createElement('template');
 template.innerHTML =
     `
-        <app-widget class="square-small" draggable="true"></app-widget>
-        <app-widget class="square-small" draggable="true"></app-widget>
+        <app-widget class="square-small" draggable="true">
+            <app-map></app-map>
+        </app-widget>
+        <app-widget class="square-small" draggable="true"><p>PIPPO</p></app-widget>
         <app-widget class="square-small" draggable="true"></app-widget>
         <app-widget class="square-small" draggable="true"></app-widget>
         <app-widget class="square-small" draggable="true"></app-widget>

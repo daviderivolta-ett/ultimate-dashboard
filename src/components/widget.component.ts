@@ -5,71 +5,89 @@ import './tooltip.component';
 
 const template: HTMLTemplateElement = document.createElement('template');
 template.innerHTML =
-    `   
-    <div class="draggable"></div>
+    `
+    <div class="draggable">
+        <span class="draggable__icon">
+            <svg xmlns="http://www.w3.org/2000/svg" id="drag-indicator" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
+                <path id="drag-indicator" fill="currentColor" d="M360-160q-33 0-56.5-23.5T280-240q0-33 23.5-56.5T360-320q33 0 56.5 23.5T440-240q0 33-23.5 56.5T360-160Zm240 0q-33 0-56.5-23.5T520-240q0-33 23.5-56.5T600-320q33 0 56.5 23.5T680-240q0 33-23.5 56.5T600-160ZM360-400q-33 0-56.5-23.5T280-480q0-33 23.5-56.5T360-560q33 0 56.5 23.5T440-480q0 33-23.5 56.5T360-400Zm240 0q-33 0-56.5-23.5T520-480q0-33 23.5-56.5T600-560q33 0 56.5 23.5T680-480q0 33-23.5 56.5T600-400ZM360-640q-33 0-56.5-23.5T280-720q0-33 23.5-56.5T360-800q33 0 56.5 23.5T440-720q0 33-23.5 56.5T360-640Zm240 0q-33 0-56.5-23.5T520-720q0-33 23.5-56.5T600-800q33 0 56.5 23.5T680-720q0 33-23.5 56.5T600-640Z"/>
+            </svg>
+        </span>
+    </div>
     <app-tooltip>
         <radio-group name="size"></radio-group>
     </app-tooltip>
+    <slot></slot>
     `
     ;
 
 const style: HTMLStyleElement = document.createElement('style');
 style.innerHTML =
     `
-        :host {
-            position: relative;
-            border: 1px solid crimson;
-            border-radius: 8px;
-            background-color: azure;
-            width: 100%;
-            height: auto;
-            aspect-ratio: 1 / 1;
-            box-sizing: border-box;
-        }
+    :host {
+        position: relative;
+        border: 1px solid crimson;
+        border-radius: 8px;
+        background-color: azure;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1 / 1;
+        box-sizing: border-box;
+    }
 
-        .draggable {
-            cursor: grab;
-            height: 50px;
-            background-color: red;
-        }
+    .draggable {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 99;
+        cursor: grab;
+        width: 40px;
+        height: 40px;
+        background-color: transparent;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
-        :host(.square-small) {
-            grid-row: span 1;
-            grid-column: span 1;
-            aspect-ratio: 1 / 1;
-        }
+    .draggable__icon {
+        color: black;
+    }
 
-        :host(.square-large) {
-            grid-row: span 2;
-            grid-column: span 2;
-            aspect-ratio: 1 / 1;
-        }
+    :host(.square-small) {
+        grid-row: span 1;
+        grid-column: span 1;
+        aspect-ratio: 1 / 1;
+    }
 
-        :host(.row-small) {
-            grid-row: span 1;
-            grid-column: span 3;
-            aspect-ratio: unset;
-        }
+    :host(.square-large) {
+        grid-row: span 2;
+        grid-column: span 2;
+        aspect-ratio: 1 / 1;
+    }
 
-        :host(.row-large) {
-            grid-row: span 2;
-            grid-column: span 3;
-            aspect-ratio: unset;
-        }
+    :host(.row-small) {
+        grid-row: span 1;
+        grid-column: span 3;
+        aspect-ratio: unset;
+    }
+
+    :host(.row-large) {
+        grid-row: span 2;
+        grid-column: span 3;
+        aspect-ratio: unset;
+    }
 
 
-        :host(.column-small) {
-            grid-row: span 3;
-            grid-column: span 1;
-            aspect-ratio: unset;
-        }
+    :host(.column-small) {
+        grid-row: span 3;
+        grid-column: span 1;
+        aspect-ratio: unset;
+    }
 
-        :host(.column-large) {
-            grid-row: span 3;
-            grid-column: span 2;
-            aspect-ratio: unset;
-        }
-
+    :host(.column-large) {
+        grid-row: span 3;
+        grid-column: span 2;
+        aspect-ratio: unset;
+    }
     `
     ;
 

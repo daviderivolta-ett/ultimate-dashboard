@@ -1,9 +1,9 @@
 const template: HTMLTemplateElement = document.createElement('template');
 template.innerHTML =
     `
-        <label class="label" for="radio">
-            <input class="input" type="radio" id="radio" name="radio">
-            <span class="icon">
+        <label class="radio" for="radio">
+            <input class="radio__input" type="radio" id="radio" name="radio">
+            <span class="radio__icon">
                 <svg viewBox="0 0 24 24">
                     <use href="/icons/square.svg#square"></use>
                 </svg>
@@ -15,11 +15,11 @@ template.innerHTML =
 const style: HTMLStyleElement = document.createElement('style');
 style.innerHTML =
     `
-        .label {
+        .radio {
             cursor: pointer;
         }
 
-        .input {
+        .radio__input {
             position: absolute;
             top: 0;
             left: 0;
@@ -28,7 +28,7 @@ style.innerHTML =
             opacity: 0;
         }
 
-        .icon {
+        .radio__icon {
             display: block;
             width: 24px;
             height: 24px;
@@ -37,7 +37,7 @@ style.innerHTML =
             transition: .2s ease-in-out;
         }
 
-        .icon--checked {
+        .radio__icon--checked {
             background-color: white;
             color: black;
             transition: .2s ease-in-out;
@@ -82,8 +82,8 @@ export default class RadioButton extends HTMLElement {
     get checked(): boolean { return this.input.checked }
     set checked(value: boolean) {    
         this.input.checked = value;
-        const icon: HTMLSpanElement | null = this.shadowRoot.querySelector('.icon');
-        if (icon) value ? icon.classList.add('icon--checked') : icon.classList.remove('icon--checked');
+        const icon: HTMLSpanElement | null = this.shadowRoot.querySelector('.radio__icon');
+        if (icon) value ? icon.classList.add('radio__icon--checked') : icon.classList.remove('radio__icon--checked');
     }
 
     public connectedCallback(): void {
