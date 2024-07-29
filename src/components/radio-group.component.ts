@@ -1,20 +1,22 @@
-import RadioButton from "./radio-btn.component";
+import RadioButton from './radio-btn.component';
 
 const template: HTMLTemplateElement = document.createElement('template');
 template.innerHTML =
     `
+    <div class="radio-group">
         <slot></slot>
+    </div>
     `
     ;
 
 const style: HTMLStyleElement = document.createElement('style');
 style.innerHTML =
     `
-        :host {
-            display:flex;
-            justify-content: center;
-            align-items: center;
-        }
+    .radio-group {
+        display:flex;
+        justify-content: center;
+        align-items: center;
+    }
     `
     ;
 

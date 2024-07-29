@@ -1,47 +1,47 @@
 const template: HTMLTemplateElement = document.createElement('template');
 template.innerHTML =
     `
-        <label class="radio" for="radio">
-            <input class="radio__input" type="radio" id="radio" name="radio">
-            <span class="radio__icon">
-                <svg viewBox="0 0 24 24">
-                    <use href="/icons/square.svg#square"></use>
-                </svg>
-            </span>
-        </label>
+    <label class="radio" for="radio">
+        <input class="radio__input" type="radio" id="radio" name="radio">
+        <span class="radio__icon">
+            <svg viewBox="0 0 24 24">
+                <use href="/icons/square.svg#square"></use>
+            </svg>
+        </span>
+    </label>
     `
     ;
 
 const style: HTMLStyleElement = document.createElement('style');
 style.innerHTML =
     `
-        .radio {
-            cursor: pointer;
-        }
+    .radio {
+        cursor: pointer;
+    }
 
-        .radio__input {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 0;
-            height: 0;
-            opacity: 0;
-        }
+    .radio__input {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 0;
+        opacity: 0;
+    }
 
-        .radio__icon {
-            display: block;
-            width: 24px;
-            height: 24px;
-            color: white;
-            border-radius: 4px;
-            transition: .2s ease-in-out;
-        }
+    .radio__icon {
+        display: block;
+        width: 24px;
+        height: 24px;
+        color: white;
+        border-radius: 4px;
+        transition: .2s ease-in-out;
+    }
 
-        .radio__icon--checked {
-            background-color: white;
-            color: black;
-            transition: .2s ease-in-out;
-        }
+    .radio__icon--checked {
+        background-color: white;
+        color: black;
+        transition: .2s ease-in-out;
+    }
     `
     ;
 

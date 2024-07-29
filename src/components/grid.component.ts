@@ -1,5 +1,3 @@
-import './widget.component';
-
 const template: HTMLTemplateElement = document.createElement('template');
 template.innerHTML =
     `

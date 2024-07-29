@@ -1,4 +1,3 @@
-
 import { Map } from 'maplibre-gl';
 import maplibreStyle from 'maplibre-gl/dist/maplibre-gl.css?raw';
 
@@ -15,6 +14,7 @@ style.innerHTML =
     #map {
         height: 100%;
         z-index: 0;
+        border-radius: 8px;
     }
     `
     ;

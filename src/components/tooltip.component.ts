@@ -14,11 +14,11 @@ style.innerHTML =
         color: white;
         display: flex;
         align-items: center;
-        padding: 8px;
+        padding: 4px;
         border-radius: 4px;
         background-color: black;
         position: absolute;
-        bottom: 16px;
+        bottom: -10px;
         left: 50%;       
         transform: translateX(-50%);
         opacity: 0;
