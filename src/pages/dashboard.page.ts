@@ -3,9 +3,9 @@ import '../components/grid.component';
 const template: HTMLTemplateElement = document.createElement('template');
 template.innerHTML =
     `
-        <div id="widget-container">
-            <app-grid></app-grid>
-        </div>
+    <div id="dashboard">
+        <app-grid></app-grid>
+    </div>
     `
     ;
 

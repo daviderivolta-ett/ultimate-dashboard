@@ -6,10 +6,10 @@ import './tooltip.component';
 const template: HTMLTemplateElement = document.createElement('template');
 template.innerHTML =
     `   
-        <div class="draggable"></div>
-        <app-tooltip>
-            <radio-group name="size"></radio-group>
-        </app-tooltip>
+    <div class="draggable"></div>
+    <app-tooltip>
+        <radio-group name="size"></radio-group>
+    </app-tooltip>
     `
     ;
 
