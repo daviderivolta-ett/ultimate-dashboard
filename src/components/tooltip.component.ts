@@ -16,7 +16,7 @@ style.innerHTML =
         align-items: center;
         padding: 4px;
         border-radius: 4px;
-        background-color: black;
+        background-color: var(--bg-color-emphasis);
         position: absolute;
         bottom: -10px;
         left: 50%;       

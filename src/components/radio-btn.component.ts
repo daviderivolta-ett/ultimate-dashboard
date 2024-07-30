@@ -32,6 +32,8 @@ style.innerHTML =
         display: block;
         width: 24px;
         height: 24px;
+        padding: 2px;
+        box-sizing: border-box;
         color: white;
         border-radius: 4px;
         transition: .2s ease-in-out;

@@ -5,6 +5,7 @@ import RadioGroup from './radio-group.component';
 const template: HTMLTemplateElement = document.createElement('template');
 template.innerHTML =
     `
+    <div class="widget">
     <div class="draggable">
         <span class="draggable__icon">
             <svg xmlns="http://www.w3.org/2000/svg" id="drag-indicator" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
@@ -16,26 +17,39 @@ template.innerHTML =
         <radio-group name="size"></radio-group>
     </app-tooltip>
     <slot></slot>
+    </div>
     `
     ;
 
 const style: HTMLStyleElement = document.createElement('style');
 style.innerHTML =
     `
+    .widget {
+        width: 100%;
+        height: 100%;
+        padding: 4%;
+        box-sizing: border-box;
+    }
+
+    .widget--fullwidth {
+        padding: 0;
+    }
+
     :host {
         position: relative;
         border-radius: 8px;
-        background-color: azure;
+        background-color: var(--bg-color-default);
         width: 100%;
         height: auto;
         aspect-ratio: 1 / 1;
         box-sizing: border-box;
+        filter: drop-shadow(0 0 4px rgba(0, 0, 0, .05));
     }
 
     .draggable {
         position: absolute;
-        top: 0;
-        right: 0;
+        top: 8px;
+        right: 8px;
         z-index: 99;
         cursor: grab;
         width: 40px;
@@ -47,7 +61,7 @@ style.innerHTML =
     }
 
     .draggable__icon {
-        color: black;
+        color: var(--button-invisible-icon-color-rest);
     }
 
     :host(.square-small) {
@@ -92,6 +106,7 @@ style.innerHTML =
 export default class WidgetComponent extends HTMLElement {
     public shadowRoot: ShadowRoot;
     private _size: WidgetSize = WidgetSize.SquareSm;
+    private _isFullWidth: boolean = false;
 
     constructor() {
         super();
@@ -104,9 +119,22 @@ export default class WidgetComponent extends HTMLElement {
     public get size(): WidgetSize { return this._size }
     public set size(value: WidgetSize) { this._size = value }
 
+    public get isFullWidth(): boolean { return this._isFullWidth }
+    public set isFullWidth(value: boolean) {
+        this._isFullWidth = value;       
+        this._handleFullWidth(value);
+    }
+
     public connectedCallback(): void {
         this._render();
         this._setup();
+    }
+
+    static observedAttributes: string[] = ['is-fullwidth'];
+    public attributeChangedCallback(name: string, oldValue: string, newValue: string): void {        
+        if (name === 'is-fullwidth' && (newValue === 'true' || newValue === 'false')) {
+            newValue === 'true' ? this.isFullWidth = true : this.isFullWidth = false;
+        }
     }
 
     private _render(): void {
@@ -127,7 +155,7 @@ export default class WidgetComponent extends HTMLElement {
             const radioButton: RadioButton = new RadioButton();
             radioButton.value = size;
             radioButton.name = size;
-            radioButton.iconUrl = '/icons/square.svg#square';
+            radioButton.iconUrl = `/icons/${size}.svg#${size}`;
             radioGroup.appendChild(radioButton);
             if (size === this.size) radioButton.checked = true;
         });
@@ -146,6 +174,13 @@ export default class WidgetComponent extends HTMLElement {
 
     private _resetSize(): void {
         this.classList.remove(...Object.values(WidgetSize));
+    }
+
+    private _handleFullWidth(value: boolean): void {
+        console.log(value);                
+        const widget: HTMLDivElement | null = this.shadowRoot.querySelector('.widget');
+        if (!widget) return;
+        value === true ? widget.classList.add('widget--fullwidth') : widget.classList.remove('widget--fullwidth');
     }
 }
 

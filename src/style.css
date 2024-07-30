@@ -3,6 +3,7 @@ body {
   padding: 0;
   margin: 0;
   scrollbar-width: none;
+  background-color: var(--bg-color-inset);
 }
 
 * {
@@ -12,6 +13,31 @@ body {
 button {
   cursor: pointer;
   background-color: red;
+}
+
+.light {
+  --fg-color-default: #1F2328;
+  --fg-color-muted: #636C76;
+  --fg-color-disabled: #8C959F;
+
+  --bg-color-inset: #F6F5FA;
+  --bg-color-default: #FFFFFF;
+  --bg-color-muted: #E8E9F2;
+  --bg-color-emphasis: #24292f;
+  --bg-color-done-emphasis: #8250DF;
+  --bg-color-done-muted: #FBEFFF;
+  --bg-color-danger-emphasis: #CF222E;
+  --bg-color-danger-muted: #FFEBE9;
+  --bg-color-attention-emphasis: #9A6700;
+  --bg-color-attention-muted: #FFF8C5;
+  --bg-color-success-emphasis: #1F883D;
+  --bg-color-success-muted: #DAFBE1;
+
+  --button-invisible-icon-color-rest: #636C76;
+
+  --border-color-default: #ECECEC;
+
+  --data-purple-color: #894CEB:
 }
 
 /* :root {
