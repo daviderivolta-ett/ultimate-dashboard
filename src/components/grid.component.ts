@@ -1,21 +1,16 @@
 const template: HTMLTemplateElement = document.createElement('template');
 template.innerHTML =
     `
-        <app-widget class="square-small" draggable="true">
-            <app-map></app-map>
-        </app-widget>
-        <app-widget class="square-small" draggable="true"><p>PIPPO</p></app-widget>
-        <app-widget class="square-small" draggable="true"></app-widget>
-        <app-widget class="square-small" draggable="true"></app-widget>
-        <app-widget class="square-small" draggable="true"></app-widget>
-        <app-widget class="square-small" draggable="true"></app-widget>
+    <div class="grid">
+        <slot></slot>
+    </div>
     `
     ;
 
 const style: HTMLStyleElement = document.createElement('style');
 style.innerHTML =
     `
-    :host {
+    .grid {
         display: grid;
         grid-template-columns: repeat(6, calc((100dvw - 16px * 7) / 6));
         grid-auto-rows: calc((100dvw - 16px * 7) / 6);
@@ -24,21 +19,21 @@ style.innerHTML =
     }
 
      @media (max-width: 1400px) {
-        :host {
+        .grid {
             grid-template-columns: repeat(4, calc((100dvw - 16px * 5) / 4));
             grid-auto-rows: calc((100dvw - 16px * 5) / 4);
         }
     }                
 
     @media (max-width: 768px) {
-        :host {
+        .grid {
             grid-template-columns: repeat(2, calc((100dvw - 16px * 3) / 2));
             grid-auto-rows: calc((100dvw - 16px * 3) / 2);
         }
     }
 
     @media (max-width: 576px) {
-        :host {
+        .grid {
             grid-template-columns: calc(100dvw - 16px * 2);
             grid-auto-rows: calc(100dvw - 16px * 2);
         }
@@ -67,37 +62,43 @@ export default class GridComponent extends HTMLElement {
     }
 
     private _handleDragAndDrop(): void {
-        const elements: NodeListOf<HTMLElement> = this.shadowRoot.querySelectorAll('*[draggable="true"]');
+        const slot: HTMLSlotElement | null = this.shadowRoot.querySelector('slot');
+        if (!slot) return;
 
-        elements.forEach((element: HTMLElement) => {
-            const dragbar: HTMLDivElement | null = element.shadowRoot
-                ? element.shadowRoot.querySelector('.draggable')
-                : element.querySelector('.draggable');
+        slot.addEventListener('slotchange', () => {
+            const elements: NodeListOf<HTMLElement> = this.querySelectorAll('*[draggable="true"]');
+            elements.forEach((element: HTMLElement) => {
+                const draggable: HTMLElement | null = element.shadowRoot ?
+                    element.shadowRoot.querySelector('.draggable') :
+                    element.querySelector('.draggable');
 
-            if (dragbar) dragbar.addEventListener('mousedown', () => this.draggingElement = element);
+                if (draggable) draggable.addEventListener('mousedown', () => this.draggingElement = element);
 
-            element.addEventListener('dragstart', (e: DragEvent) => {
-                if (this.draggingElement !== element) {
-                    e.preventDefault();
-                    return;
-                }
-                element.classList.add('dragging');
-            });
+                element.addEventListener('dragstart', (e: DragEvent) => {
+                    if (this.draggingElement !== element) {
+                        e.preventDefault();
+                        return;
+                    }
+                    element.classList.add('dragging');
+                });
 
-            element.addEventListener('dragend', (event: DragEvent) => {
-                const afterElement: { distance: number, element: HTMLElement | null } = this.getDragAfterElement(this.shadowRoot, event.clientX, event.clientY);
-                if (!this.draggingElement) return;
+                element.addEventListener('dragend', (event: DragEvent) => {
+                    const afterElement: { distance: number, element: HTMLElement | null } = this.getDragAfterElement(slot, event.clientX, event.clientY);
+                    if (!this.draggingElement) return;
 
-                afterElement ? this.shadowRoot.insertBefore(this.draggingElement, afterElement.element) : this.shadowRoot.appendChild(this.draggingElement);
+                    afterElement ? this.insertBefore(this.draggingElement, afterElement.element) : this.appendChild(this.draggingElement);
 
-                element.classList.remove('dragging');
-                this.draggingElement = null;
+                    element.classList.remove('dragging');
+                    this.draggingElement = null;
+                });
+
             });
         });
     }
 
-    private getDragAfterElement(container: ShadowRoot, x: number, y: number): { distance: number, element: HTMLElement | null } {
-        const draggableElements = [...container.querySelectorAll('*[draggable="true"]')];
+    private getDragAfterElement(container: HTMLSlotElement, x: number, y: number): { distance: number, element: HTMLElement | null } {
+        const slotElements: HTMLElement[] = container.assignedElements() as HTMLElement[];
+        const draggableElements: HTMLElement[] = slotElements.filter(el => el.draggable);
 
         return draggableElements.reduce<{ distance: number; element: HTMLElement | null }>((closest, child) => {
             const box = child.getBoundingClientRect();
