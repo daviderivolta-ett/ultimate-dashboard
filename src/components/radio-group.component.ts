@@ -59,8 +59,8 @@ export default class RadioGroup extends HTMLElement {
         radioButtons.forEach((radioButton: RadioButton) => {                    
             if (radioButton.value !== e.detail) radioButton.checked = false;
         });
-
-        this.dispatchEvent(new CustomEvent(`${this.name}-change`, { detail: e.detail }));
+     
+        this.dispatchEvent(new CustomEvent(`${this.name}-change`, { bubbles: true, composed: true, detail: e.detail }));
     }
 }
 

@@ -14,7 +14,7 @@ style.innerHTML =
     #map {
         height: 100%;
         z-index: 0;
-        border-radius: 8px;
+        border-radius: var(--border-radius);
     }
     `
     ;

@@ -18,7 +18,43 @@ style.innerHTML =
         gap: 16px;
     }
 
-     @media (max-width: 1400px) {
+    ::slotted(.square-small) {
+        grid-row: span 1;
+        grid-column: span 1;
+        aspect-ratio: 1 / 1;
+    }
+
+    ::slotted(.square-large) {
+        grid-row: span 2;
+        grid-column: span 2;
+        aspect-ratio: 1 / 1;
+    }
+
+    ::slotted(.row-small) {
+        grid-row: span 1;
+        grid-column: span 3;
+        aspect-ratio: unset;
+    }
+
+    ::slotted(.row-large) {
+        grid-row: span 2;
+        grid-column: span 3;
+        aspect-ratio: unset;
+    }
+
+    ::slotted(.column-small) {
+        grid-row: span 3;
+        grid-column: span 1;
+        aspect-ratio: unset;
+    }
+
+    ::slotted(.column-large) {
+        grid-row: span 3;
+        grid-column: span 2;
+        aspect-ratio: unset;
+    }
+
+    @media (max-width: 1400px) {
         .grid {
             grid-template-columns: repeat(4, calc((100dvw - 16px * 5) / 4));
             grid-auto-rows: calc((100dvw - 16px * 5) / 4);
