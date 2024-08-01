@@ -11,16 +11,17 @@ template.innerHTML =
             <app-widget size="square-small">
                 <span slot="title">Total income</span>
                 <span slot="desc">Lorem ipsum dolor sit amet</span>
-                <line-chart slot="content" y-unit="m/s" x-unit="Data"></line-chart>
             </app-widget>
             <app-widget size="square-small"></app-widget>
             <app-widget size="square-small"></app-widget>
             <app-widget size="square-small"></app-widget>
-            <app-widget size="square-small"></app-widget>
+            <app-widget size="square-large"></app-widget>
         </app-grid>
     </div>
     `
     ;
+
+// <div class="dropzone square-small" style="background-color: purple;"></div>
 
 const style: HTMLStyleElement = document.createElement('style');
 style.innerHTML =

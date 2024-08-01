@@ -54,6 +54,12 @@ style.innerHTML =
         aspect-ratio: unset;
     }
 
+    .dragging {
+        position: fixed;
+        pointer-events: none;
+        z-index: 9999;
+    }
+
     @media (max-width: 1400px) {
         .grid {
             grid-template-columns: repeat(4, calc((100dvw - 16px * 5) / 4));
@@ -94,42 +100,148 @@ export default class GridComponent extends HTMLElement {
     }
 
     private _setup(): void {
-        this._handleDragAndDrop();
+        this._handleDrag();
     }
 
-    private _handleDragAndDrop(): void {
+    private _handleDrag(): void {
         const slot: HTMLSlotElement | null = this.shadowRoot.querySelector('slot');
         if (!slot) return;
 
-        slot.addEventListener('slotchange', () => {
-            const elements: NodeListOf<HTMLElement> = this.querySelectorAll('*[draggable="true"]');
-            elements.forEach((element: HTMLElement) => {
-                const draggable: HTMLElement | null = element.shadowRoot ?
-                    element.shadowRoot.querySelector('.draggable') :
-                    element.querySelector('.draggable');
+        slot.addEventListener('slotchange', this._onSlotChange.bind(this), { once: true });
 
-                if (draggable) draggable.addEventListener('mousedown', () => this.draggingElement = element);
+        const dropzone: HTMLDivElement | null = this.querySelector('.dropzone');
+        if (dropzone) {
+            dropzone.addEventListener('dragover', (event: DragEvent) => this._onDragOver(event));
+            dropzone.addEventListener('drop', (event: DragEvent) => this._onDrop(event));
+        }
+    }
 
-                element.addEventListener('dragstart', (e: DragEvent) => {
-                    if (this.draggingElement !== element) {
-                        e.preventDefault();
-                        return;
-                    }
-                    element.classList.add('dragging');
-                });
+    private _onSlotChange(): void {
+        const elements: NodeListOf<HTMLElement> = this.querySelectorAll('*');
+        elements.forEach((element: HTMLElement) => {
+            const anchor: HTMLElement | null = element.shadowRoot ?
+                element.shadowRoot.querySelector('.draggable') :
+                element.querySelector('.draggable');
 
-                element.addEventListener('dragend', (event: DragEvent) => {
-                    const afterElement: { distance: number, element: HTMLElement | null } = this.getDragAfterElement(slot, event.clientX, event.clientY);
-                    if (!this.draggingElement) return;
+            if (anchor) {
+                anchor.addEventListener('mouseenter', this._onMouseEnter.bind(this, element));
+                anchor.addEventListener('mouseleave', this._onMouseLeave.bind(this, element));
 
-                    afterElement ? this.insertBefore(this.draggingElement, afterElement.element) : this.appendChild(this.draggingElement);
-
-                    element.classList.remove('dragging');
-                    this.draggingElement = null;
-                });
-
-            });
+                element.addEventListener('dragstart', (event: DragEvent) => this._onDragStart(event, element));
+                element.addEventListener('drag', (event: DragEvent) => this._onDrag(event));
+                element.addEventListener('dragend', this._onDragEnd.bind(this, element));
+            }
         });
+    }
+
+    private _onMouseEnter(element: HTMLElement): void {
+        element.setAttribute('draggable', 'true');
+    }
+
+    private _onMouseLeave(element: HTMLElement): void {
+        element.removeAttribute('draggable');
+    }
+
+    private _onDragStart(event: DragEvent, element: HTMLElement): void {
+        console.log('Drag started');         
+        this.draggingElement = element.cloneNode(true) as HTMLElement;        
+        this.draggingElement.className = element.className;
+        this.draggingElement.style.cssText = element.style.cssText;
+        
+        element.style.opacity = '0';
+        element.id = 'dragging-element';
+
+        this.draggingElement.style.position = 'fixed';
+        this.draggingElement.style.pointerEvents = 'none';
+        this.draggingElement.style.zIndex = '9999';
+        this.draggingElement.style.width = element.clientWidth + 'px';
+        this.draggingElement.style.height = element.clientHeight + 'px';
+        this.draggingElement.style.left = `${event.pageX}px`;
+        this.draggingElement.style.top = `${event.pageY}px`;
+
+        document.body.appendChild(this.draggingElement);
+    }
+
+    private _onDrag(event: DragEvent): void {
+        if (!this.draggingElement) return;
+        this.draggingElement.style.left = `${event.pageX}px`;
+        this.draggingElement.style.top = `${event.pageY}px`;
+
+        const slot: HTMLSlotElement | null = this.shadowRoot.querySelector('slot');
+        if (!slot) return;
+
+        let dropzone: HTMLElement | null = this.querySelector('#dropzone');
+
+        if (!dropzone) {
+            
+            dropzone = document.createElement('div');
+            dropzone.id = 'dropzone';
+
+            for (const cssClass of Array.from(this.draggingElement.classList)) {
+                dropzone.classList.add(cssClass);
+            }
+            
+            dropzone.style.backgroundColor = 'purple';
+        }
+
+        const underneathElement: HTMLElement | null = this._getUnderneathElement(slot, event.clientX, event.clientY);
+
+        if (underneathElement && underneathElement !== dropzone) {
+            this.insertBefore(dropzone, underneathElement);
+        // } else if (!underneathElement && dropzone.parentNode !== this) {
+        //     this.appendChild(dropzone);
+        } else if (!underneathElement) {
+            this.appendChild(dropzone);
+        }
+    }
+
+    private _onDragEnd(element: HTMLElement): void {
+        console.log('Drag ended');
+        element.removeAttribute('style');
+        element.removeAttribute('id')
+
+        if (this.draggingElement) {
+            document.body.removeChild(this.draggingElement);
+            this.draggingElement = null;
+        }
+
+        const dropzone: HTMLElement | null = this.querySelector('#dropzone');
+        if (dropzone) dropzone.remove();
+    }
+
+    private _onDragOver(event: DragEvent): void {
+        event.preventDefault();
+        console.log('Drag over');
+    }
+
+    private _onDrop(event: DragEvent): void {
+        console.log('Drop:', event);
+        const dropzone: HTMLDivElement | null = this.querySelector('.dropzone');
+
+        const originalElement = this.querySelector(`#dragging-element`) as HTMLElement;
+        console.log(originalElement);
+        if (dropzone && originalElement && this.draggingElement) {
+            originalElement.style.removeProperty('opacity');
+            dropzone.appendChild(originalElement);
+            originalElement.removeAttribute('id');
+
+            document.body.removeChild(this.draggingElement);
+            this.draggingElement = null;
+        }
+    }
+
+    private _getUnderneathElement(container: HTMLSlotElement, x: number, y: number): HTMLElement | null {
+        const slotElements: HTMLElement[] = container.assignedElements() as HTMLElement[];
+
+        for (const el of slotElements) {
+            const box: DOMRect = el.getBoundingClientRect();
+
+            if (x >= box.left && x <= box.right && y >= box.top && y <= box.bottom) {
+                return el;
+            }
+        }
+
+        return null;
     }
 
     private getDragAfterElement(container: HTMLSlotElement, x: number, y: number): { distance: number, element: HTMLElement | null } {
@@ -149,6 +261,7 @@ export default class GridComponent extends HTMLElement {
             }
         }, { distance: Number.POSITIVE_INFINITY, element: null });
     }
+
 }
 
 customElements.define('app-grid', GridComponent);

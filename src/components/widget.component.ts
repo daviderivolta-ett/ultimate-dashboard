@@ -142,7 +142,7 @@ export default class WidgetComponent extends HTMLElement {
 
     private _setup(): void {
         this.addEventListener('size-change', this._handleWidgetResize.bind(this));        
-        this._handleSlots();        
+        this._handleSlots();
     }
 
     // Methods
