@@ -11,6 +11,7 @@ template.innerHTML =
             <app-widget size="square-small">
                 <span slot="title">Total income</span>
                 <span slot="desc">Lorem ipsum dolor sit amet</span>
+                <line-chart slot="content"></line-chart>
             </app-widget>
             <app-widget size="square-small"></app-widget>
             <app-widget size="square-small"></app-widget>

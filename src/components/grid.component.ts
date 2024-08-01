@@ -3,6 +3,7 @@ template.innerHTML =
     `
     <div class="grid">
         <slot></slot>
+        <div class="dropzone"></div>
     </div>
     `
     ;
@@ -58,6 +59,12 @@ style.innerHTML =
         position: fixed;
         pointer-events: none;
         z-index: 9999;
+    }
+
+    ::slotted(.dropzone) {
+        border-radius: var(--border-radius);
+        background-color: #8EB9C0;
+        box-shadow: inset 0 0 5px #00000033;
     }
 
     @media (max-width: 1400px) {
@@ -147,25 +154,28 @@ export default class GridComponent extends HTMLElement {
         this.draggingElement = element.cloneNode(true) as HTMLElement;        
         this.draggingElement.className = element.className;
         this.draggingElement.style.cssText = element.style.cssText;
-        
+
         element.style.opacity = '0';
         element.id = 'dragging-element';
 
         this.draggingElement.style.position = 'fixed';
         this.draggingElement.style.pointerEvents = 'none';
         this.draggingElement.style.zIndex = '9999';
+        this.draggingElement.style.borderRadius = '24px';
+        this.draggingElement.style.boxShadow = '0 0 50px #00000059';
+        this.draggingElement.style.scale = '1.1';
         this.draggingElement.style.width = element.clientWidth + 'px';
         this.draggingElement.style.height = element.clientHeight + 'px';
-        this.draggingElement.style.left = `${event.pageX}px`;
-        this.draggingElement.style.top = `${event.pageY}px`;
+        this.draggingElement.style.left = `${event.clientX}px`;
+        this.draggingElement.style.top = `${event.clientY}px`;
 
         document.body.appendChild(this.draggingElement);
     }
 
     private _onDrag(event: DragEvent): void {
         if (!this.draggingElement) return;
-        this.draggingElement.style.left = `${event.pageX}px`;
-        this.draggingElement.style.top = `${event.pageY}px`;
+        this.draggingElement.style.left = `${event.clientX}px`;
+        this.draggingElement.style.top = `${event.clientY}px`;
 
         const slot: HTMLSlotElement | null = this.shadowRoot.querySelector('slot');
         if (!slot) return;
@@ -181,7 +191,7 @@ export default class GridComponent extends HTMLElement {
                 dropzone.classList.add(cssClass);
             }
             
-            dropzone.style.backgroundColor = 'purple';
+            dropzone.classList.add('dropzone');
         }
 
         const underneathElement: HTMLElement | null = this._getUnderneathElement(slot, event.clientX, event.clientY);
