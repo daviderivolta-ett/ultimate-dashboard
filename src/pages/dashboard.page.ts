@@ -8,11 +8,7 @@ template.innerHTML =
             <app-widget size="square-small" is-fullwidth="true">
                 <app-map slot="content" lat="44.40600206763519" lng="8.93632319402044" zoom="14"></app-map>
             </app-widget>
-            <app-widget size="square-small">
-                <span slot="title">Total income</span>
-                <span slot="desc">Lorem ipsum dolor sit amet</span>
-                <line-chart slot="content"></line-chart>
-            </app-widget>
+            <app-widget size="square-small"></app-widget>
             <app-widget size="square-small"></app-widget>
             <app-widget size="square-small"></app-widget>
             <app-widget size="square-small"></app-widget>

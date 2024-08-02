@@ -115,12 +115,6 @@ export default class GridComponent extends HTMLElement {
         if (!slot) return;
 
         slot.addEventListener('slotchange', this._onSlotChange.bind(this), { once: true });
-
-        const dropzone: HTMLDivElement | null = this.querySelector('.dropzone');
-        if (dropzone) {
-            dropzone.addEventListener('dragover', (event: DragEvent) => this._onDragOver(event));
-            dropzone.addEventListener('drop', (event: DragEvent) => this._onDrop(event));
-        }
     }
 
     private _onSlotChange(): void {
@@ -134,9 +128,9 @@ export default class GridComponent extends HTMLElement {
                 anchor.addEventListener('mouseenter', this._onMouseEnter.bind(this, element));
                 anchor.addEventListener('mouseleave', this._onMouseLeave.bind(this, element));
 
-                element.addEventListener('dragstart', (event: DragEvent) => this._onDragStart(event, element));
-                element.addEventListener('drag', (event: DragEvent) => this._onDrag(event));
-                element.addEventListener('dragend', this._onDragEnd.bind(this, element));
+                element.addEventListener('dragstart', this._onDragStart.bind(this));
+                element.addEventListener('drag', this._onDrag.bind(this));
+                element.addEventListener('dragend', this._onDragEnd.bind(this));
             }
         });
     }
@@ -149,93 +143,70 @@ export default class GridComponent extends HTMLElement {
         element.removeAttribute('draggable');
     }
 
-    private _onDragStart(event: DragEvent, element: HTMLElement): void {
-        console.log('Drag started');         
-        this.draggingElement = element.cloneNode(true) as HTMLElement;        
-        this.draggingElement.className = element.className;
-        this.draggingElement.style.cssText = element.style.cssText;
+    private _onDragStart(event: DragEvent): void {
+        // console.log('Drag started');
+        if (!(event.currentTarget instanceof HTMLElement)) return;
+        this.draggingElement = event.currentTarget.cloneNode(true) as HTMLElement;
 
-        element.style.opacity = '0';
-        element.id = 'dragging-element';
+        this.draggingElement.className = event.currentTarget.className;
+        this.draggingElement.style.cssText = event.currentTarget.style.cssText;
 
-        this.draggingElement.style.position = 'fixed';
-        this.draggingElement.style.pointerEvents = 'none';
-        this.draggingElement.style.zIndex = '9999';
-        this.draggingElement.style.borderRadius = '24px';
-        this.draggingElement.style.boxShadow = '0 0 50px #00000059';
-        this.draggingElement.style.scale = '1.1';
-        this.draggingElement.style.width = element.clientWidth + 'px';
-        this.draggingElement.style.height = element.clientHeight + 'px';
-        this.draggingElement.style.left = `${event.clientX}px`;
-        this.draggingElement.style.top = `${event.clientY}px`;
-
-        document.body.appendChild(this.draggingElement);
+        event.currentTarget.id = 'dragging-element';
     }
 
     private _onDrag(event: DragEvent): void {
         if (!this.draggingElement) return;
-        this.draggingElement.style.left = `${event.clientX}px`;
-        this.draggingElement.style.top = `${event.clientY}px`;
 
         const slot: HTMLSlotElement | null = this.shadowRoot.querySelector('slot');
         if (!slot) return;
 
         let dropzone: HTMLElement | null = this.querySelector('#dropzone');
-
         if (!dropzone) {
-            
             dropzone = document.createElement('div');
             dropzone.id = 'dropzone';
 
-            for (const cssClass of Array.from(this.draggingElement.classList)) {
-                dropzone.classList.add(cssClass);
-            }
+            for (const cssClass of Array.from(this.draggingElement.classList)) dropzone.classList.add(cssClass);
             
             dropzone.classList.add('dropzone');
+            dropzone.addEventListener('dragover', this._onDragOver.bind(this));
+            dropzone.addEventListener('drop', this._onDrop.bind(this));
         }
 
         const underneathElement: HTMLElement | null = this._getUnderneathElement(slot, event.clientX, event.clientY);
 
         if (underneathElement && underneathElement !== dropzone) {
             this.insertBefore(dropzone, underneathElement);
-        // } else if (!underneathElement && dropzone.parentNode !== this) {
-        //     this.appendChild(dropzone);
         } else if (!underneathElement) {
             this.appendChild(dropzone);
         }
     }
 
-    private _onDragEnd(element: HTMLElement): void {
-        console.log('Drag ended');
-        element.removeAttribute('style');
-        element.removeAttribute('id')
+    private _onDragEnd(event: DragEvent): void {
+        // console.log('Drag ended');
+        if (!(event.currentTarget instanceof HTMLElement)) return;
 
-        if (this.draggingElement) {
-            document.body.removeChild(this.draggingElement);
-            this.draggingElement = null;
-        }
+        event.currentTarget.removeAttribute('id');
+        if (this.draggingElement) this.draggingElement = null;
 
         const dropzone: HTMLElement | null = this.querySelector('#dropzone');
-        if (dropzone) dropzone.remove();
+        if (dropzone) {
+            dropzone.removeEventListener('dragover', this._onDragOver.bind(this));
+            dropzone.remove();
+        }
     }
 
     private _onDragOver(event: DragEvent): void {
         event.preventDefault();
-        console.log('Drag over');
+        // console.log('Drag over');
     }
 
-    private _onDrop(event: DragEvent): void {
-        console.log('Drop:', event);
+    private _onDrop(): void {
+        // console.log('Drop');
         const dropzone: HTMLDivElement | null = this.querySelector('.dropzone');
-
         const originalElement = this.querySelector(`#dragging-element`) as HTMLElement;
-        console.log(originalElement);
-        if (dropzone && originalElement && this.draggingElement) {
-            originalElement.style.removeProperty('opacity');
-            dropzone.appendChild(originalElement);
-            originalElement.removeAttribute('id');
 
-            document.body.removeChild(this.draggingElement);
+        if (dropzone && originalElement && this.draggingElement) {
+            this.replaceChild(originalElement, dropzone);
             this.draggingElement = null;
         }
     }
@@ -245,33 +216,11 @@ export default class GridComponent extends HTMLElement {
 
         for (const el of slotElements) {
             const box: DOMRect = el.getBoundingClientRect();
-
-            if (x >= box.left && x <= box.right && y >= box.top && y <= box.bottom) {
-                return el;
-            }
+            if (x >= box.left && x <= box.right && y >= box.top && y <= box.bottom) return el;
         }
 
         return null;
     }
-
-    private getDragAfterElement(container: HTMLSlotElement, x: number, y: number): { distance: number, element: HTMLElement | null } {
-        const slotElements: HTMLElement[] = container.assignedElements() as HTMLElement[];
-        const draggableElements: HTMLElement[] = slotElements.filter(el => el.draggable);
-
-        return draggableElements.reduce<{ distance: number; element: HTMLElement | null }>((closest, child) => {
-            const box = child.getBoundingClientRect();
-            const offsetX = x - (box.left + box.width / 2);
-            const offsetY = y - (box.top + box.height / 2);
-            const distance = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
-
-            if (distance < closest.distance) {
-                return { distance: distance, element: child as HTMLElement };
-            } else {
-                return closest;
-            }
-        }, { distance: Number.POSITIVE_INFINITY, element: null });
-    }
-
 }
 
 customElements.define('app-grid', GridComponent);
