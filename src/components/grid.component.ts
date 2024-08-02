@@ -144,7 +144,7 @@ export default class GridComponent extends HTMLElement {
     }
 
     private _onDragStart(event: DragEvent): void {
-        // console.log('Drag started');
+        console.log('Drag started');
         if (!(event.currentTarget instanceof HTMLElement)) return;
         event.currentTarget.style.opacity = '.25';
         this.draggingElement = event.currentTarget.cloneNode(true) as HTMLElement;
@@ -167,7 +167,7 @@ export default class GridComponent extends HTMLElement {
             dropzone.id = 'dropzone';
 
             for (const cssClass of Array.from(this.draggingElement.classList)) dropzone.classList.add(cssClass);
-            
+
             dropzone.classList.add('dropzone');
             dropzone.addEventListener('dragover', this._onDragOver.bind(this));
             dropzone.addEventListener('drop', this._onDrop.bind(this));
@@ -183,7 +183,7 @@ export default class GridComponent extends HTMLElement {
     }
 
     private _onDragEnd(event: DragEvent): void {
-        // console.log('Drag ended');
+        console.log('Drag ended');
         if (!(event.currentTarget instanceof HTMLElement)) return;
 
         event.currentTarget.removeAttribute('id');
@@ -203,7 +203,7 @@ export default class GridComponent extends HTMLElement {
     }
 
     private _onDrop(): void {
-        // console.log('Drop');
+        console.log('Drop');
         const dropzone: HTMLDivElement | null = this.querySelector('.dropzone');
         const originalElement = this.querySelector(`#dragging-element`) as HTMLElement;
 
@@ -211,6 +211,8 @@ export default class GridComponent extends HTMLElement {
             this.replaceChild(originalElement, dropzone);
             this.draggingElement = null;
         }
+
+        this.dispatchEvent(new CustomEvent('grid-order-changed', { bubbles: true, composed: true }));
     }
 
     private _getUnderneathElement(container: HTMLSlotElement, x: number, y: number): HTMLElement | null {

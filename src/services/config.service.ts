@@ -5,7 +5,7 @@ export class ConfigService {
     private static _instance: ConfigService;
     private _data: any;
 
-    constructor(){
+    constructor() {
         if (ConfigService._instance) return ConfigService._instance;
         ConfigService._instance = this;
     }
@@ -23,11 +23,19 @@ export class ConfigService {
         this._data = value;
     }
 
-    public async getConfig(id: string = 'standard'): Promise<any> {
+    public async getConfig(id: string = 'standard'): Promise<AppConfig> {
         if (this.config) return this.config;
+
+        const customConfig: AppConfig | null = this._getCustomConfig();
+        if (customConfig) {
+            this.config = customConfig;
+            return customConfig;
+        }
+
         const data: any = await fetch(this.CONFIG_URL).then((res: Response) => res.json());
-        const config: AppConfig = this._parseConfig(data, id)
+        const config: AppConfig = this._parseConfig(data, id);
         this.config = config;
+
         return config;
     }
 
@@ -45,5 +53,16 @@ export class ConfigService {
         }
 
         return config;
+    }
+
+    private _getCustomConfig(): AppConfig | null {
+        const configJson: string | null = localStorage.getItem('config');
+        if (!configJson) return null;
+        const config: AppConfig = JSON.parse(configJson);
+        return config;
+    }
+
+    private _setCustomConfig(): void {
+        localStorage.setItem('config', this.config);
     }
 }

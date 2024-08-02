@@ -17,10 +17,10 @@
                 },
                 {
                     "type": "ettdash-line-chart",
-                    "size": "square-small",
+                    "size": "column-small",
                     "is-fullwidth": false,
                     "input": {
-                        "x-unit": "m/s",
+                        "x-unit": "m/s2",
                         "y-unit": "date"
                     }
                 },

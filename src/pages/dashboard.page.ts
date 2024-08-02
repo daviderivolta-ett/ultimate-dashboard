@@ -2,7 +2,6 @@ import '../components/grid.component';
 import GridComponent from '../components/grid.component';
 import WidgetComponent from '../components/widget.component';
 import { AppConfig } from '../models/config.model';
-import { WidgetSize } from '../models/widget.model';
 import { ConfigService } from '../services/config.service';
 
 // Template
@@ -46,12 +45,17 @@ export default class DashboardPage extends HTMLElement {
     // Component callbacks
     public async connectedCallback(): Promise<void> {
         const config: AppConfig = await ConfigService.instance.getConfig();
-        console.log(config);        
-        this.render();
+        console.log(config);
+        this._render();
+        this._setup();
         this._fillGrid(config.widgets);
     }
 
-    private render(): void { }
+    private _render(): void { }
+
+    private _setup(): void {
+        this.addEventListener('grid-order-changed', this._getGridContent);
+    }
 
     // Methods
     private _fillGrid(widgets: any[]): void {
@@ -83,6 +87,45 @@ export default class DashboardPage extends HTMLElement {
         for (const key in input) {
             component.setAttribute(`${key}`, `${input[key]}`);
         }
+    }
+
+    private _getGridContent() {
+        const grid: GridComponent | null = this.shadowRoot.querySelector('app-grid');
+        if (!grid) return;
+
+        // const widgetNodes: NodeListOf<HTMLElement> = grid.querySelectorAll('*');
+        // const widgetsArray: HTMLElement[] = Array.from(widgetNodes);
+
+        // const widgetsData = widgetsArray.map((node: HTMLElement) => ({
+        //     tagName: node.tagName,
+        //     id: node.id,
+        //     classList: Array.from(node.classList),
+        //     attributes: Array.from(node.attributes).reduce((attrs: any, attr) => {
+        //         attrs[attr.name] = attr.value;
+        //         return attrs;
+        //     }, {})
+        // }));
+
+        // console.log(widgetsData);
+
+        const widgetNodes: HTMLElement[] = Array.from(grid.querySelectorAll('app-widget'));
+
+        const widgets = widgetNodes.map((node: HTMLElement) => ({
+            type: node.tagName,
+            size: node.getAttribute('size'),
+            'is-fullwidth': node.getAttribute('is-fullwidth'),
+            input: {}
+        }));
+
+        widgetNodes.forEach((node: HTMLElement) => {
+            const child: HTMLElement[] = Array.from(node.querySelectorAll('*'));
+            child.forEach((node: HTMLElement) => {
+                console.log(Array.from(node.attributes));
+            });            
+        });
+
+        console.log(widgets);
+
     }
 }
 
