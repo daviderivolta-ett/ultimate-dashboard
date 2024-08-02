@@ -66,6 +66,7 @@ export default class MapComponent extends HTMLElement {
 
         this._map.setZoom(this.zoom);
         this._map.setCenter(new LngLat(this.center[1], this.center[0]));
+        this._map.on('load', () => this._map.resize());
     }
 
     static observedAttributes: string[] = ['lat', 'lng', 'zoom'];
@@ -78,4 +79,4 @@ export default class MapComponent extends HTMLElement {
     }
 }
 
-customElements.define('app-map', MapComponent);
+customElements.define('ettdash-map', MapComponent);

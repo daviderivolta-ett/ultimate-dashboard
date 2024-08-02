@@ -1,4 +1,4 @@
-import { WidgetSize } from '../models/widget-size.model';
+import { WidgetSize } from '../models/widget.model';
 import RadioButton from './radio-btn.component';
 import RadioGroup from './radio-group.component';
 

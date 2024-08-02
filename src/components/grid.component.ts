@@ -146,6 +146,7 @@ export default class GridComponent extends HTMLElement {
     private _onDragStart(event: DragEvent): void {
         // console.log('Drag started');
         if (!(event.currentTarget instanceof HTMLElement)) return;
+        event.currentTarget.style.opacity = '.25';
         this.draggingElement = event.currentTarget.cloneNode(true) as HTMLElement;
 
         this.draggingElement.className = event.currentTarget.className;
@@ -186,6 +187,7 @@ export default class GridComponent extends HTMLElement {
         if (!(event.currentTarget instanceof HTMLElement)) return;
 
         event.currentTarget.removeAttribute('id');
+        event.currentTarget.removeAttribute('style');
         if (this.draggingElement) this.draggingElement = null;
 
         const dropzone: HTMLElement | null = this.querySelector('#dropzone');

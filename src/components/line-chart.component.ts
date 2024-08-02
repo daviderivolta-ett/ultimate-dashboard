@@ -81,13 +81,13 @@ export default class LineChart extends HTMLElement {
 
     // Methods
     private _drawChart(): void {
-        const container: HTMLDivElement | null = this.shadowRoot.querySelector('#line-chart');
+        const container: HTMLDivElement | null = this.shadowRoot.querySelector('#line-chart');       
         if (!container) return;
 
         container.innerHTML = '';
 
         const currentWidth: number = this._getContainerSize('line-chart', 'width');
-        const currentHeight: number = this._getContainerSize('line-chart', 'height');
+        const currentHeight: number = this._getContainerSize('line-chart', 'height');        
 
         const padding: number = 48;
 
@@ -184,6 +184,7 @@ export default class LineChart extends HTMLElement {
     }
 
     private _getContainerSize(id: string, size: string): number {
+        if (!d3.select(this.shadowRoot.querySelector(`#${id}`)).style(size)) return 0;        
         return parseInt(d3.select(this.shadowRoot.querySelector(`#${id}`)).style(size), 10);
     }
 
@@ -192,4 +193,4 @@ export default class LineChart extends HTMLElement {
     }
 }
 
-customElements.define('line-chart', LineChart);
+customElements.define('ettdash-line-chart', LineChart);

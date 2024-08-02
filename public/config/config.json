@@ -1,0 +1,74 @@
+{
+    "configs": [
+        {
+            "id": "standard",
+            "label": "Standard",
+            "icon": "",
+            "grid": [
+                {
+                    "type": "ettdash-map",
+                    "size": "square-large",
+                    "is-fullwidth": true,
+                    "input": {
+                        "lat": 44.407659397825526,
+                        "lng": 8.934664996596462,
+                        "zoom": 13
+                    }
+                },
+                {
+                    "type": "ettdash-line-chart",
+                    "size": "square-small",
+                    "is-fullwidth": false,
+                    "input": {
+                        "x-unit": "m/s",
+                        "y-unit": "date"
+                    }
+                },
+                {
+                    "type": "ettdash-line-chart",
+                    "size": "square-small",
+                    "is-fullwidth": false,
+                    "input": {
+                        "x-unit": "m/s",
+                        "y-unit": "date"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "full",
+            "label": "Full",
+            "icon": "",
+            "grid": [
+                {
+                    "type": "ettdash-map",
+                    "size": "square-small",
+                    "is-fullwidth": true,
+                    "input": {
+                        "lat": 43.116752956131826,
+                        "lng": 12.365259516889365,
+                        "zoom": 4
+                    }
+                },
+                {
+                    "type": "ettdash-line-chart",
+                    "size": "square-large",
+                    "is-fullwidth": false,
+                    "input": {
+                        "x-unit": "m/s",
+                        "y-unit": "date"
+                    }
+                },
+                {
+                    "type": "ettdash-line-chart",
+                    "size": "square-small",
+                    "is-fullwidth": false,
+                    "input": {
+                        "x-unit": "m/s",
+                        "y-unit": "date"
+                    }
+                }
+            ]
+        }
+    ]
+}
