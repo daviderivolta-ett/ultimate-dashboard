@@ -13,6 +13,9 @@ const style: HTMLStyleElement = document.createElement('style');
 style.innerHTML =
     `
     #line-chart {
+        position: absolute;
+        top: 0;
+        left: 0;
         height: 100%;
         width: 100%;
     }
@@ -58,7 +61,7 @@ export default class LineChart extends HTMLElement {
 
     public get yUnit(): string { return this._yUnit }
     public set yUnit(value: string) {
-        this._yUnit = value;
+        this._yUnit = value;  
         this._drawChart();
     }
 
@@ -81,7 +84,8 @@ export default class LineChart extends HTMLElement {
 
     // Methods
     private _drawChart(): void {
-        const container: HTMLDivElement | null = this.shadowRoot.querySelector('#line-chart');       
+        console.log('DRAW CHART');
+        const container: HTMLDivElement | null = this.shadowRoot.querySelector('#line-chart');        
         if (!container) return;
 
         container.innerHTML = '';
@@ -184,7 +188,7 @@ export default class LineChart extends HTMLElement {
     }
 
     private _getContainerSize(id: string, size: string): number {
-        if (!d3.select(this.shadowRoot.querySelector(`#${id}`)).style(size)) return 0;        
+        if (!d3.select(this.shadowRoot.querySelector(`#${id}`)).style(size)) return 0;
         return parseInt(d3.select(this.shadowRoot.querySelector(`#${id}`)).style(size), 10);
     }
 

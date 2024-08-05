@@ -192,8 +192,8 @@ export default class WidgetComponent extends HTMLElement {
         else this._createResizeController('desktop');
     }
 
-    private _handleWidgetResize(event: Event): void {
-        const e: CustomEvent = event as CustomEvent;
+    private _handleWidgetResize(event: Event): void {  
+        const e: CustomEvent = event as CustomEvent;           
         this.setAttribute('size', e.detail);
         event.stopPropagation();
     }

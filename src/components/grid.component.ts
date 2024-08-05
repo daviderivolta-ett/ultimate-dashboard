@@ -92,6 +92,7 @@ style.innerHTML =
 
 export default class GridComponent extends HTMLElement {
     public shadowRoot: ShadowRoot;
+    private _dragoverFixAdded: boolean = false;
     public draggingElement: HTMLElement | null = null;
 
     constructor() {
@@ -145,6 +146,7 @@ export default class GridComponent extends HTMLElement {
 
     private _onDragStart(event: DragEvent): void {
         console.log('Drag started');
+
         if (!(event.currentTarget instanceof HTMLElement)) return;
         event.currentTarget.style.opacity = '.25';
         this.draggingElement = event.currentTarget.cloneNode(true) as HTMLElement;
@@ -156,6 +158,7 @@ export default class GridComponent extends HTMLElement {
     }
 
     private _onDrag(event: DragEvent): void {
+        // console.log('Dragging...');
         if (!this.draggingElement) return;
 
         const slot: HTMLSlotElement | null = this.shadowRoot.querySelector('slot');
@@ -165,20 +168,21 @@ export default class GridComponent extends HTMLElement {
         if (!dropzone) {
             dropzone = document.createElement('div');
             dropzone.id = 'dropzone';
-
-            for (const cssClass of Array.from(this.draggingElement.classList)) dropzone.classList.add(cssClass);
-
             dropzone.classList.add('dropzone');
             dropzone.addEventListener('dragover', this._onDragOver.bind(this));
             dropzone.addEventListener('drop', this._onDrop.bind(this));
         }
 
-        const underneathElement: HTMLElement | null = this._getUnderneathElement(slot, event.clientX, event.clientY);
+        dropzone.className = 'dropzone';
+        for (const cssClass of Array.from(this.draggingElement.classList)) dropzone.classList.add(cssClass);
 
-        if (underneathElement && underneathElement !== dropzone) {
-            this.insertBefore(dropzone, underneathElement);
-        } else if (!underneathElement) {
-            this.appendChild(dropzone);
+        if (event.clientX || event.clientY) {
+            this._handleDropzonePosition(slot, dropzone, event.clientX, event.clientY);
+        } else {            
+            if (!this._dragoverFixAdded) {
+                this._dragoverFixAdded = true;
+                window.addEventListener('dragover', (event: DragEvent) => this._handleDropzonePosition(slot, dropzone!, event.clientX, event.clientY));
+            }
         }
     }
 
@@ -198,8 +202,9 @@ export default class GridComponent extends HTMLElement {
     }
 
     private _onDragOver(event: DragEvent): void {
+        console.log('Drag over');
         event.preventDefault();
-        // console.log('Drag over');
+        event.stopPropagation();
     }
 
     private _onDrop(): void {
@@ -222,6 +227,15 @@ export default class GridComponent extends HTMLElement {
         }
 
         return null;
+    }
+
+    private _handleDropzonePosition(slot: HTMLSlotElement, dropzone: HTMLElement, x: number, y: number): void {
+        const underneathElement: HTMLElement | null = this._getUnderneathElement(slot, x, y);
+        if (underneathElement && underneathElement !== dropzone) {
+            this.insertBefore(dropzone, underneathElement);
+        } else if (!underneathElement) {
+            this.appendChild(dropzone);
+        }
     }
 }
 

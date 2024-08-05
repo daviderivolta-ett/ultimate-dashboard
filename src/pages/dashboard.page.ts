@@ -45,8 +45,7 @@ export default class DashboardPage extends HTMLElement {
 
     // Component callbacks
     public async connectedCallback(): Promise<void> {
-        const config: AppConfig = await ConfigService.instance.getConfig();
-        this._render();
+        const config: AppConfig = await ConfigService.instance.getConfig('minimal');
         this._setup();
         this._fillGrid(config.widgets);
     }
@@ -54,8 +53,6 @@ export default class DashboardPage extends HTMLElement {
     public disconnectedCallback(): void {
         clearInterval(this._configAutosave);
     }
-
-    private _render(): void { }
 
     private _setup(): void {
         this._configAutosave = setInterval(this._handleGridChange.bind(this), 5000);

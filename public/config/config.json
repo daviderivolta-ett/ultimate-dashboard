@@ -76,13 +76,11 @@
             "icon": "",
             "grid": [
                 {
-                    "type": "ettdash-map",
-                    "size": "square-small",
-                    "is-fullwidth": true,
+                    "type": "ettdash-line-chart",
+                    "size": "square-large",
+                    "is-fullwidth": false,
                     "input": {
-                        "lat": 43.116752956131826,
-                        "lng": 12.365259516889365,
-                        "zoom": 4
+                        "x-unit": "m/s"
                     }
                 }
             ]
