@@ -21,7 +21,7 @@
                     "is-fullwidth": false,
                     "input": {
                         "x-unit": "m/s2",
-                        "y-unit": "date"
+                        "y-unit": "Date"
                     }
                 },
                 {
@@ -30,7 +30,7 @@
                     "is-fullwidth": false,
                     "input": {
                         "x-unit": "m/s",
-                        "y-unit": "date"
+                        "y-unit": "Date"
                     }
                 }
             ]
@@ -56,7 +56,7 @@
                     "is-fullwidth": false,
                     "input": {
                         "x-unit": "m/s",
-                        "y-unit": "date"
+                        "y-unit": "Date"
                     }
                 },
                 {
@@ -65,7 +65,7 @@
                     "is-fullwidth": false,
                     "input": {
                         "x-unit": "m/s",
-                        "y-unit": "date"
+                        "y-unit": "Date"
                     }
                 }
             ]
@@ -80,7 +80,8 @@
                     "size": "square-large",
                     "is-fullwidth": false,
                     "input": {
-                        "x-unit": "m/s"
+                        "x-unit": "m/s",
+                        "y-unit": "Date"
                     }
                 }
             ]

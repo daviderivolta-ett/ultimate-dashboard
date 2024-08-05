@@ -62,7 +62,7 @@ export default class LineChart extends HTMLElement {
 
     public get yUnit(): string { return this._yUnit }
     public set yUnit(value: string) {
-        this._yUnit = value;  
+        this._yUnit = value;
         this._drawChart();
     }
 
@@ -85,13 +85,13 @@ export default class LineChart extends HTMLElement {
 
     // Methods
     private _drawChart(): void {
-        const container: HTMLDivElement | null = this.shadowRoot.querySelector('#line-chart');        
+        const container: HTMLDivElement | null = this.shadowRoot.querySelector('#line-chart');
         if (!container) return;
 
         container.innerHTML = '';
 
         const currentWidth: number = this._getContainerSize('line-chart', 'width');
-        const currentHeight: number = this._getContainerSize('line-chart', 'height');        
+        const currentHeight: number = this._getContainerSize('line-chart', 'height');
 
         const padding: number = 48;
 
@@ -118,11 +118,19 @@ export default class LineChart extends HTMLElement {
         // x axis
         const xAxis = svg.append('g')
             .attr('transform', 'translate(0,' + (currentHeight - padding) + ')')
-            .call(d3.axisBottom(xScale).ticks(2))
+            .call(d3.axisBottom(xScale).ticks(currentWidth / 50))
+
+        xAxis.selectAll('text')
+            .style('font-size', '.6rem')
+            .style('font-family', 'Inter')
 
         xAxis.selectAll('.tick')
             .filter((d, i) => i === 0)
             .style('display', 'none')
+
+        xAxis.selectAll('.tick')
+            .filter((d, i, nodes) => i === nodes.length - 1)
+            .remove();
 
         xAxis.selectAll('.tick')
             .select('line')
@@ -134,11 +142,15 @@ export default class LineChart extends HTMLElement {
         // y axis
         const yAxis = svg.append('g')
             .attr('transform', 'translate(' + padding + ', 0)')
-            .call(d3.axisLeft(yScale))
+            .call(d3.axisLeft(yScale).ticks(currentWidth / 50))
 
-        // yAxis.selectAll('.tick')
-        //     .filter((d, i) => i === 0)
-        //     .style('display', 'none')
+        yAxis.selectAll('text')
+            .style('font-size', '.6rem')
+            .style('font-family', 'Inter')
+
+        yAxis.selectAll('.tick')
+            .filter((d, i, nodes) => i === nodes.length - 1)
+            .remove();
 
         yAxis.selectAll('.tick')
             .select('line')
@@ -147,25 +159,23 @@ export default class LineChart extends HTMLElement {
         yAxis.select('.domain')
             .style('display', 'none')
 
-        // y uom
-        svg.append('text')
-            .attr('class', 'y-unit')
-            .attr('x', padding)
-            .attr('y', currentHeight / 2)
-            .attr('transform-origin', `${padding / 2} ${currentHeight / 2}`)
-            .attr('transform', 'rotate(-90)')
-            .attr('text-anchor', 'middle')
-            .style('font-size', '10px')
-            .text(this.yUnit);
-
         // x uom
         svg.append('text')
             .attr('class', 'x-unit')
-            .attr('x', currentWidth / 2)
-            .attr('y', currentHeight - padding / 4)
-            .attr('text-anchor', 'middle')
-            .style('font-size', '10px')
-            .text(this.xUnit);
+            .attr('x', currentWidth - padding - 10)
+            .attr('y', currentHeight - padding + 15)
+            .style('font-size', '.6rem')
+            .style('text-anchor', 'start')
+            .text(this.xUnit)
+
+        // y uom
+        svg.append('text')
+            .attr('class', 'y-unit')
+            .attr('x', padding / 2)
+            .attr('y', padding)
+            .style('font-size', '.6rem')
+            .style('text-anchor', 'start')
+            .text(this.yUnit)
 
         // horizontal grid
         svg.append('g')
