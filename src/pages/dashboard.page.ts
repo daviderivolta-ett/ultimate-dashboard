@@ -45,7 +45,7 @@ export default class DashboardPage extends HTMLElement {
 
     // Component callbacks
     public async connectedCallback(): Promise<void> {
-        const config: AppConfig = await ConfigService.instance.getConfig('minimal');
+        const config: AppConfig = await ConfigService.instance.getConfig();
         this._render();
         this._setup();
         this._fillGrid(config.widgets);

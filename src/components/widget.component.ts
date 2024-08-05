@@ -154,23 +154,10 @@ export default class WidgetComponent extends HTMLElement {
         if (!radioGroup) return;
         radioGroup.innerHTML = '';
 
-        let validSizes: string[] = [];
-
-        switch (media) {
-            case 'tablet':
-                validSizes = ['square-small', 'square-large', 'column-small', 'column-large'];
-                break;
-
-            case 'mobile':
-                validSizes = ['square-small', 'column-small'];
-                break;
-
-            default:
-                validSizes = Object.values(WidgetSize);
-                break;
-        }
+        let validSizes: string[] = this._getValidSizes(media);
 
         if (!validSizes.includes(this.size)) this.size = WidgetSize.SquareSm;
+        
         validSizes.forEach((size: string) => {
             const radioButton: RadioButton = new RadioButton();
             radioButton.iconUrl = `/icons/${size}.svg#${size}`;
@@ -183,6 +170,21 @@ export default class WidgetComponent extends HTMLElement {
         });
     }
 
+    private _getValidSizes(media: 'desktop' | 'tablet' | 'mobile' = 'desktop'): string[] {
+        let validSizes: string[] = [];
+        switch (media) {
+            case 'tablet':
+                validSizes = ['square-small', 'square-large', 'column-small', 'column-large'];
+                break;
+            case 'mobile':
+                validSizes = ['square-small', 'column-small'];
+                break;
+            default:
+                validSizes = Object.values(WidgetSize);
+                break;
+        }
+        return validSizes;
+    }
 
     private _handleWindowResize(): void {
         if (window.innerWidth < 576) this._createResizeController('mobile');
