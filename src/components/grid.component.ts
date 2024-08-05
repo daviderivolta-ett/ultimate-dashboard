@@ -211,8 +211,6 @@ export default class GridComponent extends HTMLElement {
             this.replaceChild(originalElement, dropzone);
             this.draggingElement = null;
         }
-
-        this.dispatchEvent(new CustomEvent('grid-order-changed', { bubbles: true, composed: true }));
     }
 
     private _getUnderneathElement(container: HTMLSlotElement, x: number, y: number): HTMLElement | null {

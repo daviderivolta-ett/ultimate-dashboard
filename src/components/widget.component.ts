@@ -163,7 +163,7 @@ export default class WidgetComponent extends HTMLElement {
 
     private _handleWidgetResize(event: Event) {            
         const e: CustomEvent = event as CustomEvent;
-        this.size = e.detail;
+        this.setAttribute('size', e.detail);
         event.stopPropagation();
     }
 

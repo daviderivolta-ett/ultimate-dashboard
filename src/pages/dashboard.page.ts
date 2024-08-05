@@ -30,6 +30,7 @@ style.innerHTML =
 export default class DashboardPage extends HTMLElement {
     public shadowRoot: ShadowRoot;
     private _config: AppConfig = new AppConfig();
+    private _configAutosave: number = 0;
 
     constructor() {
         super();
@@ -45,16 +46,19 @@ export default class DashboardPage extends HTMLElement {
     // Component callbacks
     public async connectedCallback(): Promise<void> {
         const config: AppConfig = await ConfigService.instance.getConfig();
-        console.log(config);
         this._render();
         this._setup();
         this._fillGrid(config.widgets);
     }
 
+    public disconnectedCallback(): void {
+        clearInterval(this._configAutosave);
+    }
+
     private _render(): void { }
 
     private _setup(): void {
-        this.addEventListener('grid-order-changed', this._getGridContent);
+        this._configAutosave = setInterval(this._handleGridChange.bind(this), 5000);
     }
 
     // Methods
@@ -71,8 +75,9 @@ export default class DashboardPage extends HTMLElement {
                 component.setAttribute('slot', 'content');
                 if (widget['input']) this._setComponentAttribute(component, widget.input);
                 w.appendChild(component);
-                grid.appendChild(w);
             }
+
+            grid.appendChild(w);
         });
     }
 
@@ -89,43 +94,45 @@ export default class DashboardPage extends HTMLElement {
         }
     }
 
-    private _getGridContent() {
+    private _getGridContent(): any[] {
         const grid: GridComponent | null = this.shadowRoot.querySelector('app-grid');
-        if (!grid) return;
-
-        // const widgetNodes: NodeListOf<HTMLElement> = grid.querySelectorAll('*');
-        // const widgetsArray: HTMLElement[] = Array.from(widgetNodes);
-
-        // const widgetsData = widgetsArray.map((node: HTMLElement) => ({
-        //     tagName: node.tagName,
-        //     id: node.id,
-        //     classList: Array.from(node.classList),
-        //     attributes: Array.from(node.attributes).reduce((attrs: any, attr) => {
-        //         attrs[attr.name] = attr.value;
-        //         return attrs;
-        //     }, {})
-        // }));
-
-        // console.log(widgetsData);
+        if (!grid) return [];
 
         const widgetNodes: HTMLElement[] = Array.from(grid.querySelectorAll('app-widget'));
 
-        const widgets = widgetNodes.map((node: HTMLElement) => ({
-            type: node.tagName,
-            size: node.getAttribute('size'),
-            'is-fullwidth': node.getAttribute('is-fullwidth'),
-            input: {}
-        }));
-
-        widgetNodes.forEach((node: HTMLElement) => {
+        const widgets: any[] = widgetNodes.map((node: HTMLElement) => {
+            const widget: any = {
+                type: '',
+                size: node.getAttribute('size'),
+                'is-fullwidth': node.getAttribute('is-fullwidth'),
+                input: {}
+            }
             const child: HTMLElement[] = Array.from(node.querySelectorAll('*'));
             child.forEach((node: HTMLElement) => {
-                console.log(Array.from(node.attributes));
-            });            
+                widget.type = node.tagName;
+                const attributes: Attr[] = Array.from(node.attributes).filter((attr: Attr) => attr.name !== 'slot');
+                const input: { [key: string]: string } = attributes.reduce((acc, attr) => {
+                    acc[attr.name] = attr.value;
+                    return acc;
+                }, {} as { [key: string]: string });
+
+                widget.input = input;
+            });
+            return widget;
         });
 
-        console.log(widgets);
+        return widgets;
+    }
 
+    private _handleGridChange(): void {
+        const widgets: any[] = this._getGridContent();
+        const config = new AppConfig();
+        config.id = 'custom';
+        config.label = 'Custom';
+        config.widgets = [...widgets];
+        ConfigService.instance.config = config;
+        localStorage.setItem('config', JSON.stringify(config));
+        console.log('Grid saved');        
     }
 }
 
