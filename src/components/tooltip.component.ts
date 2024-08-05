@@ -96,6 +96,7 @@ export default class TooltipComponent extends HTMLElement {
     }
 
     private _toggleVisibility = (): void => {
+        console.log('toggle');        
         this.isVisible = !this.isVisible;       
     }
 }

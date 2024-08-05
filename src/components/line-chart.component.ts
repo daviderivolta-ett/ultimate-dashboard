@@ -14,6 +14,7 @@ style.innerHTML =
     `
     #line-chart {
         position: absolute;
+        pointer-events: none;
         top: 0;
         left: 0;
         height: 100%;
@@ -84,7 +85,6 @@ export default class LineChart extends HTMLElement {
 
     // Methods
     private _drawChart(): void {
-        console.log('DRAW CHART');
         const container: HTMLDivElement | null = this.shadowRoot.querySelector('#line-chart');        
         if (!container) return;
 
