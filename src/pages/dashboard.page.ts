@@ -45,7 +45,7 @@ export default class DashboardPage extends HTMLElement {
 
     // Component callbacks
     public async connectedCallback(): Promise<void> {
-        const config: AppConfig = await ConfigService.instance.getConfig();
+        const config: AppConfig = await ConfigService.instance.getConfig('minimal');
         this._render();
         this._setup();
         this._fillGrid(config.widgets);
@@ -130,9 +130,7 @@ export default class DashboardPage extends HTMLElement {
         config.id = 'custom';
         config.label = 'Custom';
         config.widgets = [...widgets];
-        ConfigService.instance.config = config;
-        localStorage.setItem('config', JSON.stringify(config));
-        console.log('Grid saved');        
+        ConfigService.instance.config = config;      
     }
 }
 

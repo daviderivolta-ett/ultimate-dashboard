@@ -22,7 +22,7 @@ style.innerHTML =
 // Component
 export default class LineChart extends HTMLElement {
     public shadowRoot: ShadowRoot;
-    private resizeObserver: ResizeObserver;
+    private _resizeObserver: ResizeObserver;
     private _yUnit: string = '';
     private _xUnit: string = '';
 
@@ -47,7 +47,7 @@ export default class LineChart extends HTMLElement {
         this.shadowRoot.appendChild(template.content.cloneNode(true));
         this.shadowRoot.appendChild(style.cloneNode(true));
 
-        this.resizeObserver = new ResizeObserver(() => this._drawChart());
+        this._resizeObserver = new ResizeObserver(() => this._drawChart());
     }
 
     public get xUnit(): string { return this._xUnit }
@@ -65,7 +65,7 @@ export default class LineChart extends HTMLElement {
     // Component callbacks
     public connectedCallback(): void {
         const container: HTMLDivElement | null = this.shadowRoot.querySelector('#line-chart');
-        if (container) this.resizeObserver.observe(container);
+        if (container) this._resizeObserver.observe(container);
     }
 
     static observedAttributes: string[] = ['x-unit', 'y-unit'];
@@ -76,7 +76,7 @@ export default class LineChart extends HTMLElement {
 
     public disconnectedCallback(): void {
         const container: HTMLDivElement | null = this.shadowRoot.querySelector('#line-chart');
-        if (container) this.resizeObserver.unobserve(container);
+        if (container) this._resizeObserver.unobserve(container);
     }
 
     // Methods

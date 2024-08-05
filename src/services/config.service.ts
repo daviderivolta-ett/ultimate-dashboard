@@ -3,7 +3,7 @@ import { AppConfig } from '../models/config.model';
 export class ConfigService {
     private CONFIG_URL: string = './config/config.json';
     private static _instance: ConfigService;
-    private _data: any;
+    private _config: any;
 
     constructor() {
         if (ConfigService._instance) return ConfigService._instance;
@@ -16,11 +16,12 @@ export class ConfigService {
     }
 
     public get config(): any {
-        return this._data;
+        return this._config;
     }
 
     public set config(value: any) {
-        this._data = value;
+        this._config = value;
+        this._setCustomConfig(value);
     }
 
     public async getConfig(id: string = 'standard'): Promise<AppConfig> {
@@ -28,13 +29,13 @@ export class ConfigService {
 
         const customConfig: AppConfig | null = this._getCustomConfig();
         if (customConfig) {
-            this.config = customConfig;
+            this._config = customConfig;
             return customConfig;
         }
 
         const data: any = await fetch(this.CONFIG_URL).then((res: Response) => res.json());
         const config: AppConfig = this._parseConfig(data, id);
-        this.config = config;
+        this._config = config;
 
         return config;
     }
@@ -62,7 +63,7 @@ export class ConfigService {
         return config;
     }
 
-    private _setCustomConfig(): void {
-        localStorage.setItem('config', this.config);
+    private _setCustomConfig(config: AppConfig): void {
+        localStorage.setItem('config', JSON.stringify(config));
     }
 }

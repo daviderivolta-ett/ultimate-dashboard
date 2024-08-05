@@ -104,6 +104,7 @@ export default class WidgetComponent extends HTMLElement {
 
         this.shadowRoot.appendChild(template.content.cloneNode(true));
         this.shadowRoot.appendChild(style.cloneNode(true));
+
     }
 
     public get size(): WidgetSize { return this._size }
@@ -123,6 +124,8 @@ export default class WidgetComponent extends HTMLElement {
     public connectedCallback(): void {
         this._render();
         this._setup();
+
+        window.addEventListener('resize', this._handleWindowResize.bind(this));
     }
 
     static observedAttributes: string[] = ['size', 'is-fullwidth'];
@@ -137,31 +140,57 @@ export default class WidgetComponent extends HTMLElement {
     }
 
     private _render(): void {
-        this._createResizeController();
+        this._handleWindowResize();
     }
 
     private _setup(): void {
-        this.addEventListener('size-change', this._handleWidgetResize.bind(this));        
+        this.addEventListener('size-change', this._handleWidgetResize.bind(this));
         this._handleSlots();
     }
 
     // Methods
-    private _createResizeController(): void {
+    private _createResizeController(media: 'desktop' | 'tablet' | 'mobile' = 'desktop'): void {
         const radioGroup: RadioGroup | null = this.shadowRoot.querySelector('radio-group');
         if (!radioGroup) return;
         radioGroup.innerHTML = '';
 
-        Object.values(WidgetSize).forEach((size: string) => {
+        let validSizes: string[] = [];
+
+        switch (media) {
+            case 'tablet':
+                validSizes = ['square-small', 'square-large', 'column-small', 'column-large'];
+                break;
+
+            case 'mobile':
+                validSizes = ['square-small', 'column-small'];
+                break;
+
+            default:
+                validSizes = Object.values(WidgetSize);
+                break;
+        }
+
+        if (!validSizes.includes(this.size)) this.size = WidgetSize.SquareSm;
+        validSizes.forEach((size: string) => {
             const radioButton: RadioButton = new RadioButton();
+            radioButton.iconUrl = `/icons/${size}.svg#${size}`;
+
             radioButton.value = size;
             radioButton.name = size;
-            radioButton.iconUrl = `/icons/${size}.svg#${size}`;
+
             radioGroup.appendChild(radioButton);
             if (size === this.size) radioButton.checked = true;
         });
     }
 
-    private _handleWidgetResize(event: Event) {            
+
+    private _handleWindowResize(): void {
+        if (window.innerWidth < 576) this._createResizeController('mobile');
+        else if (window.innerWidth < 768 && window.innerWidth > 576) this._createResizeController('tablet');
+        else this._createResizeController('desktop');
+    }
+
+    private _handleWidgetResize(event: Event): void {
         const e: CustomEvent = event as CustomEvent;
         this.setAttribute('size', e.detail);
         event.stopPropagation();

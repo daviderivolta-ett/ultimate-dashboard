@@ -69,6 +69,23 @@
                     }
                 }
             ]
+        },
+        {
+            "id": "minimal",
+            "label": "Minimal",
+            "icon": "",
+            "grid": [
+                {
+                    "type": "ettdash-map",
+                    "size": "square-small",
+                    "is-fullwidth": true,
+                    "input": {
+                        "lat": 43.116752956131826,
+                        "lng": 12.365259516889365,
+                        "zoom": 4
+                    }
+                }
+            ]
         }
     ]
 }
