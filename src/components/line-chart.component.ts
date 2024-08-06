@@ -227,7 +227,7 @@ export default class LineChart extends HTMLElement {
                     .text(`${this.xUnit}: ${d[0]}, ${this.yUnit}: ${d[1]}`)
             })
             .on('mouseout', function () {
-                d3.select('#d3-tooltip').style('opacity', 0)
+                d3.select('#d3-tooltip').style('opacity', 0).style('display', 'none')
             })
 
         // tooltip

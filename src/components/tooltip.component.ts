@@ -64,7 +64,7 @@ export default class TooltipComponent extends HTMLElement {
     }
 
     private _setup(): void {
-        const parentElement: HTMLElement | null = this._getParentElement();             
+        const parentElement: HTMLElement | null = this._getParentElement();
         if (parentElement) this._addEventListeners(parentElement);
     }
 
@@ -86,19 +86,23 @@ export default class TooltipComponent extends HTMLElement {
     }
 
     private _addEventListeners(element: HTMLElement): void {
-        element.addEventListener('mouseenter', this._toggleVisibility);
-        element.addEventListener('mouseleave', this._toggleVisibility);
+        element.addEventListener('mouseover', this._toggleVisibilityOn);
+        element.addEventListener('mouseout', this._toggleVisibilityOff);
     }
 
     private _removeEventListeners(element: HTMLElement): void {
-        element.removeEventListener('mouseenter', this._toggleVisibility);
-        element.removeEventListener('mouseleave', this._toggleVisibility);
+        element.removeEventListener('mouseover', this._toggleVisibilityOn);
+        element.removeEventListener('mouseout', this._toggleVisibilityOff);
     }
 
-    private _toggleVisibility = (): void => {   
-        this.isVisible = !this.isVisible;    
-        console.log('Toogle tooltip');           
+    private _toggleVisibilityOn = (): void => {
+        this.isVisible = true;
     }
+
+    private _toggleVisibilityOff = (): void => {
+        this.isVisible = false;
+    }
+
 }
 
 customElements.define('app-tooltip', TooltipComponent);
