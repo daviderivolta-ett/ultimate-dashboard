@@ -29,6 +29,7 @@ style.innerHTML =
 export default class LineChart extends HTMLElement {
     public shadowRoot: ShadowRoot;
     private _resizeObserver: ResizeObserver;
+    private _showLabel: boolean = false;
     private _yUnit: string = '';
     private _xUnit: string = '';
 
@@ -57,6 +58,16 @@ export default class LineChart extends HTMLElement {
                 [40, 60],
                 [50, 70]
             ]
+        },
+        {
+            label: 'Topolino',
+            dataset: [
+                [80, 45],
+                [40, 65],
+                [100, 70],
+                [70, 70],
+                [30, 50]
+            ]
         }
     ]
 
@@ -68,6 +79,12 @@ export default class LineChart extends HTMLElement {
         this.shadowRoot.appendChild(style.cloneNode(true));
 
         this._resizeObserver = new ResizeObserver(() => this._drawChart());
+    }
+
+    public get showLabel(): boolean { return this._showLabel }
+    public set showLabel(value: boolean) {
+        this._showLabel = value;
+        this._drawChart();
     }
 
     public get xUnit(): string { return this._xUnit }
@@ -94,10 +111,13 @@ export default class LineChart extends HTMLElement {
         if (container) this._resizeObserver.observe(container);
     }
 
-    static observedAttributes: string[] = ['x-unit', 'y-unit'];
+    static observedAttributes: string[] = ['x-unit', 'y-unit', 'show-label'];
     public attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
         if (name === 'x-unit') this.xUnit = newValue;
         if (name === 'y-unit') this.yUnit = newValue;
+        if (name === 'show-label' && (newValue === 'true' || newValue === 'false')) {
+            newValue === 'true' ? this.showLabel = true : this.showLabel = false;
+        }
     }
 
     public disconnectedCallback(): void {
@@ -209,12 +229,14 @@ export default class LineChart extends HTMLElement {
             .attr('x2', currentWidth - padding)
             .attr('stroke', 'var(--chart-line-color)')
 
+
         const legends = svg.append('g')
             .attr('class', 'legends')
             .attr('transform', `translate(${currentWidth / 2}, ${padding / 3})`)
 
         let xOffset: number = 0;
         let totalWidth: number = 0;
+
 
         const colorScale: d3.ScaleOrdinal<string, string> = d3.scaleOrdinal(d3.schemeCategory10);
         this.data.forEach((dataset: LineChartDataset, i: number) => {
@@ -283,27 +305,29 @@ export default class LineChart extends HTMLElement {
             }
 
             // legend
-            const legend = legends.append('g')
-                .attr('class', 'legend')
-                .attr('transform', `translate(${xOffset}, 0)`)
+            if (this.showLabel) {
+                const legend = legends.append('g')
+                    .attr('class', 'legend')
+                    .attr('transform', `translate(${xOffset}, 0)`)
 
-            legend.append('rect')
-                .attr('x', -32)
-                .attr('y', -7)
-                .attr('height', '12px')
-                .attr('width', '24px')
-                .attr('fill', color)
+                legend.append('rect')
+                    .attr('x', -32)
+                    .attr('y', -7)
+                    .attr('height', '12px')
+                    .attr('width', '24px')
+                    .attr('fill', color)
 
-            legend.append('text')
-                .attr('x', 0)
-                .attr('y', 0)
-                .style('text-anchor', 'start')
-                .style('font-size', '.8rem')
-                .attr('dominant-baseline', 'middle')
-                .text(dataset.label)
+                legend.append('text')
+                    .attr('x', 0)
+                    .attr('y', 0)
+                    .style('text-anchor', 'start')
+                    .style('font-size', '.8rem')
+                    .attr('dominant-baseline', 'middle')
+                    .text(dataset.label)
 
-            xOffset += textWidth + 64;
-            totalWidth = xOffset;
+                xOffset += textWidth + 64;
+                totalWidth = xOffset;
+            }
         });
 
         legends.attr('transform', `translate(${currentWidth / 2 - totalWidth / 4}, ${padding / 3})`);
