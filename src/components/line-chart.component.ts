@@ -1,5 +1,10 @@
 import * as d3 from 'd3';
 
+type LineChartDataset = {
+    label: string,
+    dataset: number[][]
+}
+
 // Template
 const template: HTMLTemplateElement = document.createElement('template');
 template.innerHTML =
@@ -27,19 +32,33 @@ export default class LineChart extends HTMLElement {
     private _yUnit: string = '';
     private _xUnit: string = '';
 
-    public data: number[][] = [
-        [50, 78],
-        [109, 280],
-        [310, 120],
-        [105, 411],
-        [420, 220],
-        [233, 145],
-        [333, 96],
-        [222, 333],
-        [150, 320],
-        [21, 123],
-        [210, 500]
-    ];
+    private _data: LineChartDataset[] = [
+        {
+            label: 'Example label',
+            dataset: [
+                [10, 20],
+                [20, 35],
+                [30, 25],
+                [40, 50],
+                [50, 60],
+                [60, 45],
+                [70, 70],
+                [80, 55],
+                [90, 80],
+                [100, 90]
+            ]
+        },
+        {
+            label: 'Pippo',
+            dataset: [
+                [10, 30],
+                [20, 45],
+                [30, 35],
+                [40, 60],
+                [50, 70]
+            ]
+        }
+    ]
 
     constructor() {
         super();
@@ -60,6 +79,12 @@ export default class LineChart extends HTMLElement {
     public get yUnit(): string { return this._yUnit }
     public set yUnit(value: string) {
         this._yUnit = value;
+        this._drawChart();
+    }
+
+    public get data(): LineChartDataset[] { return this._data }
+    public set data(value: LineChartDataset[]) {
+        this._data = value;
         this._drawChart();
     }
 
@@ -89,24 +114,29 @@ export default class LineChart extends HTMLElement {
 
         const currentWidth: number = this._getContainerSize('line-chart', 'width');
         const currentHeight: number = this._getContainerSize('line-chart', 'height');
-
         const padding: number = 24;
 
-        this._sortDataset(this.data);
+        this._sortDatasets(this.data);
+
+        // scale
+        const data: number[][] = this.data.flatMap((d: LineChartDataset) => d.dataset);
 
         const xScale = d3.scaleLinear()
-            .domain([d3.min(this.data, (d: number[]) => d[0] ?? 0)!, d3.max(this.data, (d: number[]) => d[0] ?? 0)!])
+            .domain([d3.min(data, (d: number[]) => d[0] ?? 0)!, d3.max(data, (d: number[]) => d[0] ?? 0)!])
             .range([padding, currentWidth - padding])
 
         const yScale = d3.scaleLinear()
-            .domain([0, d3.max(this.data, (d: number[]) => d[1] ?? 0)!])
+            .domain([0, d3.max(data, (d: number[]) => d[1] ?? 0)!])
             .range([currentHeight - padding, padding])
 
-        const line = d3.line<number[]>()
-            .curve(d3.curveCardinal)
-            .x(d => xScale(d[0]))
-            .y(d => yScale(d[1]))
+        // line
+        // const line = d3.line<number[]>()
+        //     .curve(d3.curveCardinal)
+        //     .x(d => xScale(d[0]))
+        //     .y(d => yScale(d[1]))
 
+
+        // svg
         const svg = d3.select(this.shadowRoot.querySelector('#line-chart'))
             .append('svg')
             .attr('width', currentWidth)
@@ -128,13 +158,6 @@ export default class LineChart extends HTMLElement {
         xAxis.selectAll('.tick')
             .filter((d, i, nodes) => i === nodes.length - 1)
             .remove();
-
-        // xAxis.selectAll('.tick')
-        //     .select('line')
-        //     .style('display', 'none')
-
-        // xAxis.select('.domain')
-        //     .style('display', 'none')
 
         // y axis
         const yAxis = svg.append('g')
@@ -162,7 +185,7 @@ export default class LineChart extends HTMLElement {
             .attr('x', currentWidth - padding)
             .attr('y', currentHeight - padding + 15)
             .style('font-size', '.6rem')
-            .style('text-anchor', 'end')
+            .style('text-anchor', 'middle')
             .text(this.xUnit)
 
         // y uom
@@ -186,57 +209,105 @@ export default class LineChart extends HTMLElement {
             .attr('x2', currentWidth - padding)
             .attr('stroke', 'var(--chart-line-color)')
 
-        // area
-        svg.append('path')
-            .datum(this.data)
-            .attr('fill', 'var(--data-purple-color)')
-            .attr('fill-opacity', '.4')
-            .attr('stroke', 'none')
-            .attr('d', d3.area<number[]>()
+        const legends = svg.append('g')
+            .attr('class', 'legends')
+            .attr('transform', `translate(${currentWidth / 2}, ${padding / 3})`)
+
+        let xOffset: number = 0;
+        let totalWidth: number = 0;
+
+        const colorScale: d3.ScaleOrdinal<string, string> = d3.scaleOrdinal(d3.schemeCategory10);
+        this.data.forEach((dataset: LineChartDataset, i: number) => {
+            const color: string = colorScale(i.toString());
+            const textWidth = this._getTextWidth(dataset.label, '.8rem');
+
+            // area
+            // svg.append('path')
+            //     .datum(dataset.dataset)
+            //     .attr('fill', color)
+            //     .attr('fill-opacity', '.4')
+            //     .attr('stroke', 'none')
+            //     .attr('d', d3.area<number[]>()
+            //         .curve(d3.curveCardinal)
+            //         .x(d => xScale(d[0]))
+            //         .y0(currentHeight - padding)
+            //         .y1(d => yScale(d[1]))
+            //     );
+
+            // line
+            const line = d3.line<number[]>()
                 .curve(d3.curveCardinal)
                 .x(d => xScale(d[0]))
-                .y0(currentHeight - padding)
-                .y1(d => yScale(d[1]))
-            );
+                .y(d => yScale(d[1]));
 
-        // line
-        svg.append('path')
-            .attr('fill', 'none')
-            .attr('stroke', 'var(--data-purple-color)')
-            .attr('stroke-width', 2)
-            .attr('d', line(this.data));
+            svg.append('path')
+                .attr('fill', 'none')
+                .attr('stroke', color)
+                .attr('stroke-width', 2)
+                .attr('d', line(dataset.dataset));
 
-        // points        
-        svg.selectAll('points')
-            .data(this.data)
-            .enter()
-            .append('circle')
-            .attr('fill', 'var(--data-purple-color)')
-            .attr('stroke', 'none')
-            .attr('cx', d => xScale(d[0]))
-            .attr('cy', d => yScale(d[1]))
-            .attr('r', 3)
-            .style('cursor', 'pointer')
-            .on('mouseover', (event, d) => {
-                d3.select('#d3-tooltip')
-                    .transition().duration(200)
-                    .style('opacity', 1)
-                    .style('display', 'block')
-                    .style('left', event.pageX + 8 + 'px')
-                    .style('top', event.pageY + 8 + 'px')
-                    .text(`${this.xUnit}: ${d[0]}, ${this.yUnit}: ${d[1]}`)
-            })
-            .on('mouseout', function () {
-                d3.select('#d3-tooltip').style('opacity', 0).style('display', 'none')
-            })
+            // points
+            const points = svg.append('g')
+                .attr('class', 'points-group')
+                .selectAll('points')
+                .data(dataset.dataset)
+                .enter()
+                .append('circle')
+                .attr('fill', color)
+                .attr('stroke', 'none')
+                .attr('cx', d => xScale(d[0]))
+                .attr('cy', d => yScale(d[1]))
+                .attr('r', 3)
+                .style('cursor', 'pointer')
+                .on('mouseover', (event, d) => {
+                    d3.select('#d3-tooltip')
+                        .transition().duration(200)
+                        .style('opacity', 1)
+                        .style('display', 'block')
+                        .style('left', event.pageX + 8 + 'px')
+                        .style('top', event.pageY + 8 + 'px')
+                        .text(`${this.xUnit}: ${d[0]}, ${this.yUnit}: ${d[1]}`)
+                })
+                .on('mouseout', function () {
+                    d3.select('#d3-tooltip')
+                        .style('opacity', 0)
+                        .style('display', 'none')
+                })
 
-        // tooltip
-        if (!document.querySelector('#d3-tooltip')) {
-            d3.select('body')
-                .append('div')
-                .attr('id', 'd3-tooltip')
-                .attr('style', 'position: absolute; opacity: 0; display: none; background-color: white; padding: 8px; border-radius: 4px; max-width: 200px')
-        }
+            // tooltip
+            if (!document.querySelector('#d3-tooltip')) {
+                d3.select('body')
+                    .append('div')
+                    .attr('id', 'd3-tooltip')
+                    .attr('style', 'position: absolute; opacity: 0; display: none; background-color: white; padding: 8px; border-radius: 4px; max-width: 200px')
+            }
+
+            // legend
+            const legend = legends.append('g')
+                .attr('class', 'legend')
+                .attr('transform', `translate(${xOffset}, 0)`)
+
+            legend.append('rect')
+                .attr('x', -32)
+                .attr('y', -7)
+                .attr('height', '12px')
+                .attr('width', '24px')
+                .attr('fill', color)
+
+            legend.append('text')
+                .attr('x', 0)
+                .attr('y', 0)
+                .style('text-anchor', 'start')
+                .style('font-size', '.8rem')
+                .attr('dominant-baseline', 'middle')
+                .text(dataset.label)
+
+            xOffset += textWidth + 64;
+            totalWidth = xOffset;
+        });
+
+        legends.attr('transform', `translate(${currentWidth / 2 - totalWidth / 4}, ${padding / 3})`);
+
     }
 
     private _getContainerSize(id: string, size: string): number {
@@ -244,9 +315,20 @@ export default class LineChart extends HTMLElement {
         return parseInt(d3.select(this.shadowRoot.querySelector(`#${id}`)).style(size), 10);
     }
 
-    private _sortDataset(data: number[][]): number[][] {
-        return data.sort((a: number[], b: number[]) => a[0] - b[0]);
+    private _sortDatasets(data: LineChartDataset[]): LineChartDataset[] {
+        return data.map(dataset => {
+            dataset.dataset.sort((a, b) => a[0] - b[0]);
+            return dataset;
+        });
     }
+
+    private _getTextWidth(text: string, fontSize: string): number {
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        if (!context) return 0;
+        context.font = fontSize;
+        return context.measureText(text).width;
+    };
 }
 
 customElements.define('ettdash-line-chart', LineChart);
