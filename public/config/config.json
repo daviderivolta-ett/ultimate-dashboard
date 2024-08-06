@@ -81,7 +81,8 @@
                     "is-fullwidth": false,
                     "input": {
                         "x-unit": "m/s",
-                        "y-unit": "Date"
+                        "y-unit": "Date",
+                        "show-label": "true"
                     }
                 },
                 {
