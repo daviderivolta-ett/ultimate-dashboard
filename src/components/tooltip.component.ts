@@ -95,8 +95,9 @@ export default class TooltipComponent extends HTMLElement {
         element.removeEventListener('mouseleave', this._toggleVisibility);
     }
 
-    private _toggleVisibility = (): void => {    
-        this.isVisible = !this.isVisible;       
+    private _toggleVisibility = (): void => {   
+        this.isVisible = !this.isVisible;    
+        console.log('Toogle tooltip');           
     }
 }
 
