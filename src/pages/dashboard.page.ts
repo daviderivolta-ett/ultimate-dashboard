@@ -46,7 +46,7 @@ export default class DashboardPage extends HTMLElement {
     // Component callbacks
     public async connectedCallback(): Promise<void> {
         const config: AppConfig = await ConfigService.instance.getConfig();
-        // this._setup();
+        this._setup();
         this._fillGrid(config.widgets);
     }
 
@@ -99,32 +99,53 @@ export default class DashboardPage extends HTMLElement {
 
         const widgets: any[] = widgetNodes.map((node: HTMLElement) => {
             const widget: any = {
-                type: '',
+                // type: '',
+                // size: node.getAttribute('size') ? node.getAttribute('size') : 'square-small',
+                // 'is-fullwidth': node.getAttribute('is-fullwidth') ? node.getAttribute('is-fullwidth') : false,
+                // slots: [],
+                // input: {}
                 size: node.getAttribute('size') ? node.getAttribute('size') : 'square-small',
                 'is-fullwidth': node.getAttribute('is-fullwidth') ? node.getAttribute('is-fullwidth') : false,
-                slots: [],
-                input: {}
+                slots: []
             }
 
             const children: HTMLElement[] = Array.from(node.querySelectorAll('*'));
 
             children.forEach((child: HTMLElement) => {
                 if (child.slot === 'content') {
-                    widget.type = child.tagName;
-                    const attributes: Attr[] = Array.from(child.attributes).filter((attr: Attr) => attr.name !== 'slot');
-                    widget.input = attributes.reduce((acc, attr) => {
+                    const slot: any = {};
+                    slot.name = 'content';
+                    slot.tag = child.tagName;
+                    slot.attributes = Array.from(child.attributes).reduce((acc, attr) => {
                         acc[attr.name] = attr.value;
                         return acc;
                     }, {} as { [key: string]: string });
-                } else {
-                    widget.slots.push({
-                        tag: child.tagName,
-                        slot: child.slot,
-                        content: child.textContent
-                    })
-                }
-            });
+                    slot.content = '';
+                    widget.slots.push(slot);
 
+                    // widget.type = child.tagName;
+                    // const attributes: Attr[] = Array.from(child.attributes).filter((attr: Attr) => attr.name !== 'slot');
+                    // widget.input = attributes.reduce((acc, attr) => {
+                    //     acc[attr.name] = attr.value;
+                    //     return acc;
+                    // }, {} as { [key: string]: string });
+                } else {
+                    // widget.slots.push({
+                    //     tag: child.tagName,
+                    //     slot: child.slot,
+                    //     content: child.textContent
+                    // })
+                    const slot: any = {};
+                    slot.name = child.slot;
+                    slot.tag = child.tagName;
+                    slot.attributes = Array.from(child.attributes).reduce((acc, attr) => {
+                        acc[attr.name] = attr.value;
+                        return acc;
+                    }, {} as { [key: string]: string });
+                    slot.content = child.textContent;
+                    widget.slots.push(slot);
+                }
+            });           
             return widget;
 
         });
@@ -136,8 +157,8 @@ export default class DashboardPage extends HTMLElement {
         const config = new AppConfig();
         config.id = 'custom';
         config.label = 'Custom';
-        config.widgets = [...widgets];
-        // ConfigService.instance.config = config;      
+        config.widgets = [...widgets];      
+        ConfigService.instance.config = config;      
     }
 }
 
