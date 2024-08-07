@@ -82,8 +82,20 @@
                     "input": {
                         "x-unit": "m/s",
                         "y-unit": "Date",
-                        "show-label": "true"
-                    }
+                        "show-legend": "true"
+                    },
+                    "slots": [
+                        {
+                            "tag": "span",
+                            "slot": "title",
+                            "content": "Titolo di esempio"
+                        },
+                        {
+                            "tag": "span",
+                            "slot": "desc",
+                            "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam tristique ligula eu luctus sollicitudin."
+                        }
+                    ]
                 },
                 {
                     "type": "ettdash-map",
@@ -93,7 +105,8 @@
                         "lat": 43.116752956131826,
                         "lng": 12.365259516889365,
                         "zoom": 4
-                    }
+                    },
+                    "slots": []
                 }
             ]
         }

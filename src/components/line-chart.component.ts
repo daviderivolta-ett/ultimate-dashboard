@@ -64,7 +64,7 @@ style.innerHTML =
 export default class LineChart extends HTMLElement {
     public shadowRoot: ShadowRoot;
     private _resizeObserver: ResizeObserver;
-    private _showLabel: boolean = false;
+    private _showLegend: boolean = false;
     private _yUnit: string = '';
     private _xUnit: string = '';
 
@@ -116,9 +116,9 @@ export default class LineChart extends HTMLElement {
         this._resizeObserver = new ResizeObserver(() => this._drawChart());
     }
 
-    public get showLabel(): boolean { return this._showLabel }
-    public set showLabel(value: boolean) {
-        this._showLabel = value;
+    public get showLegend(): boolean { return this._showLegend }
+    public set showLegend(value: boolean) {
+        this._showLegend = value;
         this._drawChart();
     }
 
@@ -146,12 +146,12 @@ export default class LineChart extends HTMLElement {
         if (container) this._resizeObserver.observe(container);
     }
 
-    static observedAttributes: string[] = ['x-unit', 'y-unit', 'show-label'];
+    static observedAttributes: string[] = ['x-unit', 'y-unit', 'show-legend'];
     public attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
         if (name === 'x-unit') this.xUnit = newValue;
         if (name === 'y-unit') this.yUnit = newValue;
-        if (name === 'show-label' && (newValue === 'true' || newValue === 'false')) {
-            newValue === 'true' ? this.showLabel = true : this.showLabel = false;
+        if (name === 'show-legend' && (newValue === 'true' || newValue === 'false')) {
+            newValue === 'true' ? this.showLegend = true : this.showLegend = false;
         }
     }
 
@@ -167,7 +167,7 @@ export default class LineChart extends HTMLElement {
 
         container.innerHTML = '';
 
-        const currentWidth: number = this._getContainerSize('line-chart', 'width');
+        const currentWidth: number = this._getContainerSize('line-chart', 'width');      
         const currentHeight: number = this._getContainerSize('line-chart', 'height');
         const padding: number = 24;
 
@@ -330,7 +330,7 @@ export default class LineChart extends HTMLElement {
             }
 
             // legend
-            if (this.showLabel) {
+            if (this.showLegend) {
                 const legend: HTMLDivElement | null = this.shadowRoot.querySelector('.legend');
                 if (legend && legend.childNodes.length < this.data.length) {
                     const item: HTMLDivElement = this._drawLegend(color, dataset.label);

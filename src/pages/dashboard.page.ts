@@ -9,7 +9,9 @@ const template: HTMLTemplateElement = document.createElement('template');
 template.innerHTML =
     `
     <div id="dashboard">
-        <app-grid></app-grid>
+        <app-grid>
+
+        </app-grid>
     </div>
     `
     ;
@@ -46,6 +48,7 @@ export default class DashboardPage extends HTMLElement {
     // Component callbacks
     public async connectedCallback(): Promise<void> {
         const config: AppConfig = await ConfigService.instance.getConfig('minimal');
+        console.log(config);        
         this._setup();
         this._fillGrid(config.widgets);
     }
@@ -55,7 +58,7 @@ export default class DashboardPage extends HTMLElement {
     }
 
     private _setup(): void {
-        this._configAutosave = setInterval(this._handleGridChange.bind(this), 5000);
+        this._configAutosave = setInterval(this._handleGridChange.bind(this), 1000);
     }
 
     // Methods
@@ -66,6 +69,7 @@ export default class DashboardPage extends HTMLElement {
         widgets.forEach((widget: any) => {
             let w: WidgetComponent = new WidgetComponent();
             this._setWidgetAttribute(w, widget);
+            this._setWidgetSlot(w, widget.slots);
 
             if (widget['type']) {
                 const component: HTMLElement = document.createElement(widget.type);
@@ -75,7 +79,7 @@ export default class DashboardPage extends HTMLElement {
             }
 
             grid.appendChild(w);
-        });
+        });       
     }
 
     private _setWidgetAttribute(widget: WidgetComponent, input: any): void {
@@ -83,6 +87,15 @@ export default class DashboardPage extends HTMLElement {
             if (key === 'type' || key === 'input') continue;
             widget.setAttribute(key, input[key]);
         }
+    }
+
+    private _setWidgetSlot(widget: WidgetComponent, slots: any): void {
+        slots.forEach((slot: any) => {
+            const element: HTMLElement = document.createElement(slot['tag']);
+            element.setAttribute('slot', slot['slot']);
+            element.innerText = slot['content']
+            widget.appendChild(element);
+        });        
     }
 
     private _setComponentAttribute(component: HTMLElement, input: any): void {
@@ -100,24 +113,34 @@ export default class DashboardPage extends HTMLElement {
         const widgets: any[] = widgetNodes.map((node: HTMLElement) => {
             const widget: any = {
                 type: '',
-                size: node.getAttribute('size'),
-                'is-fullwidth': node.getAttribute('is-fullwidth'),
+                size: node.getAttribute('size') ? node.getAttribute('size') : 'square-small',
+                'is-fullwidth': node.getAttribute('is-fullwidth') ? node.getAttribute('is-fullwidth') : false,
+                slots: [],
                 input: {}
             }
-            const child: HTMLElement[] = Array.from(node.querySelectorAll('*'));
-            child.forEach((node: HTMLElement) => {
-                widget.type = node.tagName;
-                const attributes: Attr[] = Array.from(node.attributes).filter((attr: Attr) => attr.name !== 'slot');
-                const input: { [key: string]: string } = attributes.reduce((acc, attr) => {
-                    acc[attr.name] = attr.value;
-                    return acc;
-                }, {} as { [key: string]: string });
 
-                widget.input = input;
+            const children: HTMLElement[] = Array.from(node.querySelectorAll('*'));
+
+            children.forEach((child: HTMLElement) => {
+                if (child.slot === 'content') {
+                    widget.type = child.tagName;
+                    const attributes: Attr[] = Array.from(child.attributes).filter((attr: Attr) => attr.name !== 'slot');
+                    widget.input = attributes.reduce((acc, attr) => {
+                        acc[attr.name] = attr.value;
+                        return acc;
+                    }, {} as { [key: string]: string });
+                } else {
+                    widget.slots.push({
+                        tag: child.tagName,
+                        slot: child.slot,
+                        content: child.textContent
+                    })
+                }                
             });
-            return widget;
-        });
 
+            return widget;
+
+        });        
         return widgets;
     }
 
@@ -126,8 +149,8 @@ export default class DashboardPage extends HTMLElement {
         const config = new AppConfig();
         config.id = 'custom';
         config.label = 'Custom';
-        config.widgets = [...widgets];
-        ConfigService.instance.config = config;      
+        config.widgets = [...widgets];      
+        // ConfigService.instance.config = config;      
     }
 }
 
