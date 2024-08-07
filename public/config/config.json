@@ -6,107 +6,48 @@
             "icon": "",
             "grid": [
                 {
-                    "type": "ettdash-map",
-                    "size": "square-large",
-                    "is-fullwidth": true,
-                    "input": {
-                        "lat": 44.407659397825526,
-                        "lng": 8.934664996596462,
-                        "zoom": 13
-                    }
-                },
-                {
-                    "type": "ettdash-line-chart",
-                    "size": "column-small",
-                    "is-fullwidth": false,
-                    "input": {
-                        "x-unit": "m/s2",
-                        "y-unit": "Date"
-                    }
-                },
-                {
-                    "type": "ettdash-line-chart",
-                    "size": "square-small",
-                    "is-fullwidth": false,
-                    "input": {
-                        "x-unit": "m/s",
-                        "y-unit": "Date"
-                    }
-                }
-            ]
-        },
-        {
-            "id": "full",
-            "label": "Full",
-            "icon": "",
-            "grid": [
-                {
-                    "type": "ettdash-map",
                     "size": "square-small",
                     "is-fullwidth": true,
-                    "input": {
-                        "lat": 43.116752956131826,
-                        "lng": 12.365259516889365,
-                        "zoom": 4
-                    }
-                },
-                {
-                    "type": "ettdash-line-chart",
-                    "size": "square-large",
-                    "is-fullwidth": false,
-                    "input": {
-                        "x-unit": "m/s",
-                        "y-unit": "Date"
-                    }
-                },
-                {
-                    "type": "ettdash-line-chart",
-                    "size": "square-small",
-                    "is-fullwidth": false,
-                    "input": {
-                        "x-unit": "m/s",
-                        "y-unit": "Date"
-                    }
-                }
-            ]
-        },
-        {
-            "id": "minimal",
-            "label": "Minimal",
-            "icon": "",
-            "grid": [
-                {
-                    "type": "ettdash-line-chart",
-                    "size": "square-small",
-                    "is-fullwidth": false,
-                    "input": {
-                        "x-unit": "m/s",
-                        "y-unit": "Date",
-                        "show-legend": "true"
-                    },
                     "slots": [
                         {
-                            "tag": "span",
-                            "slot": "title",
-                            "content": "Titolo di esempio"
-                        },
-                        {
-                            "tag": "span",
-                            "slot": "desc",
-                            "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam tristique ligula eu luctus sollicitudin."
+                            "name": "content",
+                            "tag": "ettdash-map",
+                            "attributes": {
+                                "lat": 43.116752956131826,
+                                "lng": 12.365259516889365,
+                                "zoom": 4
+                            },
+                            "content": ""
                         }
                     ]
                 },
                 {
-                    "type": "ettdash-map",
                     "size": "square-small",
-                    "is-fullwidth": true,
-                    "input": {
-                        "lat": 43.116752956131826,
-                        "lng": 12.365259516889365,
-                        "zoom": 4
-                    },
-                    "slots": []
+                    "is-fullwidth": false,
+                    "slots": [
+                        {
+                            "name": "title",
+                            "tag": "span",
+                            "attributes": {},
+                            "content": "Titolo di esempio"
+                        },
+                        {
+                            "name": "desc",
+                            "tag": "span",
+                            "attributes": {},
+                            "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam tristique ligula eu luctus sollicitudin."
+                        },
+                        {
+                            "name": "content",
+                            "tag": "ettdash-line-chart",
+                            "attributes": {
+                                "x-unit": "m/s",
+                                "y-unit": "Date",
+                                "show-legend": true
+                            },
+                            "content": ""
+                        }
+                    ]
                 }
             ]
         }

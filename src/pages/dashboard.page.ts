@@ -9,9 +9,7 @@ const template: HTMLTemplateElement = document.createElement('template');
 template.innerHTML =
     `
     <div id="dashboard">
-        <app-grid>
-
-        </app-grid>
+        <app-grid></app-grid>
     </div>
     `
     ;
@@ -47,9 +45,8 @@ export default class DashboardPage extends HTMLElement {
 
     // Component callbacks
     public async connectedCallback(): Promise<void> {
-        const config: AppConfig = await ConfigService.instance.getConfig('minimal');
-        console.log(config);        
-        this._setup();
+        const config: AppConfig = await ConfigService.instance.getConfig();
+        // this._setup();
         this._fillGrid(config.widgets);
     }
 
@@ -58,7 +55,7 @@ export default class DashboardPage extends HTMLElement {
     }
 
     private _setup(): void {
-        this._configAutosave = setInterval(this._handleGridChange.bind(this), 1000);
+        this._configAutosave = setInterval(this._handleGridChange.bind(this), 5000);
     }
 
     // Methods
@@ -70,21 +67,13 @@ export default class DashboardPage extends HTMLElement {
             let w: WidgetComponent = new WidgetComponent();
             this._setWidgetAttribute(w, widget);
             this._setWidgetSlot(w, widget.slots);
-
-            if (widget['type']) {
-                const component: HTMLElement = document.createElement(widget.type);
-                component.setAttribute('slot', 'content');
-                if (widget['input']) this._setComponentAttribute(component, widget.input);
-                w.appendChild(component);
-            }
-
             grid.appendChild(w);
-        });       
+        });
     }
 
     private _setWidgetAttribute(widget: WidgetComponent, input: any): void {
         for (const key in input) {
-            if (key === 'type' || key === 'input') continue;
+            if (key == 'slots') continue;
             widget.setAttribute(key, input[key]);
         }
     }
@@ -92,16 +81,14 @@ export default class DashboardPage extends HTMLElement {
     private _setWidgetSlot(widget: WidgetComponent, slots: any): void {
         slots.forEach((slot: any) => {
             const element: HTMLElement = document.createElement(slot['tag']);
-            element.setAttribute('slot', slot['slot']);
-            element.innerText = slot['content']
-            widget.appendChild(element);
-        });        
-    }
+            element.setAttribute('slot', slot['name']);
+            element.innerHTML = slot['content'];
 
-    private _setComponentAttribute(component: HTMLElement, input: any): void {
-        for (const key in input) {
-            component.setAttribute(`${key}`, `${input[key]}`);
-        }
+            for (const key in slot['attributes']) {
+                element.setAttribute(key, slot['attributes'][key]);
+            }
+            widget.appendChild(element);
+        });
     }
 
     private _getGridContent(): any[] {
@@ -135,12 +122,12 @@ export default class DashboardPage extends HTMLElement {
                         slot: child.slot,
                         content: child.textContent
                     })
-                }                
+                }
             });
 
             return widget;
 
-        });        
+        });
         return widgets;
     }
 
@@ -149,7 +136,7 @@ export default class DashboardPage extends HTMLElement {
         const config = new AppConfig();
         config.id = 'custom';
         config.label = 'Custom';
-        config.widgets = [...widgets];      
+        config.widgets = [...widgets];
         // ConfigService.instance.config = config;      
     }
 }

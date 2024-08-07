@@ -50,7 +50,7 @@ style.innerHTML =
         color: var(--fg-color-default);
         font-size: 1rem;
         font-weight: 600;
-        margin: 0 0 .25rem 0;
+        margin: 0 0 .5rem 0;
     }
 
     slot[name="desc"] {

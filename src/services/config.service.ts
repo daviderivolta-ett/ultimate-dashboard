@@ -47,12 +47,13 @@ export class ConfigService {
 
         data.configs = data.configs.filter((config: any) => config.id === id);
 
-        for (const c of data.configs) {
+        for (const c of data.configs) {            
             if (c.id) config.id = c.id;
             if (c.label) config.label = c.label;
+            if (c.icon) config.icon = c.icon;
             if (c.grid) config.widgets = c.grid;
         }
-
+        
         return config;
     }
 

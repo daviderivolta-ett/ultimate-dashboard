@@ -112,19 +112,20 @@ export default class GridComponent extends HTMLElement {
     }
 
     private _handleDrag(): void {
-        const slot: HTMLSlotElement | null = this.shadowRoot.querySelector('slot');
+        const slot: HTMLSlotElement | null = this.shadowRoot.querySelector('slot');      
         if (!slot) return;
 
         slot.addEventListener('slotchange', this._onSlotChange.bind(this), { once: true });
     }
 
-    private _onSlotChange(): void {
+    private _onSlotChange(): void {        
         const elements: NodeListOf<HTMLElement> = this.querySelectorAll('*');
+        
         elements.forEach((element: HTMLElement) => {
             const anchor: HTMLElement | null = element.shadowRoot ?
                 element.shadowRoot.querySelector('.draggable') :
                 element.querySelector('.draggable');
-
+            
             if (anchor) {
                 anchor.addEventListener('mouseenter', this._onMouseEnter.bind(this, element));
                 anchor.addEventListener('mouseleave', this._onMouseLeave.bind(this, element));
