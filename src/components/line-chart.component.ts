@@ -10,6 +10,7 @@ const template: HTMLTemplateElement = document.createElement('template');
 template.innerHTML =
     `
     <div id="line-chart"></div>
+    <div class="legend"></div>
     `
     ;
 
@@ -17,10 +18,44 @@ template.innerHTML =
 const style: HTMLStyleElement = document.createElement('style');
 style.innerHTML =
     `
-    #line-chart {
+    :host {
         display: flex;
+        flex-direction: column;
         height: 100%;
         width: 100%;
+        gap: 24px;
+    }
+
+    #line-chart {
+        display: flex;
+        flex-grow: 1;
+    }
+
+    .legend {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .legend__item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 8px 0 0;
+    }
+
+    .legend__item {
+        gap: 8px;
+    }
+
+    .legend__item__rect {
+        width: 24px;
+        height: 3px;
+    }
+
+    .legend__item__label {
+        font-size: .8rem;
     }
     `
     ;
@@ -229,19 +264,9 @@ export default class LineChart extends HTMLElement {
             .attr('x2', currentWidth - padding)
             .attr('stroke', 'var(--chart-line-color)')
 
-
-        const legends = svg.append('g')
-            .attr('class', 'legends')
-            .attr('transform', `translate(${currentWidth / 2}, ${padding / 3})`)
-
-        let xOffset: number = 0;
-        let totalWidth: number = 0;
-
-
         const colorScale: d3.ScaleOrdinal<string, string> = d3.scaleOrdinal(d3.schemeCategory10);
         this.data.forEach((dataset: LineChartDataset, i: number) => {
             const color: string = colorScale(i.toString());
-            const textWidth = this._getTextWidth(dataset.label, '.8rem');
 
             // area
             // svg.append('path')
@@ -306,32 +331,13 @@ export default class LineChart extends HTMLElement {
 
             // legend
             if (this.showLabel) {
-                const legend = legends.append('g')
-                    .attr('class', 'legend')
-                    .attr('transform', `translate(${xOffset}, 0)`)
-
-                legend.append('rect')
-                    .attr('x', -32)
-                    .attr('y', -7)
-                    .attr('height', '12px')
-                    .attr('width', '24px')
-                    .attr('fill', color)
-
-                legend.append('text')
-                    .attr('x', 0)
-                    .attr('y', 0)
-                    .style('text-anchor', 'start')
-                    .style('font-size', '.8rem')
-                    .attr('dominant-baseline', 'middle')
-                    .text(dataset.label)
-
-                xOffset += textWidth + 64;
-                totalWidth = xOffset;
+                const legend: HTMLDivElement | null = this.shadowRoot.querySelector('.legend');
+                if (legend && legend.childNodes.length < this.data.length) {
+                    const item: HTMLDivElement = this._drawLegend(color, dataset.label);
+                    legend.appendChild(item);
+                }
             }
         });
-
-        legends.attr('transform', `translate(${currentWidth / 2 - totalWidth / 4}, ${padding / 3})`);
-
     }
 
     private _getContainerSize(id: string, size: string): number {
@@ -346,13 +352,22 @@ export default class LineChart extends HTMLElement {
         });
     }
 
-    private _getTextWidth(text: string, fontSize: string): number {
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
-        if (!context) return 0;
-        context.font = fontSize;
-        return context.measureText(text).width;
-    };
+    private _drawLegend(color: string, labelText: string): HTMLDivElement {
+        const container: HTMLDivElement = document.createElement('div');
+        container.classList.add('legend__item');
+
+        const rect: HTMLDivElement = document.createElement('div');
+        rect.classList.add('legend__item__rect');
+        rect.style.backgroundColor = color;
+        container.appendChild(rect);
+
+        const label: HTMLSpanElement = document.createElement('span');
+        label.classList.add('legend__item__label');
+        label.innerText = labelText;
+        container.appendChild(label);
+
+        return container;
+    }
 }
 
 customElements.define('ettdash-line-chart', LineChart);
