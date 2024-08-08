@@ -1,8 +1,7 @@
 import '../components/grid.component';
 import GridComponent from '../components/grid.component';
-import { IconBtn } from '../components/icon-btn.component';
 import WidgetComponent from '../components/widget.component';
-import { AppConfig } from '../models/config.model';
+import { AppConfig, GridConfig } from '../models/config.model';
 import { Widget, WidgetSlot } from '../models/widget.model';
 import { ConfigService } from '../services/config.service';
 
@@ -10,13 +9,8 @@ import { ConfigService } from '../services/config.service';
 const template: HTMLTemplateElement = document.createElement('template');
 template.innerHTML =
     `
-    <div id="dashboard">
+    <div class="dashboard">
         <app-grid></app-grid>
-        <icon-btn class="add-widget-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
-                <path fill="currentColor" d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/>
-            </svg>
-        </icon-btn>
         <widget-icons class="widget-icons"></widget-icons>
     </div>
     `
@@ -28,21 +22,16 @@ style.innerHTML =
     `
     @import "/src/style.css";
 
-    :host {
+    .dashboard {
         display: block;
         padding: 16px;
-    }
-
-    .add-widget-btn {
-        position: fixed;
-        bottom: 24px;
-        right: 24px;
+        min-height: 100dvh;
     }
 
     .widget-icons {
         position: fixed;
         bottom: 24px;
-        right: calc(24px + 40px + 16px);
+        right: 24px;
     }
 
     `
@@ -66,20 +55,27 @@ export default class DashboardPage extends HTMLElement {
 
     // Component callbacks
     public async connectedCallback(): Promise<void> {
-        const config: AppConfig = await ConfigService.instance.getConfig();      
+        const gridConfig: GridConfig = await ConfigService.instance.getGridConfig();
         this._setup();
-        this._fillGrid(config.widgets);
+        this._fillGrid(gridConfig.grid);
     }
 
     public disconnectedCallback(): void {
-        clearInterval(this._configAutosave);
+        this._removeEventListeners();
     }
 
     private _setup(): void {
         this._configAutosave = setInterval(this._handleGridChange.bind(this), 5000);
+        this._setupWidgetIcons();
+    }
 
-        const addWidgetBtn: IconBtn | null = this.shadowRoot.querySelector('.add-widget-btn');              
-        if (addWidgetBtn) addWidgetBtn.addEventListener('icon-btn-click', this._onAddWidgetBtnClick.bind(this));
+    private _removeEventListeners(): void {
+        clearInterval(this._configAutosave);
+        const dashboard: HTMLElement | null = this.shadowRoot.querySelector('.dashboard');
+        if (dashboard) {
+            dashboard.addEventListener('dragover', this._handleGridDragOver.bind(this));
+            dashboard.addEventListener('drop', this._handleGridDrop.bind(this));
+        }
     }
 
     // Methods
@@ -96,21 +92,21 @@ export default class DashboardPage extends HTMLElement {
     }
 
     private _setWidgetAttribute(widget: WidgetComponent, attributes: any): void {
-        for (const key in attributes) {            
+        for (const key in attributes) {
             widget.setAttribute(key, attributes[key]);
         }
     }
 
     private _setWidgetSlot(widget: WidgetComponent, slots: WidgetSlot[]): void {
-        slots.forEach((slot: WidgetSlot) => {       
+        slots.forEach((slot: WidgetSlot) => {
             const element: HTMLElement = document.createElement(slot.tag);
             element.innerHTML = slot.content;
             element.setAttribute('slot', slot.name);
 
-            for (const key in slot.attributes) {                  
+            for (const key in slot.attributes) {
                 element.setAttribute(key, slot.attributes[key]);
             }
-            
+
             widget.appendChild(element);
         });
     }
@@ -139,7 +135,7 @@ export default class DashboardPage extends HTMLElement {
             });
             return widget;
         });
-      
+
         return widgets;
     }
 
@@ -151,20 +147,84 @@ export default class DashboardPage extends HTMLElement {
     }
 
     private _handleGridChange(): void {
-        const widgets: any[] = this._getGridContent();    
-        const config = new AppConfig();
+        const widgets: any[] = this._getGridContent();
+        const config = new GridConfig();
         config.id = 'custom';
         config.label = 'Custom';
-        config.widgets = [...widgets];
-        ConfigService.instance.config = config;
+        config.grid = [...widgets];
+        ConfigService.instance.gridConfig = config;
     }
 
-    private _onAddWidgetBtnClick(): void {
-        const widgetIcons = this.shadowRoot.querySelector('widget-icons');        
-        if (widgetIcons) {
-            const isOpen: string | null = widgetIcons.getAttribute('is-open');
-            !isOpen || isOpen === 'false' ? widgetIcons.setAttribute('is-open', 'true') : widgetIcons.setAttribute('is-open', 'false');
+    private _setupWidgetIcons(): void {
+        const grid: HTMLElement | null = this.shadowRoot.querySelector('app-grid');
+        if (!grid) return;
+
+        const dashboard: HTMLElement | null = this.shadowRoot.querySelector('.dashboard');
+        const icons: NodeListOf<HTMLElement> = this.shadowRoot.querySelectorAll('widget-icons>*');
+
+        if (dashboard) {
+            dashboard.addEventListener('dragover', this._handleGridDragOver.bind(this));
+            dashboard.addEventListener('drop', this._handleGridDrop.bind(this));
+
+            icons.forEach((icon: HTMLElement) => icon.addEventListener('dragstart', this._handleIconDragStart.bind(this)))
         }
+    }
+
+    private _handleIconDragStart(event: DragEvent): void {
+        const target = event.target as HTMLElement;
+        if (target && target.id) {
+            const id: string | undefined = target.id.split('#').pop();
+            if (id) event.dataTransfer?.setData('text/plain', id);
+        }
+    }
+
+    private _handleGridDragOver(event: DragEvent): void {
+        event.preventDefault();
+
+        const grid: HTMLElement | null = this.shadowRoot.querySelector('app-grid');
+        if (!grid) return;
+
+        const dropTargetRect = grid.getBoundingClientRect();
+
+        if (event.clientX >= dropTargetRect.left &&
+            event.clientX <= dropTargetRect.right &&
+            event.clientY >= dropTargetRect.top &&
+            event.clientY <= dropTargetRect.bottom) {
+            event.dataTransfer!.dropEffect = 'copy';
+        } else {
+            event.dataTransfer!.dropEffect = 'none';
+        }
+    }
+
+    private _handleGridDrop(event: DragEvent): void {
+        console.log(event.dataTransfer);
+        const grid: HTMLElement | null = this.shadowRoot.querySelector('app-grid');
+        if (!grid) return;
+
+        const tag: string | undefined = event.dataTransfer?.getData('text/plain');
+        if (tag) this._addWidget(tag);
+        
+
+        // const dropTargetRect = grid.getBoundingClientRect();
+
+        // if (event.clientX >= dropTargetRect.left &&
+        //     event.clientX <= dropTargetRect.right &&
+        //     event.clientY >= dropTargetRect.top &&
+        //     event.clientY <= dropTargetRect.bottom) {
+        //     console.log('Element dropped on the target');
+        // } else {
+        //     console.log('Element not dropped on the target');
+        // }
+    }
+
+    private _addWidget(tag: string): void {
+        const widget: WidgetComponent = new WidgetComponent();
+        const el: HTMLElement = document.createElement(tag);
+        el.setAttribute('slot', 'content');
+        widget.appendChild(el);
+        const grid: HTMLElement | null = this.shadowRoot.querySelector('app-grid');
+        if (!grid) return;
+        grid.appendChild(widget);
     }
 }
 

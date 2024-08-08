@@ -1,0 +1,66 @@
+{
+    "configs": [
+        {
+            "id": "waterfront",
+            "label": "Waterfront",
+            "icon": "",
+            "widgets": [
+                {
+                    "tag": "ettdash-map",
+                    "card": {
+                        "is-fullwidth": true
+                    },
+                    "attributes": {
+                        "zoom": 12
+                    },
+                    "wizard": [
+                        {
+                            "input": "number",
+                            "label": "Scegliere la latitudine",
+                            "attribute": "lat"
+                        },
+                        {
+                            "input": "number",
+                            "label": "Scegliere la longitudine",
+                            "attribute": "lat"
+                        }
+                    ]
+                },
+                {
+                    "tag": "ettdash-line-chart",
+                    "card": {
+                        "is-fullwidth": false
+                    },
+                    "attributes": {},
+                    "wizard": [
+                        {
+                            "input": "text",
+                            "label": "Titolo del grafico",
+                            "slot": "title"
+                        },
+                        {
+                            "input": "textarea",
+                            "label": "Descrizione del grafico",
+                            "slot": "desc"
+                        },
+                        {
+                            "input": "text",
+                            "label": "Unità di misura ascisse",
+                            "attribute": "x-unit"
+                        },
+                        {
+                            "input": "text",
+                            "label": "Unità di misura ordinate",
+                            "attribute": "y-unit"
+                        },
+                        {
+                            "input": "checkbox",
+                            "label": "Mostrare la legenda",
+                            "attribute": "show-legend"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

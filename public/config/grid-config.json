@@ -4,7 +4,7 @@
             "id": "standard",
             "label": "Standard",
             "icon": "",
-            "widgets": [
+            "grid": [
                 {
                     "attributes": {
                         "size": "square-small",

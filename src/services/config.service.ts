@@ -1,9 +1,10 @@
-import { AppConfig } from '../models/config.model';
+import { AppConfig, GridConfig } from '../models/config.model';
 
 export class ConfigService {
-    private CONFIG_URL: string = './config/config.json';
     private static _instance: ConfigService;
-    private _config: AppConfig | null = null;
+    
+    private GRID_CONFIG_URL: string = './config/grid-config.json';
+    private _gridConfig: GridConfig | null = null;
 
     constructor() {
         if (ConfigService._instance) return ConfigService._instance;
@@ -15,40 +16,37 @@ export class ConfigService {
         return ConfigService._instance;
     }
 
-    public get config(): AppConfig | null {
-        return this._config;
+    public get gridConfig(): GridConfig | null { return this._gridConfig }
+    public set gridConfig(value: GridConfig | null) {
+        this._gridConfig = value;
+        if (value) this._setCustomGridConfig(value);
     }
 
-    public set config(value: AppConfig | null) {
-        this._config = value;
-        if (value) this._setCustomConfig(value);
-    }
+    public async getGridConfig(id: string = 'standard'): Promise<GridConfig> {
+        if (this.gridConfig) return this.gridConfig;
 
-    public async getConfig(id: string = 'standard'): Promise<AppConfig> {
-        if (this.config) return this.config;
-
-        const customConfig: AppConfig | null = this._getCustomConfig();
-        if (customConfig) {
-            this._config = customConfig;
-            return customConfig;
+        const customGridConfig: GridConfig | null = this._getCustomGridConfig();
+        if (customGridConfig) {
+            this._gridConfig = customGridConfig;
+            return customGridConfig;
         }
 
-        const data: any = await fetch(this.CONFIG_URL).then((res: Response) => res.json());
-        const config: AppConfig = this._parseConfig(data, id);
-        this._config = config;
+        const data: any = await fetch(this.GRID_CONFIG_URL).then((res: Response) => res.json());
+        const gridConfig: GridConfig = this._parseConfig(data, id);
+        this._gridConfig = gridConfig;
 
-        return config;
+        return gridConfig;
     }
 
-    private _getCustomConfig(): AppConfig | null {
-        const configJson: string | null = localStorage.getItem('config');
+    private _getCustomGridConfig(): AppConfig | null {
+        const configJson: string | null = localStorage.getItem('grid');
         if (!configJson) return null;
         const config: AppConfig = JSON.parse(configJson);
         return config;
     }
 
-    private _setCustomConfig(config: AppConfig): void {
-        localStorage.setItem('config', JSON.stringify(config));
+    private _setCustomGridConfig(config: AppConfig): void {
+        localStorage.setItem('grid', JSON.stringify(config));
     }
 
     private _parseConfig(data: any, id: string = 'standard'): AppConfig {
@@ -62,7 +60,7 @@ export class ConfigService {
             if (c.id) config.id = c.id;
             if (c.label) config.label = c.label;
             if (c.icon) config.icon = c.icon;
-            if (c.widgets) config.widgets = c.widgets;
+            if (c.grid) config.grid = c.grid;
         }
 
         return config;
