@@ -5,3 +5,5 @@ import './components/radio-group.component';
 import './components/radio-btn.component';
 import './components/map.component';
 import './components/line-chart.component';
+import './components/icon-btn.component';
+import './components/widget-icons.component';

@@ -1,5 +1,6 @@
 import '../components/grid.component';
 import GridComponent from '../components/grid.component';
+import { IconBtn } from '../components/icon-btn.component';
 import WidgetComponent from '../components/widget.component';
 import { AppConfig } from '../models/config.model';
 import { Widget, WidgetSlot } from '../models/widget.model';
@@ -11,6 +12,12 @@ template.innerHTML =
     `
     <div id="dashboard">
         <app-grid></app-grid>
+        <icon-btn class="add-widget-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
+                <path fill="currentColor" d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/>
+            </svg>
+        </icon-btn>
+        <widget-icons class="widget-icons"></widget-icons>
     </div>
     `
     ;
@@ -19,12 +26,25 @@ template.innerHTML =
 const style: HTMLStyleElement = document.createElement('style');
 style.innerHTML =
     `
-        @import "/src/style.css";
+    @import "/src/style.css";
 
-        :host {
-            display: block;
-            padding: 16px;
-        }
+    :host {
+        display: block;
+        padding: 16px;
+    }
+
+    .add-widget-btn {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+    }
+
+    .widget-icons {
+        position: fixed;
+        bottom: 24px;
+        right: calc(24px + 40px + 16px);
+    }
+
     `
     ;
 
@@ -57,6 +77,9 @@ export default class DashboardPage extends HTMLElement {
 
     private _setup(): void {
         this._configAutosave = setInterval(this._handleGridChange.bind(this), 5000);
+
+        const addWidgetBtn: IconBtn | null = this.shadowRoot.querySelector('.add-widget-btn');              
+        if (addWidgetBtn) addWidgetBtn.addEventListener('icon-btn-click', this._onAddWidgetBtnClick.bind(this));
     }
 
     // Methods
@@ -134,6 +157,14 @@ export default class DashboardPage extends HTMLElement {
         config.label = 'Custom';
         config.widgets = [...widgets];
         ConfigService.instance.config = config;
+    }
+
+    private _onAddWidgetBtnClick(): void {
+        const widgetIcons = this.shadowRoot.querySelector('widget-icons');        
+        if (widgetIcons) {
+            const isOpen: string | null = widgetIcons.getAttribute('is-open');
+            !isOpen || isOpen === 'false' ? widgetIcons.setAttribute('is-open', 'true') : widgetIcons.setAttribute('is-open', 'false');
+        }
     }
 }
 

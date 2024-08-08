@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 
-type LineChartDataset = {
+export type LineChartDataset = {
     label: string,
     dataset: number[][]
 }
@@ -23,12 +23,12 @@ style.innerHTML =
         flex-direction: column;
         height: 100%;
         width: 100%;
-        gap: 24px;
     }
 
     #line-chart {
         display: flex;
         flex-grow: 1;
+        overflow: hidden;
     }
 
     .legend {
@@ -119,24 +119,28 @@ export default class LineChart extends HTMLElement {
     public get showLegend(): boolean { return this._showLegend }
     public set showLegend(value: boolean) {
         this._showLegend = value;
+        this._drawLegend();
         this._drawChart();
     }
 
     public get xUnit(): string { return this._xUnit }
     public set xUnit(value: string) {
         this._xUnit = value;
+        this._drawLegend();
         this._drawChart();
     }
 
     public get yUnit(): string { return this._yUnit }
     public set yUnit(value: string) {
         this._yUnit = value;
+        this._drawLegend();
         this._drawChart();
     }
 
     public get data(): LineChartDataset[] { return this._data }
     public set data(value: LineChartDataset[]) {
         this._data = value;
+        this._drawLegend();
         this._drawChart();
     }
 
@@ -164,10 +168,10 @@ export default class LineChart extends HTMLElement {
     private _drawChart(): void {
         const container: HTMLDivElement | null = this.shadowRoot.querySelector('#line-chart');
         if (!container) return;
-
         container.innerHTML = '';
 
-        const currentWidth: number = this._getContainerSize('line-chart', 'width');      
+        // chart
+        const currentWidth: number = this._getContainerSize('line-chart', 'width');
         const currentHeight: number = this._getContainerSize('line-chart', 'height');
         const padding: number = 24;
 
@@ -183,13 +187,6 @@ export default class LineChart extends HTMLElement {
         const yScale = d3.scaleLinear()
             .domain([0, d3.max(data, (d: number[]) => d[1] ?? 0)!])
             .range([currentHeight - padding, padding])
-
-        // line
-        // const line = d3.line<number[]>()
-        //     .curve(d3.curveCardinal)
-        //     .x(d => xScale(d[0]))
-        //     .y(d => yScale(d[1]))
-
 
         // svg
         const svg = d3.select(this.shadowRoot.querySelector('#line-chart'))
@@ -328,15 +325,6 @@ export default class LineChart extends HTMLElement {
                     .attr('id', 'd3-tooltip')
                     .attr('style', 'position: absolute; opacity: 0; display: none; background-color: white; padding: 8px; border-radius: 4px; max-width: 200px')
             }
-
-            // legend
-            if (this.showLegend) {
-                const legend: HTMLDivElement | null = this.shadowRoot.querySelector('.legend');
-                if (legend && legend.childNodes.length < this.data.length) {
-                    const item: HTMLDivElement = this._drawLegend(color, dataset.label);
-                    legend.appendChild(item);
-                }
-            }
         });
     }
 
@@ -352,7 +340,24 @@ export default class LineChart extends HTMLElement {
         });
     }
 
-    private _drawLegend(color: string, labelText: string): HTMLDivElement {
+    private _drawLegend(): void {
+        const legend: HTMLDivElement | null = this.shadowRoot.querySelector('.legend');
+        if (legend) legend.innerHTML = '';
+
+        const colorScale: d3.ScaleOrdinal<string, string> = d3.scaleOrdinal(d3.schemeCategory10);
+
+        this.data.forEach((dataset: LineChartDataset, i: number) => {
+            const color: string = colorScale(i.toString());
+            if (this.showLegend) {
+                if (legend && legend.childNodes.length < this.data.length) {
+                    const item: HTMLDivElement = this._drawLegendItem(color, dataset.label);
+                    legend.appendChild(item);
+                }
+            }
+        })
+    }
+
+    private _drawLegendItem(color: string, labelText: string): HTMLDivElement {
         const container: HTMLDivElement = document.createElement('div');
         container.classList.add('legend__item');
 
