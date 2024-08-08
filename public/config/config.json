@@ -4,10 +4,12 @@
             "id": "standard",
             "label": "Standard",
             "icon": "",
-            "grid": [
+            "widgets": [
                 {
-                    "size": "square-small",
-                    "is-fullwidth": true,
+                    "attributes": {
+                        "size": "square-small",
+                        "is-fullwidth": true
+                    },
                     "slots": [
                         {
                             "name": "content",
@@ -22,8 +24,10 @@
                     ]
                 },
                 {
-                    "size": "square-small",
-                    "is-fullwidth": false,
+                    "attributes": {
+                        "size": "square-small",
+                        "is-fullwidth": false
+                    },
                     "slots": [
                         {
                             "name": "title",

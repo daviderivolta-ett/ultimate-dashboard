@@ -2,6 +2,7 @@ import '../components/grid.component';
 import GridComponent from '../components/grid.component';
 import WidgetComponent from '../components/widget.component';
 import { AppConfig } from '../models/config.model';
+import { Widget, WidgetSlot } from '../models/widget.model';
 import { ConfigService } from '../services/config.service';
 
 // Template
@@ -45,7 +46,7 @@ export default class DashboardPage extends HTMLElement {
 
     // Component callbacks
     public async connectedCallback(): Promise<void> {
-        const config: AppConfig = await ConfigService.instance.getConfig();
+        const config: AppConfig = await ConfigService.instance.getConfig();      
         this._setup();
         this._fillGrid(config.widgets);
     }
@@ -59,34 +60,34 @@ export default class DashboardPage extends HTMLElement {
     }
 
     // Methods
-    private _fillGrid(widgets: any[]): void {
+    private _fillGrid(widgets: Widget[]): void {
         const grid: GridComponent | null = this.shadowRoot.querySelector('app-grid');
         if (!grid) return;
 
-        widgets.forEach((widget: any) => {
+        widgets.forEach((widget: Widget) => {
             let w: WidgetComponent = new WidgetComponent();
-            this._setWidgetAttribute(w, widget);
+            this._setWidgetAttribute(w, widget.attributes);
             this._setWidgetSlot(w, widget.slots);
             grid.appendChild(w);
         });
     }
 
-    private _setWidgetAttribute(widget: WidgetComponent, input: any): void {
-        for (const key in input) {
-            if (key == 'slots') continue;
-            widget.setAttribute(key, input[key]);
+    private _setWidgetAttribute(widget: WidgetComponent, attributes: any): void {
+        for (const key in attributes) {            
+            widget.setAttribute(key, attributes[key]);
         }
     }
 
-    private _setWidgetSlot(widget: WidgetComponent, slots: any): void {
-        slots.forEach((slot: any) => {
-            const element: HTMLElement = document.createElement(slot['tag']);
-            element.setAttribute('slot', slot['name']);
-            element.innerHTML = slot['content'];
+    private _setWidgetSlot(widget: WidgetComponent, slots: WidgetSlot[]): void {
+        slots.forEach((slot: WidgetSlot) => {       
+            const element: HTMLElement = document.createElement(slot.tag);
+            element.innerHTML = slot.content;
+            element.setAttribute('slot', slot.name);
 
-            for (const key in slot['attributes']) {
-                element.setAttribute(key, slot['attributes'][key]);
+            for (const key in slot.attributes) {                  
+                element.setAttribute(key, slot.attributes[key]);
             }
+            
             widget.appendChild(element);
         });
     }
@@ -97,68 +98,42 @@ export default class DashboardPage extends HTMLElement {
 
         const widgetNodes: HTMLElement[] = Array.from(grid.querySelectorAll('app-widget'));
 
-        const widgets: any[] = widgetNodes.map((node: HTMLElement) => {
-            const widget: any = {
-                // type: '',
-                // size: node.getAttribute('size') ? node.getAttribute('size') : 'square-small',
-                // 'is-fullwidth': node.getAttribute('is-fullwidth') ? node.getAttribute('is-fullwidth') : false,
-                // slots: [],
-                // input: {}
-                size: node.getAttribute('size') ? node.getAttribute('size') : 'square-small',
-                'is-fullwidth': node.getAttribute('is-fullwidth') ? node.getAttribute('is-fullwidth') : false,
+        const widgets: Widget[] = widgetNodes.map((node: HTMLElement) => {
+            const widget: Widget = {
+                attributes: this._getNodeAttributes(node),
                 slots: []
             }
 
             const children: HTMLElement[] = Array.from(node.querySelectorAll('*'));
 
             children.forEach((child: HTMLElement) => {
-                if (child.slot === 'content') {
-                    const slot: any = {};
-                    slot.name = 'content';
-                    slot.tag = child.tagName;
-                    slot.attributes = Array.from(child.attributes).reduce((acc, attr) => {
-                        acc[attr.name] = attr.value;
-                        return acc;
-                    }, {} as { [key: string]: string });
-                    slot.content = '';
-                    widget.slots.push(slot);
-
-                    // widget.type = child.tagName;
-                    // const attributes: Attr[] = Array.from(child.attributes).filter((attr: Attr) => attr.name !== 'slot');
-                    // widget.input = attributes.reduce((acc, attr) => {
-                    //     acc[attr.name] = attr.value;
-                    //     return acc;
-                    // }, {} as { [key: string]: string });
-                } else {
-                    // widget.slots.push({
-                    //     tag: child.tagName,
-                    //     slot: child.slot,
-                    //     content: child.textContent
-                    // })
-                    const slot: any = {};
-                    slot.name = child.slot;
-                    slot.tag = child.tagName;
-                    slot.attributes = Array.from(child.attributes).reduce((acc, attr) => {
-                        acc[attr.name] = attr.value;
-                        return acc;
-                    }, {} as { [key: string]: string });
-                    slot.content = child.textContent;
-                    widget.slots.push(slot);
-                }
-            });           
+                const slot: any = {};
+                slot.name = child.slot;
+                slot.tag = child.tagName;
+                slot.attributes = this._getNodeAttributes(child);
+                slot.content = child.textContent;
+                widget.slots.push(slot);
+            });
             return widget;
-
         });
+      
         return widgets;
     }
 
+    private _getNodeAttributes(node: HTMLElement): Record<string, any> {
+        return Array.from(node.attributes).reduce((acc, attr) => {
+            acc[attr.name] = attr.value;
+            return acc;
+        }, {} as { [key: string]: string });
+    }
+
     private _handleGridChange(): void {
-        const widgets: any[] = this._getGridContent();
+        const widgets: any[] = this._getGridContent();    
         const config = new AppConfig();
         config.id = 'custom';
         config.label = 'Custom';
-        config.widgets = [...widgets];      
-        ConfigService.instance.config = config;      
+        config.widgets = [...widgets];
+        ConfigService.instance.config = config;
     }
 }
 

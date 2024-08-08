@@ -3,7 +3,7 @@ import { AppConfig } from '../models/config.model';
 export class ConfigService {
     private CONFIG_URL: string = './config/config.json';
     private static _instance: ConfigService;
-    private _config: any;
+    private _config: AppConfig | null = null;
 
     constructor() {
         if (ConfigService._instance) return ConfigService._instance;
@@ -15,13 +15,13 @@ export class ConfigService {
         return ConfigService._instance;
     }
 
-    public get config(): any {
+    public get config(): AppConfig | null {
         return this._config;
     }
 
-    public set config(value: any) {
+    public set config(value: AppConfig | null) {
         this._config = value;
-        this._setCustomConfig(value);
+        if (value) this._setCustomConfig(value);
     }
 
     public async getConfig(id: string = 'standard'): Promise<AppConfig> {
@@ -40,23 +40,6 @@ export class ConfigService {
         return config;
     }
 
-    private _parseConfig(data: any, id: string = 'standard'): AppConfig {
-        const config: AppConfig = new AppConfig();
-
-        if (!data.configs && !Array.isArray(data.configs)) return config;
-
-        data.configs = data.configs.filter((config: any) => config.id === id);
-
-        for (const c of data.configs) {            
-            if (c.id) config.id = c.id;
-            if (c.label) config.label = c.label;
-            if (c.icon) config.icon = c.icon;
-            if (c.grid) config.widgets = c.grid;
-        }
-        
-        return config;
-    }
-
     private _getCustomConfig(): AppConfig | null {
         const configJson: string | null = localStorage.getItem('config');
         if (!configJson) return null;
@@ -66,5 +49,22 @@ export class ConfigService {
 
     private _setCustomConfig(config: AppConfig): void {
         localStorage.setItem('config', JSON.stringify(config));
+    }
+
+    private _parseConfig(data: any, id: string = 'standard'): AppConfig {
+        const config: AppConfig = new AppConfig();
+
+        if (!data.configs && !Array.isArray(data.configs)) return config;
+
+        data.configs = data.configs.filter((config: any) => config.id === id);
+
+        for (const c of data.configs) {
+            if (c.id) config.id = c.id;
+            if (c.label) config.label = c.label;
+            if (c.icon) config.icon = c.icon;
+            if (c.widgets) config.widgets = c.widgets;
+        }
+
+        return config;
     }
 }

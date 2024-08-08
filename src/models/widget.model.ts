@@ -1,18 +1,13 @@
-export class Widget {
-    size: WidgetSize = WidgetSize.SquareSm;
-    isFullwidth: boolean = false;
-    slots: WidgetSlot[] = [];
-
-    constructor() { }
+export type Widget = {
+    attributes: any;
+    slots: WidgetSlot[];
 }
 
-export class WidgetSlot {
-    name: string = 'content';
-    tag: string = 'span';
-    attributes: any = {};
-    content: string = '';
-
-    constructor() { }
+export type WidgetSlot = {
+    name: string;
+    tag: string;
+    attributes: any;
+    content: string;
 }
 
 export enum WidgetSize {
