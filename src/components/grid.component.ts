@@ -63,7 +63,7 @@ style.innerHTML =
 
     ::slotted(.dropzone) {
         border-radius: var(--border-radius);
-        background-color: #8EB9C0;
+        background-color: #F2F2F2;
         box-shadow: inset 0 0 5px #00000033;
     }
 
@@ -240,4 +240,4 @@ export default class GridComponent extends HTMLElement {
     }
 }
 
-customElements.define('app-grid', GridComponent);
+customElements.define('draggable-grid', GridComponent);

@@ -47,7 +47,7 @@ style.innerHTML =
     `
     ;
 
-export default class RadioButton extends HTMLElement {
+export default class RadioButtonComponent extends HTMLElement {
     public shadowRoot: ShadowRoot;
 
     private _value: string = '';
@@ -135,4 +135,4 @@ export default class RadioButton extends HTMLElement {
     }
 }
 
-customElements.define('radio-button', RadioButton);
+customElements.define('radio-button', RadioButtonComponent);

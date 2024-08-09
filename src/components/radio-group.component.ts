@@ -24,7 +24,7 @@ style.innerHTML =
     ;
 
 // Component
-export default class RadioGroup extends HTMLElement {
+export default class RadioGroupComponent extends HTMLElement {
     public shadowRoot: ShadowRoot;
 
     public name: string = 'radio';
@@ -79,4 +79,4 @@ export default class RadioGroup extends HTMLElement {
     }
 }
 
-customElements.define('radio-group', RadioGroup);
+customElements.define('radio-group', RadioGroupComponent);

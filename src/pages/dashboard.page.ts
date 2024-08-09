@@ -1,17 +1,18 @@
 import '../components/grid.component';
 import GridComponent from '../components/grid.component';
-import WidgetComponent from '../components/widget.component';
-import { GridConfig } from '../models/config.model';
-import { Widget, WidgetSlot } from '../models/widget.model';
+import CardComponent from '../components/card.component';
+import { AppConfig, AppConfigWidget, GridConfig, GridConfigWidget, GridConfigWidgetSlot, WizardItem } from '../models/config.model';
 import { ConfigService } from '../services/config.service';
+import { WidgetIcon, WidgetIconsComponent } from '../components/widget-icons.component';
+import WizardFormComponent from '../components/form.component';
 
 // Template
 const template: HTMLTemplateElement = document.createElement('template');
 template.innerHTML =
     `
     <div class="dashboard">
-        <app-grid></app-grid>
-        <widget-icons class="widget-icons"></widget-icons>
+        <draggable-grid></draggable-grid>
+        <dialog class="dialog"></dialog>
     </div>
     `
     ;
@@ -34,6 +35,57 @@ style.innerHTML =
         right: 24px;
     }
 
+    .dialog {
+        transition: display .2s allow-discrete, overlay .2s allow-discrete;      
+        animation: bounce-out .2s forwards;
+        &[open] {
+            animation: bounce-in .2s forwards;
+        }
+    }
+      
+    @keyframes open {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+      
+    @keyframes close {
+        from {
+            opacity: 1;
+        }
+        to {
+            opacity: 0;
+        }
+    }
+
+    @keyframes bounce-in {
+        0% {
+            opacity: 0;
+            transform: scale(.3);
+        }
+        50% {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+        70% { transform: scale(.9); }
+        100% { transform: scale(1); }
+    }
+
+    @keyframes bounce-out {
+        0% { transform: scale(1); }
+        25% { transform: scale(.95); }
+        50% {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        100% {
+            opacity: 0;
+            transform: scale(.3);
+        } 
+    }
     `
     ;
 
@@ -51,7 +103,10 @@ export default class DashboardPage extends HTMLElement {
 
     // Component callbacks
     public async connectedCallback(): Promise<void> {
+        const appConfig: AppConfig = await ConfigService.instance.getAppConfig();
+        console.log(appConfig);
         const gridConfig: GridConfig = await ConfigService.instance.getGridConfig();
+        this._render();
         this._setup();
         this._fillGrid(gridConfig.grid);
     }
@@ -60,41 +115,48 @@ export default class DashboardPage extends HTMLElement {
         this._removeEventListeners();
     }
 
+    private _render(): void {
+        this._renderWidgetIcons();
+    }
+
     private _setup(): void {
         this._configAutosave = setInterval(this._handleGridChange.bind(this), 5000);
         this._setupWidgetIcons();
+        this.addEventListener('form-submit', this._handleWizardFormSubmit.bind(this));
     }
 
     private _removeEventListeners(): void {
         clearInterval(this._configAutosave);
         const dashboard: HTMLElement | null = this.shadowRoot.querySelector('.dashboard');
         if (dashboard) {
-            dashboard.addEventListener('dragover', this._handleGridDragOver.bind(this));
-            dashboard.addEventListener('drop', this._handleGridDrop.bind(this));
+            dashboard.removeEventListener('dragover', this._handleGridDragOver.bind(this));
+            dashboard.removeEventListener('drop', this._handleGridDrop.bind(this));
         }
+        this.removeEventListener('form-submit', this._handleWizardFormSubmit.bind(this));
     }
 
     // Methods
-    private _fillGrid(widgets: Widget[]): void {
-        const grid: GridComponent | null = this.shadowRoot.querySelector('app-grid');
+    // Render draggable grid
+    private _fillGrid(widgets: GridConfigWidget[]): void {
+        const grid: GridComponent | null = this.shadowRoot.querySelector('draggable-grid');
         if (!grid) return;
 
-        widgets.forEach((widget: Widget) => {
-            let w: WidgetComponent = new WidgetComponent();
-            this._setWidgetAttribute(w, widget.attributes);
-            this._setWidgetSlot(w, widget.slots);
-            grid.appendChild(w);
+        widgets.forEach((widget: GridConfigWidget) => {
+            let card: CardComponent = new CardComponent();
+            this._setWidgetAttribute(card, widget.attributes);
+            this._setWidgetSlot(card, widget.slots);
+            grid.appendChild(card);
         });
     }
 
-    private _setWidgetAttribute(widget: WidgetComponent, attributes: any): void {
+    private _setWidgetAttribute(card: CardComponent, attributes: any): void {
         for (const key in attributes) {
-            widget.setAttribute(key, attributes[key]);
+            card.setAttribute(key, attributes[key]);
         }
     }
 
-    private _setWidgetSlot(widget: WidgetComponent, slots: WidgetSlot[]): void {
-        slots.forEach((slot: WidgetSlot) => {
+    private _setWidgetSlot(card: CardComponent, slots: GridConfigWidgetSlot[]): void {
+        slots.forEach((slot: GridConfigWidgetSlot) => {
             const element: HTMLElement = document.createElement(slot.tag);
             element.innerHTML = slot.content;
             element.setAttribute('slot', slot.name);
@@ -103,18 +165,18 @@ export default class DashboardPage extends HTMLElement {
                 element.setAttribute(key, slot.attributes[key]);
             }
 
-            widget.appendChild(element);
+            card.appendChild(element);
         });
     }
 
     private _getGridContent(): any[] {
-        const grid: GridComponent | null = this.shadowRoot.querySelector('app-grid');
+        const grid: GridComponent | null = this.shadowRoot.querySelector('draggable-grid');
         if (!grid) return [];
 
-        const widgetNodes: HTMLElement[] = Array.from(grid.querySelectorAll('app-widget'));
+        const widgetNodes: HTMLElement[] = Array.from(grid.querySelectorAll('ettdash-card'));
 
-        const widgets: Widget[] = widgetNodes.map((node: HTMLElement) => {
-            const widget: Widget = {
+        const widgets: GridConfigWidget[] = widgetNodes.map((node: HTMLElement) => {
+            const widget: GridConfigWidget = {
                 attributes: this._getNodeAttributes(node),
                 slots: []
             }
@@ -151,12 +213,27 @@ export default class DashboardPage extends HTMLElement {
         ConfigService.instance.gridConfig = config;
     }
 
+    // Render widget creation icons
+    private _renderWidgetIcons() {
+        const dashboard: HTMLElement | null = this.shadowRoot.querySelector('.dashboard');
+        if (!dashboard) return;
+
+        const icons: WidgetIconsComponent = new WidgetIconsComponent();
+        const config: AppConfig | null = ConfigService.instance.appConfig;
+        if (!config) return;
+
+        const prop: WidgetIcon[] = config.widgets.map((widget: AppConfigWidget) => ({ tag: widget.tag, url: widget.icon }));
+        icons.widgetIcons = prop;
+        icons.classList.add('widget-icons');
+        dashboard.appendChild(icons);
+    }
+
     private _setupWidgetIcons(): void {
-        const grid: HTMLElement | null = this.shadowRoot.querySelector('app-grid');
+        const grid: HTMLElement | null = this.shadowRoot.querySelector('draggable-grid');
         if (!grid) return;
 
         const dashboard: HTMLElement | null = this.shadowRoot.querySelector('.dashboard');
-        const icons: NodeListOf<HTMLElement> = this.shadowRoot.querySelectorAll('widget-icons>*');
+        const icons: NodeListOf<HTMLElement> = this.shadowRoot.querySelectorAll('ettdash-widget-icons>*');
 
         if (dashboard) {
             dashboard.addEventListener('dragover', this._handleGridDragOver.bind(this));
@@ -177,7 +254,7 @@ export default class DashboardPage extends HTMLElement {
     private _handleGridDragOver(event: DragEvent): void {
         event.preventDefault();
 
-        const grid: HTMLElement | null = this.shadowRoot.querySelector('app-grid');
+        const grid: HTMLElement | null = this.shadowRoot.querySelector('draggable-grid');
         if (!grid) return;
 
         const dropTargetRect = grid.getBoundingClientRect();
@@ -193,13 +270,18 @@ export default class DashboardPage extends HTMLElement {
     }
 
     private _handleGridDrop(event: DragEvent): void {
-        console.log(event.dataTransfer);
-        const grid: HTMLElement | null = this.shadowRoot.querySelector('app-grid');
+        // console.log(event.dataTransfer);
+        const grid: HTMLElement | null = this.shadowRoot.querySelector('draggable-grid');
         if (!grid) return;
 
         const tag: string | undefined = event.dataTransfer?.getData('text/plain');
-        if (tag) this._addWidget(tag);
-        
+        if (!tag) return;
+
+        const widgetData: AppConfigWidget | null = this._getWidgetData(tag);
+        if (!widgetData) return;
+
+        this._openDialog();
+        this._createWizardForm(widgetData.wizard);
 
         // const dropTargetRect = grid.getBoundingClientRect();
 
@@ -213,14 +295,55 @@ export default class DashboardPage extends HTMLElement {
         // }
     }
 
-    private _addWidget(tag: string): void {
-        const widget: WidgetComponent = new WidgetComponent();
-        const el: HTMLElement = document.createElement(tag);
+    private _getWidgetData(tag: string): AppConfigWidget | null {
+        const config: AppConfig | null = ConfigService.instance.appConfig;
+        if (!config) return null;
+
+        const widget: AppConfigWidget | undefined = config.widgets.find((w: AppConfigWidget) => w.tag === tag);
+        return widget ? widget : null;
+    }
+
+    private _openDialog(): void {
+        const dialog: HTMLDialogElement | null = this.shadowRoot.querySelector('.dialog');
+        if (!dialog) return;
+        dialog.innerHTML = '';
+        dialog.showModal();
+    }
+
+    private _createWizardForm(widgetData: WizardItem[]): void {
+        const dialog: HTMLDialogElement | null = this.shadowRoot.querySelector('.dialog');
+        if (!dialog) return;
+
+        const form: WizardFormComponent = new WizardFormComponent();
+        form.wizardItems = widgetData;
+        dialog.appendChild(form);
+    }
+
+    private _handleWizardFormSubmit(e: Event) {
+        e.stopPropagation();
+        const event: CustomEvent = e as CustomEvent;
+        if (event.detail instanceof FormData) {
+            const formData: FormData = event.detail;
+            for (const value of formData.entries()) {
+                console.log(value);                
+            }
+        }
+    }
+
+    private _addWidget(data: AppConfigWidget): void {
+        const card: CardComponent = new CardComponent();
+        for (const key in data.cardAttributes) {
+            card.setAttribute(key, data.cardAttributes[key]);
+        }
+        const el: HTMLElement = document.createElement(data.tag);
         el.setAttribute('slot', 'content');
-        widget.appendChild(el);
-        const grid: HTMLElement | null = this.shadowRoot.querySelector('app-grid');
+        for (const key in data.widgetAttributes) {
+            el.setAttribute(key, data.widgetAttributes[key]);
+        }
+        card.appendChild(el);
+        const grid: HTMLElement | null = this.shadowRoot.querySelector('draggable-grid');
         if (!grid) return;
-        grid.appendChild(widget);
+        grid.appendChild(card);
     }
 }
 

@@ -6,7 +6,7 @@ import RadioGroup from './radio-group.component';
 const template: HTMLTemplateElement = document.createElement('template');
 template.innerHTML =
     `
-    <div class="widget">
+    <div class="card">
         <div class="draggable">
             <span class="draggable__icon">
                 <svg xmlns="http://www.w3.org/2000/svg" id="drag-indicator" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
@@ -14,9 +14,9 @@ template.innerHTML =
                 </svg>
             </span>
         </div>
-        <app-tooltip>
+        <hover-tooltip>
             <radio-group name="size"></radio-group>
-        </app-tooltip>
+        </hover-tooltip>
 
         <div class="header">
             <slot name="title"></slot>
@@ -31,16 +31,15 @@ template.innerHTML =
 const style: HTMLStyleElement = document.createElement('style');
 style.innerHTML =
     `
-    .widget {
+    .card {
         position: relative;
         width: 100%;
         height: 100%;
-        padding: 4%;
+        padding: 24px;
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
         border-radius: var(--border-radius);
-        border: 1px solid var(--border-color-default);
         background-color: var(--bg-color-default);
         box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
     }
@@ -64,11 +63,12 @@ style.innerHTML =
         flex-grow: 1;
     }
 
-    .widget--fullwidth {
+    .card--fullwidth {
         padding: 0;
     }
 
-    slot[name="desc"].header__desc--hidden {
+    slot[name="desc"].header__desc--hidden,
+    slot[name="title"].header__title--hidden  {
         display: none;
     }
 
@@ -93,7 +93,7 @@ style.innerHTML =
     ;
 
 // Component
-export default class WidgetComponent extends HTMLElement {
+export default class CardComponent extends HTMLElement {
     public shadowRoot: ShadowRoot;
     private _size: WidgetSize = WidgetSize.SquareSm;
     private _isFullWidth: boolean = false;
@@ -111,7 +111,8 @@ export default class WidgetComponent extends HTMLElement {
     public set size(value: WidgetSize) {
         this._size = value;
         this._resizeWidget(value);
-        this._toggleDesc(value);
+        this._toggleHeader(value);
+        this._toggleMinimal(value);
     }
 
     public get isFullWidth(): boolean { return this._isFullWidth }
@@ -157,7 +158,7 @@ export default class WidgetComponent extends HTMLElement {
         let validSizes: string[] = this._getValidSizes(media);
 
         if (!validSizes.includes(this.size)) this.size = WidgetSize.SquareSm;
-        
+
         validSizes.forEach((size: string) => {
             const radioButton: RadioButton = new RadioButton();
             radioButton.iconUrl = `/icons/${size}.svg#${size}`;
@@ -192,8 +193,8 @@ export default class WidgetComponent extends HTMLElement {
         else this._createResizeController('desktop');
     }
 
-    private _handleWidgetResize(event: Event): void {  
-        const e: CustomEvent = event as CustomEvent;           
+    private _handleWidgetResize(event: Event): void {
+        const e: CustomEvent = event as CustomEvent;
         this.setAttribute('size', e.detail);
         event.stopPropagation();
     }
@@ -208,9 +209,9 @@ export default class WidgetComponent extends HTMLElement {
     }
 
     private _handleFullWidth(value: boolean): void {
-        const widget: HTMLDivElement | null = this.shadowRoot.querySelector('.widget');
+        const widget: HTMLDivElement | null = this.shadowRoot.querySelector('.card');
         if (!widget) return;
-        value === true ? widget.classList.add('widget--fullwidth') : widget.classList.remove('widget--fullwidth');
+        value === true ? widget.classList.add('card--fullwidth') : widget.classList.remove('card--fullwidth');
     }
 
     private _handleSlots(): void {
@@ -221,11 +222,22 @@ export default class WidgetComponent extends HTMLElement {
         if (descSlot && descSlot.assignedNodes().length === 0) descSlot.style.display = 'none';
     }
 
-    private _toggleDesc(size: WidgetSize): void {
+    private _toggleHeader(size: WidgetSize): void {
         const desc: HTMLSlotElement | null = this.shadowRoot.querySelector('slot[name="desc"');
-        if (!desc) return;
-        size === WidgetSize.SquareSm ? desc.classList.add('header__desc--hidden') : desc.classList.remove('header__desc--hidden');
+        if (desc) size === WidgetSize.SquareSm ? desc.classList.add('header__desc--hidden') : desc.classList.remove('header__desc--hidden');
+
+        const title: HTMLSlotElement | null = this.shadowRoot.querySelector('slot[name="title"');
+        if (title) size === WidgetSize.SquareSm ? title.classList.add('header__title--hidden') : title.classList.remove('header__title--hidden');
+    }
+
+    private _toggleMinimal(size: WidgetSize): void {
+        const slot: HTMLSlotElement | null = this.shadowRoot.querySelector('slot[name="content"]');
+        if (!slot) return;
+        const slottedElement: Element[] = slot.assignedElements();
+        if (slottedElement.length === 0) return;
+        const content: Element = slottedElement[0];
+        size === WidgetSize.SquareSm ? content.setAttribute('is-minimal', 'true') : content.setAttribute('is-minimal', 'false');
     }
 }
 
-customElements.define('app-widget', WidgetComponent);
+customElements.define('ettdash-card', CardComponent);

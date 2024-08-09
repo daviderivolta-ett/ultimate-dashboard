@@ -105,4 +105,4 @@ export default class TooltipComponent extends HTMLElement {
 
 }
 
-customElements.define('app-tooltip', TooltipComponent);
+customElements.define('hover-tooltip', TooltipComponent);

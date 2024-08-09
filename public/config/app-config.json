@@ -1,61 +1,70 @@
 {
     "configs": [
         {
-            "id": "waterfront",
-            "label": "Waterfront",
+            "id": "default",
+            "label": "Default",
             "icon": "",
             "widgets": [
                 {
                     "tag": "ettdash-map",
-                    "card": {
+                    "icon": "./icons/map.svg",
+                    "cardAttributes": {
                         "is-fullwidth": true
                     },
-                    "attributes": {
+                    "widgetAttributes": {
                         "zoom": 12
                     },
                     "wizard": [
                         {
                             "input": "number",
                             "label": "Scegliere la latitudine",
+                            "value": 40,
                             "attribute": "lat"
                         },
                         {
                             "input": "number",
                             "label": "Scegliere la longitudine",
-                            "attribute": "lat"
+                            "value": 8,
+                            "attribute": "lng"
                         }
                     ]
                 },
                 {
                     "tag": "ettdash-line-chart",
-                    "card": {
+                    "icon": "./icons/add.svg",
+                    "cardAttributes": {
                         "is-fullwidth": false
                     },
-                    "attributes": {},
+                    "widgetAttributes": {},
                     "wizard": [
                         {
                             "input": "text",
                             "label": "Titolo del grafico",
+                            "value": "",
                             "slot": "title"
                         },
                         {
-                            "input": "textarea",
+                            "input": "text",
                             "label": "Descrizione del grafico",
+                            "value": "",
                             "slot": "desc"
                         },
                         {
                             "input": "text",
                             "label": "Unità di misura ascisse",
+                            "value": "",
                             "attribute": "x-unit"
                         },
                         {
                             "input": "text",
                             "label": "Unità di misura ordinate",
+                            "value": "",
                             "attribute": "y-unit"
                         },
                         {
                             "input": "checkbox",
                             "label": "Mostrare la legenda",
+                            "value": true,
                             "attribute": "show-legend"
                         }
                     ]

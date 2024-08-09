@@ -36,7 +36,7 @@ style.innerHTML =
     ;
 
 // Component
-export class IconBtn extends HTMLElement {
+export class IconBtnComponent extends HTMLElement {
     public shadowRoot: ShadowRoot;
 
     constructor() {
@@ -67,4 +67,4 @@ export class IconBtn extends HTMLElement {
     }
 }
 
-customElements.define('icon-btn', IconBtn);
+customElements.define('icon-button', IconBtnComponent);

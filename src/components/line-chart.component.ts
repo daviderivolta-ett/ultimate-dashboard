@@ -61,8 +61,9 @@ style.innerHTML =
     ;
 
 // Component
-export default class LineChart extends HTMLElement {
+export default class LineChartComponent extends HTMLElement {
     public shadowRoot: ShadowRoot;
+    private _isMinimal: boolean = false;
     private _resizeObserver: ResizeObserver;
     private _showLegend: boolean = false;
     private _yUnit: string = '';
@@ -116,6 +117,12 @@ export default class LineChart extends HTMLElement {
         this._resizeObserver = new ResizeObserver(() => this._drawChart());
     }
 
+    public get isMinimal(): boolean { return this._isMinimal }
+    public set isMinimal(value: boolean) {
+        this._isMinimal = value;
+        this.isMinimal ? this.setAttribute('show-legend', 'false') : this.setAttribute('show-legend', 'true');
+    }
+
     public get showLegend(): boolean { return this._showLegend }
     public set showLegend(value: boolean) {
         this._showLegend = value;
@@ -150,8 +157,11 @@ export default class LineChart extends HTMLElement {
         if (container) this._resizeObserver.observe(container);
     }
 
-    static observedAttributes: string[] = ['x-unit', 'y-unit', 'show-legend'];
+    static observedAttributes: string[] = ['is-minimal', 'x-unit', 'y-unit', 'show-legend'];
     public attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
+        if (name === 'is-minimal' && (newValue === 'true' || newValue === 'false')) {
+            newValue === 'true' ? this.isMinimal = true : this.isMinimal = false;
+        }
         if (name === 'x-unit') this.xUnit = newValue;
         if (name === 'y-unit') this.yUnit = newValue;
         if (name === 'show-legend' && (newValue === 'true' || newValue === 'false')) {
@@ -342,7 +352,10 @@ export default class LineChart extends HTMLElement {
 
     private _drawLegend(): void {
         const legend: HTMLDivElement | null = this.shadowRoot.querySelector('.legend');
-        if (legend) legend.innerHTML = '';
+        if (legend) {
+            legend.removeAttribute('style');
+            legend.innerHTML = '';
+        }
 
         const colorScale: d3.ScaleOrdinal<string, string> = d3.scaleOrdinal(d3.schemeCategory10);
 
@@ -350,6 +363,7 @@ export default class LineChart extends HTMLElement {
             const color: string = colorScale(i.toString());
             if (this.showLegend) {
                 if (legend && legend.childNodes.length < this.data.length) {
+                    legend.style.marginTop = '16px';
                     const item: HTMLDivElement = this._drawLegendItem(color, dataset.label);
                     legend.appendChild(item);
                 }
@@ -375,4 +389,4 @@ export default class LineChart extends HTMLElement {
     }
 }
 
-customElements.define('ettdash-line-chart', LineChart);
+customElements.define('ettdash-line-chart', LineChartComponent);
