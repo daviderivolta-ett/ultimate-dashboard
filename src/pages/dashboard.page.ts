@@ -1,7 +1,7 @@
 import '../components/grid.component';
 import GridComponent from '../components/grid.component';
 import WidgetComponent from '../components/widget.component';
-import { AppConfig, GridConfig } from '../models/config.model';
+import { GridConfig } from '../models/config.model';
 import { Widget, WidgetSlot } from '../models/widget.model';
 import { ConfigService } from '../services/config.service';
 
@@ -39,7 +39,6 @@ style.innerHTML =
 
 export default class DashboardPage extends HTMLElement {
     public shadowRoot: ShadowRoot;
-    private _config: AppConfig = new AppConfig();
     private _configAutosave: number = 0;
 
     constructor() {
@@ -49,9 +48,6 @@ export default class DashboardPage extends HTMLElement {
         this.shadowRoot.appendChild(template.content.cloneNode(true));
         this.shadowRoot.appendChild(style.cloneNode(true));
     }
-
-    public get config(): AppConfig { return this._config }
-    public set config(value: AppConfig) { this._config = value }
 
     // Component callbacks
     public async connectedCallback(): Promise<void> {

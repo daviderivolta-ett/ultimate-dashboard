@@ -1,4 +1,4 @@
-import { AppConfig, GridConfig } from '../models/config.model';
+import { GridConfig } from '../models/config.model';
 
 export class ConfigService {
     private static _instance: ConfigService;
@@ -38,19 +38,19 @@ export class ConfigService {
         return gridConfig;
     }
 
-    private _getCustomGridConfig(): AppConfig | null {
+    private _getCustomGridConfig(): GridConfig | null {
         const configJson: string | null = localStorage.getItem('grid');
         if (!configJson) return null;
-        const config: AppConfig = JSON.parse(configJson);
+        const config: GridConfig = JSON.parse(configJson);
         return config;
     }
 
-    private _setCustomGridConfig(config: AppConfig): void {
+    private _setCustomGridConfig(config: GridConfig): void {
         localStorage.setItem('grid', JSON.stringify(config));
     }
 
-    private _parseConfig(data: any, id: string = 'standard'): AppConfig {
-        const config: AppConfig = new AppConfig();
+    private _parseConfig(data: any, id: string = 'standard'): GridConfig {
+        const config: GridConfig = new GridConfig();
 
         if (!data.configs && !Array.isArray(data.configs)) return config;
 
