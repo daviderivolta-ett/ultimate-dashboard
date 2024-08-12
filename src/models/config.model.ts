@@ -55,5 +55,6 @@ export type GridConfigWidgetSlot = {
     name: string;
     tag: string;
     attributes: any;
+    slots: GridConfigWidgetSlot[];
     content: string;
 }

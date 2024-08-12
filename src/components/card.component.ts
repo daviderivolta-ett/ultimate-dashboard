@@ -17,11 +17,6 @@ template.innerHTML =
         <hover-tooltip>
             <radio-group name="size"></radio-group>
         </hover-tooltip>
-
-        <div class="header">
-            <slot name="title"></slot>
-            <slot name="desc" class="header__desc--hidden"></slot>
-        </div>
         <slot name="content"></slot>
     </div>
     `
@@ -39,9 +34,11 @@ style.innerHTML =
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
+        border: 1px solid var(--border-color-default);
         border-radius: var(--border-radius);
         background-color: var(--bg-color-default);
-        box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+        box-shadow: var(--shadow-resting-small);
+        backdrop-filter: var(--bg-blur-default);
     }
 
     slot[name="title"] {

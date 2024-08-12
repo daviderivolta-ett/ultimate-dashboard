@@ -19,6 +19,7 @@
                                 "lng": 12.365259516889365,
                                 "zoom": 4
                             },
+                            "slots": [],
                             "content": ""
                         }
                     ]
@@ -30,18 +31,6 @@
                     },
                     "slots": [
                         {
-                            "name": "title",
-                            "tag": "span",
-                            "attributes": {},
-                            "content": "Titolo di esempio"
-                        },
-                        {
-                            "name": "desc",
-                            "tag": "span",
-                            "attributes": {},
-                            "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam tristique ligula eu luctus sollicitudin."
-                        },
-                        {
                             "name": "content",
                             "tag": "ettdash-line-chart",
                             "attributes": {
@@ -49,6 +38,22 @@
                                 "y-unit": "Date",
                                 "show-legend": true
                             },
+                            "slots": [
+                                {
+                                    "name": "title",
+                                    "tag": "span",
+                                    "attributes": {},
+                                    "slots": [],
+                                    "content": "Titolo di esempio"
+                                },
+                                {
+                                    "name": "desc",
+                                    "tag": "span",
+                                    "attributes": {},
+                                    "slots": [],
+                                    "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam tristique ligula eu luctus sollicitudin."
+                                }
+                            ],
                             "content": ""
                         }
                     ]

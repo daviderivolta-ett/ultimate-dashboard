@@ -104,7 +104,6 @@ export default class DashboardPage extends HTMLElement {
     // Component callbacks
     public async connectedCallback(): Promise<void> {
         const appConfig: AppConfig = await ConfigService.instance.getAppConfig();
-        console.log(appConfig);
         const gridConfig: GridConfig = await ConfigService.instance.getGridConfig();
         this._render();
         this._setup();
@@ -155,7 +154,7 @@ export default class DashboardPage extends HTMLElement {
         }
     }
 
-    private _setWidgetSlot(card: CardComponent, slots: GridConfigWidgetSlot[]): void {
+    private _setWidgetSlot(card: HTMLElement, slots: GridConfigWidgetSlot[]): void {
         slots.forEach((slot: GridConfigWidgetSlot) => {
             const element: HTMLElement = document.createElement(slot.tag);
             element.innerHTML = slot.content;
@@ -166,6 +165,11 @@ export default class DashboardPage extends HTMLElement {
             }
 
             card.appendChild(element);
+
+            if (slot.slots && slot.slots.length > 0) {
+                this._setWidgetSlot(element, slot.slots);
+            }
+
         });
     }
 
@@ -178,23 +182,40 @@ export default class DashboardPage extends HTMLElement {
         const widgets: GridConfigWidget[] = widgetNodes.map((node: HTMLElement) => {
             const widget: GridConfigWidget = {
                 attributes: this._getNodeAttributes(node),
-                slots: []
-            }
-
-            const children: HTMLElement[] = Array.from(node.querySelectorAll('*'));
-
-            children.forEach((child: HTMLElement) => {
-                const slot: any = {};
-                slot.name = child.slot;
-                slot.tag = child.tagName;
-                slot.attributes = this._getNodeAttributes(child);
-                slot.content = child.textContent;
-                widget.slots.push(slot);
-            });
+                slots: this._getSlotContent(node)
+            };
             return widget;
         });
-
+      
         return widgets;
+    }
+
+    private _getSlotContent(node: HTMLElement): any[] {
+        const slots: any[] = [];
+        const children: HTMLElement[] = Array.from(node.children) as HTMLElement[];
+
+        children.forEach((child: HTMLElement) => {
+            const slot: any = {};
+            slot.name = child.slot;
+            slot.tag = child.tagName;
+            slot.attributes = this._getNodeAttributes(child);
+            slot.content = this._getDirectTextContent(child);
+            slot.slots = this._getSlotContent(child);
+            slots.push(slot);
+        });
+
+        return slots;
+    }
+
+    private _getDirectTextContent(node: HTMLElement): string {
+        let textContent = '';
+        node.childNodes.forEach((childNode: ChildNode) => {
+            
+            if (childNode.nodeType === Node.TEXT_NODE) {
+                textContent += childNode.textContent;
+            }
+        });
+        return textContent.trim();
     }
 
     private _getNodeAttributes(node: HTMLElement): Record<string, any> {
@@ -325,7 +346,7 @@ export default class DashboardPage extends HTMLElement {
         if (event.detail instanceof FormData) {
             const formData: FormData = event.detail;
             for (const value of formData.entries()) {
-                console.log(value);                
+                console.log(value);
             }
         }
     }

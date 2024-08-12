@@ -33,8 +33,8 @@ button {
   --fg-color-muted: #61646F;
   --fg-color-disabled: #8C959F;
 
-  --bg-color-inset: #FFFFFF;
-  --bg-color-default: #FFFFFF;
+  --bg-color-inset: #F1F7F9;
+  --bg-color-default: #FFFFFF80;
   --bg-color-muted: #E8E9F2;
   --bg-color-emphasis: #24292f;
   --bg-color-done-emphasis: #8250DF;
@@ -45,14 +45,18 @@ button {
   --bg-color-attention-muted: #FFF8C5;
   --bg-color-success-emphasis: #1F883D;
   --bg-color-success-muted: #DAFBE1;
-
+  
   --button-invisible-icon-color-rest: #636C76;
-
+  
   --border-color-default: #FFFFFF;
-
+  
   --data-purple-color: #894CEB;
-
+  
   --chart-line-color: #90909033;
+
+  --bg-blur-default: blur(15px);
+  --shadow-inset-small: inset 0 0 4px rgba(0, 0, 0, 0.1);
+  --shadow-resting-small: 0 0 4px rgba(0, 0, 0, 0.1);
 }
 
 /* :root {

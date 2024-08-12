@@ -9,8 +9,14 @@ export type LineChartDataset = {
 const template: HTMLTemplateElement = document.createElement('template');
 template.innerHTML =
     `
-    <div id="line-chart"></div>
-    <div class="legend"></div>
+    <div class="line-chart">
+        <div class="header">
+            <slot name="title"></slot>
+            <slot name="desc"></slot>
+        </div>
+        <div id="line-chart"></div>
+        <div class="legend"></div>
+    </div>
     `
     ;
 
@@ -18,11 +24,37 @@ template.innerHTML =
 const style: HTMLStyleElement = document.createElement('style');
 style.innerHTML =
     `
-    :host {
+    // :host {
+    //    display: flex;
+    //    flex-direction: column;
+    //    height: 100%;
+    //    width: 100%;
+    // }
+
+    .line-chart {
         display: flex;
         flex-direction: column;
         height: 100%;
         width: 100%;
+    }
+
+    slot[name="desc"].header__desc--hidden,
+    slot[name="title"].header__title--hidden  {
+        display: none;
+    }
+
+    slot[name="title"] {
+        display: block;
+        color: var(--fg-color-default);
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0 0 .5rem 0;
+    }
+
+    slot[name="desc"] {
+        display: block;
+        color: var(--fg-color-muted);
+        font-size: .85rem;
     }
 
     #line-chart {
@@ -63,9 +95,11 @@ style.innerHTML =
 // Component
 export default class LineChartComponent extends HTMLElement {
     public shadowRoot: ShadowRoot;
-    private _isMinimal: boolean = false;
     private _resizeObserver: ResizeObserver;
+    private _isMinimal: boolean = false;
     private _showLegend: boolean = false;
+    private _showTitle: boolean = false;
+    private _showDesc: boolean = false;
     private _yUnit: string = '';
     private _xUnit: string = '';
 
@@ -120,7 +154,16 @@ export default class LineChartComponent extends HTMLElement {
     public get isMinimal(): boolean { return this._isMinimal }
     public set isMinimal(value: boolean) {
         this._isMinimal = value;
-        this.isMinimal ? this.setAttribute('show-legend', 'false') : this.setAttribute('show-legend', 'true');
+        if (this.isMinimal) {
+            this.setAttribute('show-title', 'false');
+            this.setAttribute('show-desc', 'false');
+            this.setAttribute('show-legend', 'false');
+        } else {
+            this.setAttribute('show-title', 'true');
+            this.setAttribute('show-desc', 'true');
+            this.setAttribute('show-legend', 'true');
+
+        }
     }
 
     public get showLegend(): boolean { return this._showLegend }
@@ -128,6 +171,18 @@ export default class LineChartComponent extends HTMLElement {
         this._showLegend = value;
         this._drawLegend();
         this._drawChart();
+    }
+
+    public get showTitle(): boolean { return this._showTitle }
+    public set showTitle(value: boolean) {
+        this._showTitle = value;
+        this._toggleTitle();
+    }
+
+    public get showDesc(): boolean { return this._showDesc }
+    public set showDesc(value: boolean) {
+        this._showDesc = value;
+        this._toggleDesc();
     }
 
     public get xUnit(): string { return this._xUnit }
@@ -155,18 +210,25 @@ export default class LineChartComponent extends HTMLElement {
     public connectedCallback(): void {
         const container: HTMLDivElement | null = this.shadowRoot.querySelector('#line-chart');
         if (container) this._resizeObserver.observe(container);
+        this._setup();
     }
 
-    static observedAttributes: string[] = ['is-minimal', 'x-unit', 'y-unit', 'show-legend'];
+    static observedAttributes: string[] = ['is-minimal', 'show-legend', 'show-title', 'show-desc', 'x-unit', 'y-unit'];
     public attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
         if (name === 'is-minimal' && (newValue === 'true' || newValue === 'false')) {
             newValue === 'true' ? this.isMinimal = true : this.isMinimal = false;
         }
-        if (name === 'x-unit') this.xUnit = newValue;
-        if (name === 'y-unit') this.yUnit = newValue;
         if (name === 'show-legend' && (newValue === 'true' || newValue === 'false')) {
             newValue === 'true' ? this.showLegend = true : this.showLegend = false;
         }
+        if (name === 'show-title' && (newValue === 'true' || newValue === 'false')) {
+            newValue === 'true' ? this.showTitle = true : this.showTitle = false;
+        }
+        if (name === 'show-desc' && (newValue === 'true' || newValue === 'false')) {
+            newValue === 'true' ? this.showDesc = true : this.showDesc = false;
+        }
+        if (name === 'x-unit') this.xUnit = newValue;
+        if (name === 'y-unit') this.yUnit = newValue;
     }
 
     public disconnectedCallback(): void {
@@ -174,7 +236,68 @@ export default class LineChartComponent extends HTMLElement {
         if (container) this._resizeObserver.unobserve(container);
     }
 
+    private _setup(): void {
+        this._handleSlots();
+    }
+
     // Methods
+    private _handleSlots(): void {
+        const titleSlot: HTMLSlotElement | null = this.shadowRoot.querySelector('slot[name="title"]');
+        const descSlot: HTMLSlotElement | null = this.shadowRoot.querySelector('slot[name="desc"]');
+
+        if (titleSlot && titleSlot.assignedNodes().length === 0) titleSlot.style.display = 'none';
+        if (descSlot && descSlot.assignedNodes().length === 0) descSlot.style.display = 'none';
+    }
+
+    private _toggleTitle(): void {
+        const title: HTMLSlotElement | null = this.shadowRoot.querySelector('slot[name="title"');
+        console.log(title);
+        if (title) this.showTitle ? title.classList.remove('header__title--hidden') : title.classList.add('header__title--hidden');
+    }
+
+    private _toggleDesc(): void {
+        const desc: HTMLSlotElement | null = this.shadowRoot.querySelector('slot[name="desc"');
+        if (desc) this.showDesc ? desc.classList.remove('header__desc--hidden') : desc.classList.add('header__desc--hidden');
+    }
+
+    private _drawLegend(): void {
+        const legend: HTMLDivElement | null = this.shadowRoot.querySelector('.legend');
+        if (legend) {
+            legend.removeAttribute('style');
+            legend.innerHTML = '';
+        }
+
+        const colorScale: d3.ScaleOrdinal<string, string> = d3.scaleOrdinal(d3.schemeCategory10);
+
+        this.data.forEach((dataset: LineChartDataset, i: number) => {
+            const color: string = colorScale(i.toString());
+            if (this.showLegend) {
+                if (legend && legend.childNodes.length < this.data.length) {
+                    legend.style.marginTop = '16px';
+                    const item: HTMLDivElement = this._drawLegendItem(color, dataset.label);
+                    legend.appendChild(item);
+                }
+            }
+        })
+    }
+
+    private _drawLegendItem(color: string, labelText: string): HTMLDivElement {
+        const container: HTMLDivElement = document.createElement('div');
+        container.classList.add('legend__item');
+
+        const rect: HTMLDivElement = document.createElement('div');
+        rect.classList.add('legend__item__rect');
+        rect.style.backgroundColor = color;
+        container.appendChild(rect);
+
+        const label: HTMLSpanElement = document.createElement('span');
+        label.classList.add('legend__item__label');
+        label.innerText = labelText;
+        container.appendChild(label);
+
+        return container;
+    }
+
     private _drawChart(): void {
         const container: HTMLDivElement | null = this.shadowRoot.querySelector('#line-chart');
         if (!container) return;
@@ -348,44 +471,6 @@ export default class LineChartComponent extends HTMLElement {
             dataset.dataset.sort((a, b) => a[0] - b[0]);
             return dataset;
         });
-    }
-
-    private _drawLegend(): void {
-        const legend: HTMLDivElement | null = this.shadowRoot.querySelector('.legend');
-        if (legend) {
-            legend.removeAttribute('style');
-            legend.innerHTML = '';
-        }
-
-        const colorScale: d3.ScaleOrdinal<string, string> = d3.scaleOrdinal(d3.schemeCategory10);
-
-        this.data.forEach((dataset: LineChartDataset, i: number) => {
-            const color: string = colorScale(i.toString());
-            if (this.showLegend) {
-                if (legend && legend.childNodes.length < this.data.length) {
-                    legend.style.marginTop = '16px';
-                    const item: HTMLDivElement = this._drawLegendItem(color, dataset.label);
-                    legend.appendChild(item);
-                }
-            }
-        })
-    }
-
-    private _drawLegendItem(color: string, labelText: string): HTMLDivElement {
-        const container: HTMLDivElement = document.createElement('div');
-        container.classList.add('legend__item');
-
-        const rect: HTMLDivElement = document.createElement('div');
-        rect.classList.add('legend__item__rect');
-        rect.style.backgroundColor = color;
-        container.appendChild(rect);
-
-        const label: HTMLSpanElement = document.createElement('span');
-        label.classList.add('legend__item__label');
-        label.innerText = labelText;
-        container.appendChild(label);
-
-        return container;
     }
 }
 
