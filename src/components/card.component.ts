@@ -30,7 +30,6 @@ style.innerHTML =
         position: relative;
         width: 100%;
         height: 100%;
-        padding: 24px;
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
@@ -41,20 +40,6 @@ style.innerHTML =
         backdrop-filter: var(--bg-blur-default);
     }
 
-    slot[name="title"] {
-        display: block;
-        color: var(--fg-color-default);
-        font-size: 1rem;
-        font-weight: 600;
-        margin: 0 0 .5rem 0;
-    }
-
-    slot[name="desc"] {
-        display: block;
-        color: var(--fg-color-muted);
-        font-size: .85rem;
-    }
-
     slot[name="content"] {
         display: block;
         flex-grow: 1;
@@ -62,11 +47,6 @@ style.innerHTML =
 
     .card--fullwidth {
         padding: 0;
-    }
-
-    slot[name="desc"].header__desc--hidden,
-    slot[name="title"].header__title--hidden  {
-        display: none;
     }
 
     .draggable {
@@ -93,7 +73,6 @@ style.innerHTML =
 export default class CardComponent extends HTMLElement {
     public shadowRoot: ShadowRoot;
     private _size: WidgetSize = WidgetSize.SquareSm;
-    private _isFullWidth: boolean = false;
 
     constructor() {
         super();
@@ -106,34 +85,23 @@ export default class CardComponent extends HTMLElement {
 
     public get size(): WidgetSize { return this._size }
     public set size(value: WidgetSize) {
-        this._size = value;
+        this._size = value;      
         this._resizeWidget(value);
-        this._toggleHeader(value);
         this._toggleMinimal(value);
-    }
-
-    public get isFullWidth(): boolean { return this._isFullWidth }
-    public set isFullWidth(value: boolean) {
-        this._isFullWidth = value;
-        this._handleFullWidth(value);
     }
 
     // Component callbacks
     public connectedCallback(): void {
         this._render();
         this._setup();
-
         window.addEventListener('resize', this._handleWindowResize.bind(this));
+        this._toggleMinimal(this.size);
     }
 
-    static observedAttributes: string[] = ['size', 'is-fullwidth'];
+    static observedAttributes: string[] = ['size'];
     public attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
         if (name === 'size' && Object.values(WidgetSize).includes(newValue as WidgetSize)) {
             this.size = newValue as WidgetSize;
-        }
-
-        if (name === 'is-fullwidth' && (newValue === 'true' || newValue === 'false')) {
-            newValue === 'true' ? this.isFullWidth = true : this.isFullWidth = false;
         }
     }
 
@@ -143,7 +111,6 @@ export default class CardComponent extends HTMLElement {
 
     private _setup(): void {
         this.addEventListener('size-change', this._handleWidgetResize.bind(this));
-        this._handleSlots();
     }
 
     // Methods
@@ -205,30 +172,8 @@ export default class CardComponent extends HTMLElement {
         this.classList.remove(...Object.values(WidgetSize));
     }
 
-    private _handleFullWidth(value: boolean): void {
-        const widget: HTMLDivElement | null = this.shadowRoot.querySelector('.card');
-        if (!widget) return;
-        value === true ? widget.classList.add('card--fullwidth') : widget.classList.remove('card--fullwidth');
-    }
-
-    private _handleSlots(): void {
-        const titleSlot: HTMLSlotElement | null = this.shadowRoot.querySelector('slot[name="title"]');
-        const descSlot: HTMLSlotElement | null = this.shadowRoot.querySelector('slot[name="desc"]');
-
-        if (titleSlot && titleSlot.assignedNodes().length === 0) titleSlot.style.display = 'none';
-        if (descSlot && descSlot.assignedNodes().length === 0) descSlot.style.display = 'none';
-    }
-
-    private _toggleHeader(size: WidgetSize): void {
-        const desc: HTMLSlotElement | null = this.shadowRoot.querySelector('slot[name="desc"');
-        if (desc) size === WidgetSize.SquareSm ? desc.classList.add('header__desc--hidden') : desc.classList.remove('header__desc--hidden');
-
-        const title: HTMLSlotElement | null = this.shadowRoot.querySelector('slot[name="title"');
-        if (title) size === WidgetSize.SquareSm ? title.classList.add('header__title--hidden') : title.classList.remove('header__title--hidden');
-    }
-
-    private _toggleMinimal(size: WidgetSize): void {
-        const slot: HTMLSlotElement | null = this.shadowRoot.querySelector('slot[name="content"]');
+    private _toggleMinimal(size: WidgetSize): void {     
+        const slot: HTMLSlotElement | null = this.shadowRoot.querySelector('slot[name="content"]');        
         if (!slot) return;
         const slottedElement: Element[] = slot.assignedElements();
         if (slottedElement.length === 0) return;

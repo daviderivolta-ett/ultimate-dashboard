@@ -7,8 +7,7 @@
             "grid": [
                 {
                     "attributes": {
-                        "size": "square-small",
-                        "is-fullwidth": true
+                        "size": "square-small"
                     },
                     "slots": [
                         {
@@ -26,8 +25,7 @@
                 },
                 {
                     "attributes": {
-                        "size": "square-small",
-                        "is-fullwidth": false
+                        "size": "square-small"
                     },
                     "slots": [
                         {

@@ -8,9 +8,7 @@
                 {
                     "tag": "ettdash-map",
                     "icon": "./icons/map.svg",
-                    "cardAttributes": {
-                        "is-fullwidth": true
-                    },
+                    "cardAttributes": {},
                     "widgetAttributes": {
                         "zoom": 12
                     },
@@ -32,9 +30,7 @@
                 {
                     "tag": "ettdash-line-chart",
                     "icon": "./icons/add.svg",
-                    "cardAttributes": {
-                        "is-fullwidth": false
-                    },
+                    "cardAttributes": {},
                     "widgetAttributes": {},
                     "wizard": [
                         {

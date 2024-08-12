@@ -24,18 +24,17 @@ template.innerHTML =
 const style: HTMLStyleElement = document.createElement('style');
 style.innerHTML =
     `
-    // :host {
-    //    display: flex;
-    //    flex-direction: column;
-    //    height: 100%;
-    //    width: 100%;
-    // }
-
     .line-chart {
         display: flex;
         flex-direction: column;
         height: 100%;
         width: 100%;
+        padding: 24px;
+        box-sizing: border-box;
+    }
+
+    .line-chart.line-chart--minimal {
+        padding: 16px;
     }
 
     slot[name="desc"].header__desc--hidden,
@@ -154,16 +153,7 @@ export default class LineChartComponent extends HTMLElement {
     public get isMinimal(): boolean { return this._isMinimal }
     public set isMinimal(value: boolean) {
         this._isMinimal = value;
-        if (this.isMinimal) {
-            this.setAttribute('show-title', 'false');
-            this.setAttribute('show-desc', 'false');
-            this.setAttribute('show-legend', 'false');
-        } else {
-            this.setAttribute('show-title', 'true');
-            this.setAttribute('show-desc', 'true');
-            this.setAttribute('show-legend', 'true');
-
-        }
+        this._toggleMinimal(value);
     }
 
     public get showLegend(): boolean { return this._showLegend }
@@ -247,6 +237,24 @@ export default class LineChartComponent extends HTMLElement {
 
         if (titleSlot && titleSlot.assignedNodes().length === 0) titleSlot.style.display = 'none';
         if (descSlot && descSlot.assignedNodes().length === 0) descSlot.style.display = 'none';
+    }
+
+    private _toggleMinimal(isMinimal: boolean): void {
+        const chart: HTMLDivElement | null = this.shadowRoot.querySelector('.line-chart');
+        if (!chart) return;
+
+        if (isMinimal) {
+            this.setAttribute('show-title', 'false');
+            this.setAttribute('show-desc', 'false');
+            this.setAttribute('show-legend', 'false');
+            chart.classList.add('line-chart--minimal');
+        } else {
+            this.setAttribute('show-title', 'true');
+            this.setAttribute('show-desc', 'true');
+            this.setAttribute('show-legend', 'true');
+            chart.classList.remove('line-chart--minimal');
+
+        }
     }
 
     private _toggleTitle(): void {
