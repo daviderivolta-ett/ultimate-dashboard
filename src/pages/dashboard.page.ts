@@ -358,9 +358,8 @@ export default class DashboardPage extends HTMLElement {
         if (dialog) dialog.close();
 
         const event: CustomEvent = e as CustomEvent;
-        const widget: GridConfigWidget = event.detail;
-
-        // this._addWidget(widget);
+        const widgetData: GridConfigWidget = event.detail;
+        this._addWidget(widgetData);
     }
 
     private _addWidget(data: GridConfigWidget): void {

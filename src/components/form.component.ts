@@ -124,10 +124,6 @@ export default class WizardFormComponent extends HTMLElement {
 
         const formData: FormData = new FormData(form);
 
-        for (const [key, value] of formData.entries()) {
-            console.log(key, value);
-        }
-
         const widget: GridConfigWidget = {
             attributes: {},
             slots: []
@@ -141,7 +137,9 @@ export default class WizardFormComponent extends HTMLElement {
             content: ''
         }
 
-        form.querySelectorAll('input').forEach((input: HTMLInputElement) => {
+        const inputs: NodeListOf<LabelInput> = form.querySelectorAll('label-input');
+
+        inputs.forEach((input: LabelInput) => {
             const type: string | undefined = input.dataset.type;
             const name: string = input.name;
             const value: FormDataEntryValue | null = formData.get(name);
@@ -171,7 +169,7 @@ export default class WizardFormComponent extends HTMLElement {
             }
         });
 
-        widget.slots.push(slot);
+        widget.slots.push(slot);          
         this.dispatchEvent(new CustomEvent('form-submit', { composed: true, detail: widget }));
     }
 
