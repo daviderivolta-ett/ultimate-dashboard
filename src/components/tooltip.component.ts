@@ -11,7 +11,7 @@ const style: HTMLStyleElement = document.createElement('style');
 style.innerHTML =
     `
     .tooltip {
-        color: white;
+        color: var(--fg-color-on-emphasis);
         display: flex;
         align-items: center;
         padding: 4px;

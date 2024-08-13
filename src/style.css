@@ -25,18 +25,20 @@ button {
 :root {
   font-family: "Inter", sans-serif;
   font-size: 14px;
-  --border-radius: 24px;
+  --border-radius: 16px;
 }
 
 .light {
   --fg-color-default: #212121;
-  --fg-color-muted: #61646F;
-  --fg-color-disabled: #8C959F;
+  --fg-color-muted: #59636E;
+  --fg-color-disabled: #818B98;
+  --fg-color-on-emphasis: #FFFFFF;
 
-  --bg-color-inset: #F1F7F9;
-  --bg-color-default: #FFFFFFBF;
-  --bg-color-muted: #E8E9F2;
-  --bg-color-emphasis: #24292f;
+  --bg-color-inset: #F6F8FA;
+  --bg-color-inset-emphasis: #E0E6EB;
+  --bg-color-default: #FFFFFF;
+  --bg-color-muted: #F6F8FA;
+  --bg-color-emphasis: #25292E;
   --bg-color-done-emphasis: #8250DF;
   --bg-color-done-muted: #FBEFFF;
   --bg-color-danger-emphasis: #CF222E;
@@ -46,20 +48,50 @@ button {
   --bg-color-success-emphasis: #1F883D;
   --bg-color-success-muted: #DAFBE1;
 
-  --overlay-bg-color: #FFFFFF40;
-  
+  --border-color-default: #E4E4E4;
+
+  --overlay-bg-color: #C8D1DA80;
+
   --button-invisible-icon-color-rest: #212121;
-  
-  --border-color-default: #FFFFFF;
-  
+  --button-default-border-color-rest: #E4E4E4;
+
+  --control-bg-color-rest: #F6F8FA;
+  --control-bg-color-hover: #EFF2F5;
+  --control-bg-color-active: #E6EaEF;
+  --control-bg-color-disabled: #EFF2F5;
+  --control-fg-color-rest: #25292E;
+  --control-fg-color-placeholder: #59636E;
+  --control-fg-color-disabled: #818B98;
+  --control-border-color-rest: #D1D9E0;
+  --control-border-color-emphasis: #818B98;
+  --control-border-color-disabled: #818B981A;
+  --control-border-color-selected: #F6F8FA;
+
+  --button-primary-bg-color-rest: #212121;
+  --button-primary-bg-color-hover: #000000;
+  --button-primary-fg-color-rest: #FFFFFF;
+
+  --data-blue-color: #18A0FB;
   --data-purple-color: #894CEB;
-  
+  --data-turquoise-color: #00B2A9;
+  --data-mint-green-color: #2ECC71;
+  --data-coral-color: #FF6F61;
+  --data-pastel-pink-color: #F39C12;
+  --data-sun-yellow-color: #F1C40F;
+  --data-light-grey-color: #BDC3C7;
+  --data-aquamarine-color: #1ABC9C;
+  --data-fire-red-color: #E74C3C;
+  --data-lime-green-color: #27AE60;
+  --data-lavender-color: #9B59B6;
+
   --chart-line-color: #90909033;
 
   --bg-blur-default: blur(5px);
 
   --shadow-inset-small: inset 0 0 4px rgba(0, 0, 0, 0.1);
   --shadow-resting-small: 0 0 4px rgba(0, 0, 0, 0.1);
+
+  --focus-outline-color: #0969DA;
 }
 
 /* :root {

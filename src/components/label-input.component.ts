@@ -16,6 +16,27 @@ style.innerHTML =
         display: block;
         width: 100%;
     }
+
+    .input-group__label {
+        color: var(--fg-color-rest);
+        font-size: 0.857rem;
+        margin: 0 0 4px 0;
+    }
+
+    .input-group__input {
+        font-family: "Inter", sans-serif;
+        font-size: 1rem;
+        color: var(--control-fg-color-rest);
+        border: 1px solid var(--control-border-color-rest);
+        border-radius: 4px;
+        padding: 8px;
+        box-sizing: border-box;
+        height: 32px;
+
+        &:focus {
+            outline: 2px solid var(--focus-outline-color);
+        }
+    }
     `
     ;
 

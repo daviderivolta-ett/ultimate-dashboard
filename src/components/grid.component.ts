@@ -3,7 +3,6 @@ template.innerHTML =
     `
     <div class="grid">
         <slot></slot>
-        <div class="dropzone"></div>
     </div>
     `
     ;
@@ -63,7 +62,7 @@ style.innerHTML =
 
     ::slotted(.dropzone) {
         border-radius: var(--border-radius);
-        background-color: #E4EEF1;
+        background-color: var(--bg-color-inset-emphasis);
         box-shadow: var(--shadow-inset-small);
     }
 
@@ -93,6 +92,7 @@ style.innerHTML =
 export default class GridComponent extends HTMLElement {
     public shadowRoot: ShadowRoot;
     private _dragoverFixAdded: boolean = false;
+    private _elements: HTMLElement[] = [];
     public draggingElement: HTMLElement | null = null;
 
     constructor() {
@@ -103,6 +103,9 @@ export default class GridComponent extends HTMLElement {
         this.shadowRoot.appendChild(style.cloneNode(true));
     }
 
+    public get elements(): HTMLElement[] { return this._elements }
+    public set elements(value: HTMLElement[]) { this._elements = value }
+
     public connectedCallback(): void {
         this._setup();
     }
@@ -112,20 +115,21 @@ export default class GridComponent extends HTMLElement {
     }
 
     private _handleDrag(): void {
-        const slot: HTMLSlotElement | null = this.shadowRoot.querySelector('slot');      
+        const slot: HTMLSlotElement | null = this.shadowRoot.querySelector('slot');
         if (!slot) return;
 
         slot.addEventListener('slotchange', this._onSlotChange.bind(this), { once: true });
     }
 
-    private _onSlotChange(): void {              
+    private _onSlotChange(): void {
+        console.log('Slot changed');
         const elements: NodeListOf<HTMLElement> = this.querySelectorAll('*');
-        
+
         elements.forEach((element: HTMLElement) => {
             const anchor: HTMLElement | null = element.shadowRoot ?
                 element.shadowRoot.querySelector('.draggable') :
                 element.querySelector('.draggable');
-            
+
             if (anchor) {
                 anchor.addEventListener('mouseenter', this._onMouseEnter.bind(this, element));
                 anchor.addEventListener('mouseleave', this._onMouseLeave.bind(this, element));
@@ -138,10 +142,12 @@ export default class GridComponent extends HTMLElement {
     }
 
     private _onMouseEnter(element: HTMLElement): void {
+        console.log('Mouse enter');
         element.setAttribute('draggable', 'true');
     }
 
     private _onMouseLeave(element: HTMLElement): void {
+        console.log('Mouse leave');
         element.removeAttribute('draggable');
     }
 
@@ -179,7 +185,7 @@ export default class GridComponent extends HTMLElement {
 
         if (event.clientX || event.clientY) {
             this._handleDropzonePosition(slot, dropzone, event.clientX, event.clientY);
-        } else {            
+        } else {
             if (!this._dragoverFixAdded) {
                 this._dragoverFixAdded = true;
                 window.addEventListener('dragover', (event: DragEvent) => this._handleDropzonePosition(slot, dropzone!, event.clientX, event.clientY));

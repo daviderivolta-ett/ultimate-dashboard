@@ -14,7 +14,7 @@ template.innerHTML =
         <button type="button" class="toggle-btn">
             <span class="toggle-btn__icon">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
-                    <path fill="currentColor" d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z"/>
+                    <path fill="currentColor" d="M440-440H240q-17 0-28.5-11.5T200-480q0-17 11.5-28.5T240-520h200v-200q0-17 11.5-28.5T480-760q17 0 28.5 11.5T520-720v200h200q17 0 28.5 11.5T760-480q0 17-11.5 28.5T720-440H520v200q0 17-11.5 28.5T480-200q-17 0-28.5-11.5T440-240v-200Z"/>
                 </svg>
             </span>
         </button>
@@ -36,9 +36,9 @@ style.innerHTML =
         width: 40px;
         height: 40px;
         padding: 8px;
-        background-color: white;
-        border: none;
-        border-radius: 100px;
+        background-color: var(--bg-color-default);
+        border: 1px solid var(--button-default-border-color-rest);
+        border-radius: var(--border-radius);
         box-shadow: var(--shadow-resting-small);
     }
 
@@ -54,7 +54,6 @@ style.innerHTML =
         opacity: 0;
         background-color: var(--bg-color-default);
         height: 40px;
-        // transform: scaleX(0);
         display: flex;
         align-items: center;
         gap: 8px;
@@ -63,9 +62,9 @@ style.innerHTML =
         margin: 0;
         list-style-type: none;
         padding: 0px 16px;
-        border-radius: 100px;
+        border-radius: var(--border-radius);
         box-shadow: var(--shadow-resting-small);
-        border: 1px solid white;
+        border: 1px solid var(--border-color-default);
         box-sizing: border-box;
         backdrop-filter: blur(5px) saturate(2.5);
     }
@@ -73,8 +72,7 @@ style.innerHTML =
     .list--visible {
         opacity: 1;
         transition: .2s ease-in-out;
-        // transform: scaleX(1);
-        margin: 0 16px 0 0;
+        margin: 0 8px 0 0;
     }
 
     ::slotted(.list__el) {

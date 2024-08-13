@@ -37,11 +37,12 @@ style.innerHTML =
 
     .dialog {
         background-color: var(--bg-color-default);
-        border-radius: 16px;
-        padding: 24px;
+        border-radius: var(--border-radius);
+        padding: 32px;
         box-sizing: border-box;
-        border: 1px solid white;
+        border: 1px solid var(--border-color-default);
         box-shadow: var(--shadow-resting-small);
+        width: 350px;
         transition: display .2s allow-discrete, overlay .2s allow-discrete;      
         animation: bounce-out .2s forwards;
         &[open] {
@@ -52,24 +53,6 @@ style.innerHTML =
     .dialog::backdrop {
         background-color: var(--overlay-bg-color);
         backdrop-filter: var(--bg-blur-default);
-    }
-      
-    @keyframes open {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
-        }
-    }
-      
-    @keyframes close {
-        from {
-            opacity: 1;
-        }
-        to {
-            opacity: 0;
-        }
     }
 
     @keyframes bounce-in {
@@ -96,6 +79,12 @@ style.innerHTML =
             opacity: 0;
             transform: scale(.3);
         } 
+    }
+
+    @media screen and (max-width: 576px) {
+        .dialog {
+            width: 92%;
+        }
     }
     `
     ;

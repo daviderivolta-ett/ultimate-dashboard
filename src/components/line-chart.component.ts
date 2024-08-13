@@ -65,6 +65,7 @@ style.innerHTML =
     .legend {
         display: flex;
         align-items: center;
+        justify-content: center;
         gap: 8px;
         flex-wrap: wrap;
     }
@@ -80,9 +81,10 @@ style.innerHTML =
         gap: 8px;
     }
 
-    .legend__item__rect {
-        width: 24px;
-        height: 3px;
+    .legend__item__circle {
+        width: 8px;
+        height: 8px;
+        border-radius: 100%;
     }
 
     .legend__item__label {
@@ -95,6 +97,22 @@ style.innerHTML =
 export default class LineChartComponent extends HTMLElement {
     public shadowRoot: ShadowRoot;
     private _resizeObserver: ResizeObserver;
+    private _colors: string[] = [
+        'var(--data-blue-color)',
+        'var(--data-purple-color)',
+        'var(--data-turquoise-color)',
+        'var(--data-mint-green-color)',
+        'var(--data-coral-color)',
+        'var(--data-pastel-pink-color)',
+        'var(--data-sun-yellow-color)',
+        'var(--data-light-grey-color)',
+        'var(--data-aquamarine-color)',
+        'var(--data-fire-red-color)',
+        'var(--data-lime-green-color)',
+        'var(--data-lavender-color)'
+    ];
+
+
     private _isMinimal: boolean = false;
     private _showLegend: boolean = false;
     private _showTitle: boolean = false;
@@ -118,26 +136,26 @@ export default class LineChartComponent extends HTMLElement {
                 [100, 90]
             ]
         },
-        {
-            label: 'Pippo',
-            dataset: [
-                [10, 30],
-                [20, 45],
-                [30, 35],
-                [40, 60],
-                [50, 70]
-            ]
-        },
-        {
-            label: 'Topolino',
-            dataset: [
-                [80, 45],
-                [40, 65],
-                [100, 70],
-                [70, 70],
-                [30, 50]
-            ]
-        }
+        // {
+        //     label: 'Pippo',
+        //     dataset: [
+        //         [10, 30],
+        //         [20, 45],
+        //         [30, 35],
+        //         [40, 60],
+        //         [50, 70]
+        //     ]
+        // },
+        // {
+        //     label: 'Topolino',
+        //     dataset: [
+        //         [80, 45],
+        //         [40, 65],
+        //         [100, 70],
+        //         [70, 70],
+        //         [30, 50]
+        //     ]
+        // }
     ]
 
     constructor() {
@@ -274,10 +292,8 @@ export default class LineChartComponent extends HTMLElement {
             legend.innerHTML = '';
         }
 
-        const colorScale: d3.ScaleOrdinal<string, string> = d3.scaleOrdinal(d3.schemeCategory10);
-
         this.data.forEach((dataset: LineChartDataset, i: number) => {
-            const color: string = colorScale(i.toString());
+            const color: string = this._colors[i];
             if (this.showLegend) {
                 if (legend && legend.childNodes.length < this.data.length) {
                     legend.style.marginTop = '16px';
@@ -293,7 +309,7 @@ export default class LineChartComponent extends HTMLElement {
         container.classList.add('legend__item');
 
         const rect: HTMLDivElement = document.createElement('div');
-        rect.classList.add('legend__item__rect');
+        rect.classList.add('legend__item__circle');
         rect.style.backgroundColor = color;
         container.appendChild(rect);
 
@@ -322,30 +338,30 @@ export default class LineChartComponent extends HTMLElement {
 
         const xScale = d3.scaleLinear()
             .domain([d3.min(data, (d: number[]) => d[0] ?? 0)!, d3.max(data, (d: number[]) => d[0] ?? 0)!])
-            .range([padding, currentWidth - padding])
+            .range([padding, currentWidth - 8]);
 
         const yScale = d3.scaleLinear()
             .domain([0, d3.max(data, (d: number[]) => d[1] ?? 0)!])
-            .range([currentHeight - padding, padding])
+            .range([currentHeight - padding, padding]);
 
         // svg
         const svg = d3.select(this.shadowRoot.querySelector('#line-chart'))
             .append('svg')
             .attr('width', currentWidth)
-            .attr('height', currentHeight)
+            .attr('height', currentHeight);
 
         // x axis
         const xAxis = svg.append('g')
             .attr('transform', 'translate(0,' + (currentHeight - padding) + ')')
-            .call(d3.axisBottom(xScale).ticks(currentWidth / 50))
+            .call(d3.axisBottom(xScale).ticks(currentWidth / 50));
 
         xAxis.selectAll('text')
             .style('font-size', '.6rem')
-            .style('font-family', 'Inter')
+            .style('font-family', 'Inter');
 
         xAxis.selectAll('.tick')
             .filter((d, i) => i === 0)
-            .style('display', 'none')
+            .style('display', 'none');
 
         xAxis.selectAll('.tick')
             .filter((d, i, nodes) => i === nodes.length - 1)
@@ -354,11 +370,11 @@ export default class LineChartComponent extends HTMLElement {
         // y axis
         const yAxis = svg.append('g')
             .attr('transform', 'translate(' + padding + ', 0)')
-            .call(d3.axisLeft(yScale).ticks(currentWidth / 50))
+            .call(d3.axisLeft(yScale).ticks(currentWidth / 50));
 
         yAxis.selectAll('text')
             .style('font-size', '.6rem')
-            .style('font-family', 'Inter')
+            .style('font-family', 'Inter');
 
         yAxis.selectAll('.tick')
             .filter((d, i, nodes) => i === nodes.length - 1)
@@ -366,10 +382,10 @@ export default class LineChartComponent extends HTMLElement {
 
         yAxis.selectAll('.tick')
             .select('line')
-            .style('display', 'none')
+            .style('display', 'none');
 
         yAxis.select('.domain')
-            .style('display', 'none')
+            .style('display', 'none');
 
         // x uom
         svg.append('text')
@@ -378,7 +394,7 @@ export default class LineChartComponent extends HTMLElement {
             .attr('y', currentHeight - padding + 15)
             .style('font-size', '.6rem')
             .style('text-anchor', 'middle')
-            .text(this.xUnit)
+            .text(this.xUnit);
 
         // y uom
         svg.append('text')
@@ -387,7 +403,7 @@ export default class LineChartComponent extends HTMLElement {
             .attr('y', padding)
             .style('font-size', '.6rem')
             .style('text-anchor', 'end')
-            .text(this.yUnit)
+            .text(this.yUnit);
 
         // horizontal grid
         svg.append('g')
@@ -399,26 +415,29 @@ export default class LineChartComponent extends HTMLElement {
             .attr('y2', d => yScale(d))
             .attr('x1', padding)
             .attr('x2', currentWidth - padding)
-            .attr('stroke', 'var(--chart-line-color)')
+            .attr('stroke', 'var(--chart-line-color)');
 
-        const colorScale: d3.ScaleOrdinal<string, string> = d3.scaleOrdinal(d3.schemeCategory10);
+        // Area
         this.data.forEach((dataset: LineChartDataset, i: number) => {
-            const color: string = colorScale(i.toString());
+            const color: string = this._colors[i];
 
-            // area
-            // svg.append('path')
-            //     .datum(dataset.dataset)
-            //     .attr('fill', color)
-            //     .attr('fill-opacity', '.4')
-            //     .attr('stroke', 'none')
-            //     .attr('d', d3.area<number[]>()
-            //         .curve(d3.curveCardinal)
-            //         .x(d => xScale(d[0]))
-            //         .y0(currentHeight - padding)
-            //         .y1(d => yScale(d[1]))
-            //     );
+            svg.append('path')
+                .datum(dataset.dataset)
+                .attr('fill', color)
+                .attr('fill-opacity', '.1')
+                .attr('stroke', 'none')
+                .attr('d', d3.area<number[]>()
+                    .curve(d3.curveCardinal)
+                    .x(d => xScale(d[0]))
+                    .y0(currentHeight - padding)
+                    .y1(d => yScale(d[1]))
+                );
+        });
 
-            // line
+        // Lines
+        this.data.forEach((dataset: LineChartDataset, i: number) => {
+            const color: string = this._colors[i];
+
             const line = d3.line<number[]>()
                 .curve(d3.curveCardinal)
                 .x(d => xScale(d[0]))
@@ -429,9 +448,13 @@ export default class LineChartComponent extends HTMLElement {
                 .attr('stroke', color)
                 .attr('stroke-width', 2)
                 .attr('d', line(dataset.dataset));
+        });
 
-            // points
-            const points = svg.append('g')
+        // Circles
+        this.data.forEach((dataset: LineChartDataset, i: number) => {
+            const color: string = this._colors[i];
+
+            svg.append('g')
                 .attr('class', 'points-group')
                 .selectAll('points')
                 .data(dataset.dataset)
@@ -441,7 +464,7 @@ export default class LineChartComponent extends HTMLElement {
                 .attr('stroke', 'none')
                 .attr('cx', d => xScale(d[0]))
                 .attr('cy', d => yScale(d[1]))
-                .attr('r', 3)
+                .attr('r', 2)
                 .style('cursor', 'pointer')
                 .on('mouseover', (event, d) => {
                     d3.select('#d3-tooltip')
@@ -450,23 +473,24 @@ export default class LineChartComponent extends HTMLElement {
                         .style('display', 'block')
                         .style('left', event.pageX + 8 + 'px')
                         .style('top', event.pageY + 8 + 'px')
-                        .text(`${this.xUnit}: ${d[0]}, ${this.yUnit}: ${d[1]}`)
+                        .text(`${this.xUnit}: ${d[0]}, ${this.yUnit}: ${d[1]}`);
                 })
                 .on('mouseout', function () {
                     d3.select('#d3-tooltip')
                         .style('opacity', 0)
-                        .style('display', 'none')
-                })
-
-            // tooltip
-            if (!document.querySelector('#d3-tooltip')) {
-                d3.select('body')
-                    .append('div')
-                    .attr('id', 'd3-tooltip')
-                    .attr('style', 'position: absolute; opacity: 0; display: none; background-color: white; padding: 8px; border-radius: 4px; max-width: 200px')
-            }
+                        .style('display', 'none');
+                });
         });
+
+        // Tooltip
+        if (!document.querySelector('#d3-tooltip')) {
+            d3.select('body')
+                .append('div')
+                .attr('id', 'd3-tooltip')
+                .attr('style', 'position: absolute; opacity: 0; display: none; color: var(--fg-color-on-emphasis); background-color: var(--bg-color-emphasis); padding: 8px; border-radius: 4px; max-width: 200px');
+        }
     }
+
 
     private _getContainerSize(id: string, size: string): number {
         if (!d3.select(this.shadowRoot.querySelector(`#${id}`)).style(size)) return 0;

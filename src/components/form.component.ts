@@ -6,10 +6,10 @@ const template: HTMLTemplateElement = document.createElement('template');
 template.innerHTML =
     `
     <div class="form">
-        <h2>Creazione widget</h2>
+        <h2 class="form__title">Creazione widget</h2>
         <form>
             <div class="form__fields"></div>
-            <button type="submit">Crea componente</button>
+            <button type="submit" class="form__button">Crea componente</button>
         </form>
     </div>
     `
@@ -19,6 +19,36 @@ template.innerHTML =
 const style: HTMLStyleElement = document.createElement('style');
 style.innerHTML =
     `
+    .form__title {
+        text-align: center;
+        font-weight: 600;
+        font-size: 1.143rem;
+        margin: 0 0 24px 0;
+    }
+
+    .form__fields {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin: 0 0 24px 0;
+    }
+
+    .form__button {
+        cursor: pointer;
+        font-family: "Inter", sans-serif;
+        font-size: 1rem;
+        padding: 8px;
+        color: var(--button-primary-fg-color-rest);
+        background-color: var(--button-primary-bg-color-rest);
+        width: 100%;
+        border: none;
+        border-radius: 4px;
+        height: 32px;
+
+        &:hover {
+            background-color: var(--button-primary-bg-color-hover);
+        }
+    }
     `
     ;
 

@@ -55,15 +55,20 @@ style.innerHTML =
         right: 8px;
         z-index: 99;
         cursor: grab;
-        width: 40px;
-        height: 40px;
+        width: 32px;
+        height: 32px;
         background-color: transparent;
         display: flex;
         justify-content: center;
         align-items: center;
+        background-color: var(--bg-color-default);
+        border-radius: 8px;
     }
 
     .draggable__icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         color: var(--button-invisible-icon-color-rest);
     }
     `
