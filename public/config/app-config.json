@@ -29,7 +29,7 @@
                 },
                 {
                     "tag": "ettdash-line-chart",
-                    "icon": "./icons/add.svg",
+                    "icon": "./icons/line-chart.svg",
                     "cardAttributes": {},
                     "widgetAttributes": {},
                     "wizard": [
@@ -56,12 +56,6 @@
                             "label": "Unità di misura ordinate",
                             "value": "",
                             "attribute": "y-unit"
-                        },
-                        {
-                            "input": "checkbox",
-                            "label": "Mostrare la legenda",
-                            "value": true,
-                            "attribute": "show-legend"
                         }
                     ]
                 }

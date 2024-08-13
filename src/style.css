@@ -29,12 +29,12 @@ button {
 }
 
 .light {
-  --fg-color-default: #1F2328;
+  --fg-color-default: #212121;
   --fg-color-muted: #61646F;
   --fg-color-disabled: #8C959F;
 
   --bg-color-inset: #F1F7F9;
-  --bg-color-default: #FFFFFF80;
+  --bg-color-default: #FFFFFFBF;
   --bg-color-muted: #E8E9F2;
   --bg-color-emphasis: #24292f;
   --bg-color-done-emphasis: #8250DF;
@@ -45,8 +45,10 @@ button {
   --bg-color-attention-muted: #FFF8C5;
   --bg-color-success-emphasis: #1F883D;
   --bg-color-success-muted: #DAFBE1;
+
+  --overlay-bg-color: #FFFFFF40;
   
-  --button-invisible-icon-color-rest: #636C76;
+  --button-invisible-icon-color-rest: #212121;
   
   --border-color-default: #FFFFFF;
   
@@ -54,7 +56,8 @@ button {
   
   --chart-line-color: #90909033;
 
-  --bg-blur-default: blur(15px);
+  --bg-blur-default: blur(5px);
+
   --shadow-inset-small: inset 0 0 4px rgba(0, 0, 0, 0.1);
   --shadow-resting-small: 0 0 4px rgba(0, 0, 0, 0.1);
 }

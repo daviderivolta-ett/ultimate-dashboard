@@ -259,7 +259,6 @@ export default class LineChartComponent extends HTMLElement {
 
     private _toggleTitle(): void {
         const title: HTMLSlotElement | null = this.shadowRoot.querySelector('slot[name="title"');
-        console.log(title);
         if (title) this.showTitle ? title.classList.remove('header__title--hidden') : title.classList.add('header__title--hidden');
     }
 

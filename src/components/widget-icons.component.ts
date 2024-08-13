@@ -33,9 +33,13 @@ style.innerHTML =
 
     .toggle-btn {
         cursor: pointer;
-        width: 32px;
-        height: 32px;
+        width: 40px;
+        height: 40px;
         padding: 8px;
+        background-color: white;
+        border: none;
+        border-radius: 100px;
+        box-shadow: var(--shadow-resting-small);
     }
 
     .toggle-btn__icon {
@@ -48,22 +52,29 @@ style.innerHTML =
 
     .list {
         opacity: 0;
-        background-color: red;
-        height: 32px;
-        transform: scaleX(0);
+        background-color: var(--bg-color-default);
+        height: 40px;
+        // transform: scaleX(0);
         display: flex;
         align-items: center;
+        gap: 8px;
         transition: .2s ease-in-out;
         transform-origin: right;
         margin: 0;
         list-style-type: none;
-        padding: 0;
+        padding: 0px 16px;
+        border-radius: 100px;
+        box-shadow: var(--shadow-resting-small);
+        border: 1px solid white;
+        box-sizing: border-box;
+        backdrop-filter: blur(5px) saturate(2.5);
     }
     
     .list--visible {
         opacity: 1;
         transition: .2s ease-in-out;
-        transform: scaleX(1);
+        // transform: scaleX(1);
+        margin: 0 16px 0 0;
     }
 
     ::slotted(.list__el) {

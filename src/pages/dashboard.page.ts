@@ -36,11 +36,22 @@ style.innerHTML =
     }
 
     .dialog {
+        background-color: var(--bg-color-default);
+        border-radius: 16px;
+        padding: 24px;
+        box-sizing: border-box;
+        border: 1px solid white;
+        box-shadow: var(--shadow-resting-small);
         transition: display .2s allow-discrete, overlay .2s allow-discrete;      
         animation: bounce-out .2s forwards;
         &[open] {
             animation: bounce-in .2s forwards;
         }
+    }
+
+    .dialog::backdrop {
+        background-color: var(--overlay-bg-color);
+        backdrop-filter: var(--bg-blur-default);
     }
       
     @keyframes open {
@@ -186,7 +197,7 @@ export default class DashboardPage extends HTMLElement {
             };
             return widget;
         });
-      
+
         return widgets;
     }
 
@@ -210,7 +221,7 @@ export default class DashboardPage extends HTMLElement {
     private _getDirectTextContent(node: HTMLElement): string {
         let textContent = '';
         node.childNodes.forEach((childNode: ChildNode) => {
-            
+
             if (childNode.nodeType === Node.TEXT_NODE) {
                 textContent += childNode.textContent;
             }
@@ -302,7 +313,7 @@ export default class DashboardPage extends HTMLElement {
         if (!widgetData) return;
 
         this._openDialog();
-        this._createWizardForm(widgetData.wizard);
+        this._createWizardForm(widgetData);
 
         // const dropTargetRect = grid.getBoundingClientRect();
 
@@ -331,40 +342,55 @@ export default class DashboardPage extends HTMLElement {
         dialog.showModal();
     }
 
-    private _createWizardForm(widgetData: WizardItem[]): void {
+    private _createWizardForm(widgetData: AppConfigWidget): void {
         const dialog: HTMLDialogElement | null = this.shadowRoot.querySelector('.dialog');
         if (!dialog) return;
 
         const form: WizardFormComponent = new WizardFormComponent();
-        form.wizardItems = widgetData;
+        form.widget = widgetData;
         dialog.appendChild(form);
     }
 
     private _handleWizardFormSubmit(e: Event) {
         e.stopPropagation();
+
+        const dialog: HTMLDialogElement | null = this.shadowRoot.querySelector('dialog');
+        if (dialog) dialog.close();
+
         const event: CustomEvent = e as CustomEvent;
-        if (event.detail instanceof FormData) {
-            const formData: FormData = event.detail;
-            for (const value of formData.entries()) {
-                console.log(value);
-            }
-        }
+        const widget: GridConfigWidget = event.detail;
+
+        // this._addWidget(widget);
     }
 
-    private _addWidget(data: AppConfigWidget): void {
+    private _addWidget(data: GridConfigWidget): void {
         const card: CardComponent = new CardComponent();
-        for (const key in data.cardAttributes) {
-            card.setAttribute(key, data.cardAttributes[key]);
+
+        for (const key in data.attributes) {
+            card.setAttribute(key, data.attributes[key]);
         }
-        const el: HTMLElement = document.createElement(data.tag);
-        el.setAttribute('slot', 'content');
-        for (const key in data.widgetAttributes) {
-            el.setAttribute(key, data.widgetAttributes[key]);
-        }
-        card.appendChild(el);
+
+        this._addSlots(card, data.slots);
+
         const grid: HTMLElement | null = this.shadowRoot.querySelector('draggable-grid');
         if (!grid) return;
+        
         grid.appendChild(card);
+    }
+
+    private _addSlots(parentEl: HTMLElement, slots: GridConfigWidgetSlot[]) {
+        slots.forEach((slot: GridConfigWidgetSlot) => {
+            const el: HTMLElement = document.createElement(slot.tag);
+            el.setAttribute('slot', slot.name);
+            el.innerHTML = slot.content;
+            for (const key in slot.attributes) {
+                el.setAttribute(key, slot.attributes[key]);
+            }
+            parentEl.appendChild(el);
+            if (slot.slots && slot.slots.length > 0) {
+                this._addSlots(el, slot.slots);
+            }
+        });
     }
 }
 
