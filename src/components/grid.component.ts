@@ -118,7 +118,7 @@ export default class GridComponent extends HTMLElement {
         slot.addEventListener('slotchange', this._onSlotChange.bind(this), { once: true });
     }
 
-    private _onSlotChange(): void {        
+    private _onSlotChange(): void {              
         const elements: NodeListOf<HTMLElement> = this.querySelectorAll('*');
         
         elements.forEach((element: HTMLElement) => {
