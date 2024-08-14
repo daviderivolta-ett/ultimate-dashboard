@@ -186,7 +186,7 @@ export default class DashboardPage extends HTMLElement {
             };
             return widget;
         });
-
+        
         return widgets;
     }
 
@@ -220,7 +220,9 @@ export default class DashboardPage extends HTMLElement {
 
     private _getNodeAttributes(node: HTMLElement): Record<string, any> {
         return Array.from(node.attributes).reduce((acc, attr) => {
-            acc[attr.name] = attr.value;
+            if (attr.name !== 'is-draggable') {
+                acc[attr.name] = attr.value;
+            }
             return acc;
         }, {} as { [key: string]: string });
     }

@@ -118,14 +118,17 @@ export default class GridComponent extends HTMLElement {
         const slot: HTMLSlotElement | null = this.shadowRoot.querySelector('slot');
         if (!slot) return;
 
-        slot.addEventListener('slotchange', this._onSlotChange.bind(this), { once: true });
+        slot.addEventListener('slotchange', this._onSlotChange.bind(this));
     }
 
     private _onSlotChange(): void {
-        console.log('Slot changed');
+        // console.log('Slot changed');
         const elements: NodeListOf<HTMLElement> = this.querySelectorAll('*');
 
         elements.forEach((element: HTMLElement) => {
+            if (element.hasAttribute('is-draggable')) return;
+            element.setAttribute('is-draggable', '');
+
             const anchor: HTMLElement | null = element.shadowRoot ?
                 element.shadowRoot.querySelector('.draggable') :
                 element.querySelector('.draggable');
@@ -142,17 +145,17 @@ export default class GridComponent extends HTMLElement {
     }
 
     private _onMouseEnter(element: HTMLElement): void {
-        console.log('Mouse enter');
+        // console.log('Mouse enter');
         element.setAttribute('draggable', 'true');
     }
 
     private _onMouseLeave(element: HTMLElement): void {
-        console.log('Mouse leave');
+        // console.log('Mouse leave');
         element.removeAttribute('draggable');
     }
 
     private _onDragStart(event: DragEvent): void {
-        console.log('Drag started');
+        // console.log('Drag started');
 
         if (!(event.currentTarget instanceof HTMLElement)) return;
         event.currentTarget.style.opacity = '.25';
@@ -194,7 +197,7 @@ export default class GridComponent extends HTMLElement {
     }
 
     private _onDragEnd(event: DragEvent): void {
-        console.log('Drag ended');
+        // console.log('Drag ended');
         if (!(event.currentTarget instanceof HTMLElement)) return;
 
         event.currentTarget.removeAttribute('id');
@@ -209,13 +212,13 @@ export default class GridComponent extends HTMLElement {
     }
 
     private _onDragOver(event: DragEvent): void {
-        console.log('Drag over');
+        // console.log('Drag over');
         event.preventDefault();
         event.stopPropagation();
     }
 
     private _onDrop(): void {
-        console.log('Drop');
+        // console.log('Drop');
         const dropzone: HTMLDivElement | null = this.querySelector('.dropzone');
         const originalElement = this.querySelector(`#dragging-element`) as HTMLElement;
 
