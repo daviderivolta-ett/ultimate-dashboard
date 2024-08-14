@@ -24,6 +24,12 @@ style.innerHTML =
         padding: 0 4%;
         box-sizing: border-box;
     }
+
+    .topbar__menu {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
     `
     ;
 

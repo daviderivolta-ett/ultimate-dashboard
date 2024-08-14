@@ -1,7 +1,7 @@
 import '../components/grid.component';
 import GridComponent from '../components/grid.component';
 import CardComponent from '../components/card.component';
-import { AppConfig, AppConfigWidget, GridConfig, GridConfigWidget, GridConfigWidgetSlot, WizardItem } from '../models/config.model';
+import { AppConfig, AppConfigWidget, GridConfig, GridConfigWidget, GridConfigWidgetSlot } from '../models/config.model';
 import { ConfigService } from '../services/config.service';
 import { WidgetIcon, WidgetIconsComponent } from '../components/widget-icons.component';
 import WizardFormComponent from '../components/form.component';
@@ -14,7 +14,11 @@ template.innerHTML =
     `
     <div class="dashboard">
         <navigation-topbar>
-            <expandable-list slot="topbar-menu">
+            <expandable-list slot="topbar-menu" class="change-grid-layout-button">
+                <span slot="button-label">Test</span>
+                <span slot="panel-content">PIPPO</span>
+            </expandable-list>
+            <expandable-list slot="topbar-menu" class="change-grid-layout-button">
                 <span slot="button-label">Grid</span>
                 <radio-group slot="panel-content" name="grid-config" layout-orientation="vertical"></radio-group>
             </expandable-list>
