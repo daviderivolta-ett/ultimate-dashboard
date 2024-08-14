@@ -3,11 +3,7 @@ template.innerHTML =
     `
     <label class="radio" for="radio">
         <input class="radio__input" type="radio" id="radio" name="radio">
-        <span class="radio__icon">
-            <svg viewBox="0 0 24 24">
-                <use href="/icons/square.svg#square"></use>
-            </svg>
-        </span>
+        <slot name="radio-icon" class="radio__icon"></slot>
         <span class="radio__label"></span>
     </label>
     `
@@ -55,7 +51,6 @@ export default class RadioButtonComponent extends HTMLElement {
 
     private _value: string = '';
     private _name: string = '';
-    private _iconUrl: string = '';
     private _label: string = '';
     public input: HTMLInputElement = document.createElement('input');
 
@@ -79,12 +74,6 @@ export default class RadioButtonComponent extends HTMLElement {
         this._updateInputName();
     }
 
-    public get iconUrl(): string { return this._iconUrl }
-    public set iconUrl(value: string) {
-        this._iconUrl = value;
-        this._updateIconUrl();
-    }
-
     public get label(): string { return this._label }
     public set label(value: string) {
         this._label = value;
@@ -103,11 +92,10 @@ export default class RadioButtonComponent extends HTMLElement {
         this._setup();
     }
 
-    static observedAttributes: string[] = ['value', 'name', 'label', 'iconUrl', 'label'];
+    static observedAttributes: string[] = ['value', 'name', 'label', 'label'];
     public attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
         if (name === 'value') this.value = newValue;
         if (name === 'name') this.name = newValue;
-        if (name === 'icon-url') this.iconUrl = newValue;
         if (name === 'label') this.label = newValue;
     }
 
@@ -117,7 +105,6 @@ export default class RadioButtonComponent extends HTMLElement {
 
         this._updateInputValue();
         this._updateInputName();
-        this._updateIconUrl();
     }
 
     private _updateInputValue(): void {
@@ -128,11 +115,6 @@ export default class RadioButtonComponent extends HTMLElement {
     private _updateInputName(): void {
         const input: HTMLInputElement | null = this.shadowRoot.querySelector('input');
         if (input) input.name = this.name;
-    }
-
-    private _updateIconUrl(): void {
-        const icon: SVGUseElement | null = this.shadowRoot.querySelector('use');
-        if (icon) icon.href.baseVal = this.iconUrl;
     }
 
     private _updateLabel(): void {

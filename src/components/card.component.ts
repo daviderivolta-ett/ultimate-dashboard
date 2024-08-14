@@ -91,7 +91,7 @@ export default class CardComponent extends HTMLElement {
 
     public get size(): WidgetSize { return this._size }
     public set size(value: WidgetSize) {
-        this._size = value;      
+        this._size = value;
         this._resizeWidget(value);
         this._toggleMinimal(value);
     }
@@ -131,7 +131,16 @@ export default class CardComponent extends HTMLElement {
 
         validSizes.forEach((size: string) => {
             const radioButton: RadioButton = new RadioButton();
-            radioButton.iconUrl = `/icons/${size}.svg#${size}`;
+
+            fetch(`/icons/${size}.svg`)
+                .then((res: Response) => res.text())
+                .then((iconString: string) => {
+                    const icon = document.createElement('span');
+                    icon.setAttribute('slot', 'radio-icon');
+                    icon.innerHTML = iconString;
+                    radioButton.appendChild(icon);
+                })
+                .catch(() => { throw new Error('Icon not found') })
 
             radioButton.value = size;
             radioButton.name = size;
@@ -178,8 +187,8 @@ export default class CardComponent extends HTMLElement {
         this.classList.remove(...Object.values(WidgetSize));
     }
 
-    private _toggleMinimal(size: WidgetSize): void {     
-        const slot: HTMLSlotElement | null = this.shadowRoot.querySelector('slot[name="content"]');        
+    private _toggleMinimal(size: WidgetSize): void {
+        const slot: HTMLSlotElement | null = this.shadowRoot.querySelector('slot[name="content"]');
         if (!slot) return;
         const slottedElement: Element[] = slot.assignedElements();
         if (slottedElement.length === 0) return;
