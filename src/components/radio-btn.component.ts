@@ -8,6 +8,7 @@ template.innerHTML =
                 <use href="/icons/square.svg#square"></use>
             </svg>
         </span>
+        <span class="radio__label"></span>
     </label>
     `
     ;
@@ -17,6 +18,8 @@ style.innerHTML =
     `
     .radio {
         cursor: pointer;
+        display: flex;
+        align-items: center;
     }
 
     .radio__input {
@@ -52,7 +55,8 @@ export default class RadioButtonComponent extends HTMLElement {
 
     private _value: string = '';
     private _name: string = '';
-    private _iconUrl: string = '/icons/square.svg#square';
+    private _iconUrl: string = '';
+    private _label: string = '';
     public input: HTMLInputElement = document.createElement('input');
 
     constructor() {
@@ -81,8 +85,14 @@ export default class RadioButtonComponent extends HTMLElement {
         this._updateIconUrl();
     }
 
+    public get label(): string { return this._label }
+    public set label(value: string) {
+        this._label = value;
+        this._updateLabel();
+    }
+
     get checked(): boolean { return this.input.checked }
-    set checked(value: boolean) {    
+    set checked(value: boolean) {
         this.input.checked = value;
         const icon: HTMLSpanElement | null = this.shadowRoot.querySelector('.radio__icon');
         if (icon) value ? icon.classList.add('radio__icon--checked') : icon.classList.remove('radio__icon--checked');
@@ -93,11 +103,12 @@ export default class RadioButtonComponent extends HTMLElement {
         this._setup();
     }
 
-    static observedAttributes: string[] = ['value', 'name', 'label', 'iconUrl'];
+    static observedAttributes: string[] = ['value', 'name', 'label', 'iconUrl', 'label'];
     public attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
         if (name === 'value') this.value = newValue;
         if (name === 'name') this.name = newValue;
         if (name === 'icon-url') this.iconUrl = newValue;
+        if (name === 'label') this.label = newValue;
     }
 
     private _render(): void {
@@ -122,6 +133,11 @@ export default class RadioButtonComponent extends HTMLElement {
     private _updateIconUrl(): void {
         const icon: SVGUseElement | null = this.shadowRoot.querySelector('use');
         if (icon) icon.href.baseVal = this.iconUrl;
+    }
+
+    private _updateLabel(): void {
+        const label = this.shadowRoot.querySelector('.radio__label');
+        if (label) label.innerHTML = this.label;
     }
 
     private _setup(): void {

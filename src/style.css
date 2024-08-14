@@ -26,6 +26,7 @@ button {
   font-family: "Inter", sans-serif;
   font-size: 14px;
   --border-radius: 16px;
+  --border-radius-small: 8px;
 }
 
 .light {
@@ -35,7 +36,7 @@ button {
   --fg-color-on-emphasis: #FFFFFF;
 
   --bg-color-inset: #F6F8FA;
-  --bg-color-inset-emphasis: #E0E6EB;
+  --bg-color-inset-emphasis: #F0F0F0;
   --bg-color-default: #FFFFFF;
   --bg-color-muted: #F6F8FA;
   --bg-color-emphasis: #25292E;
@@ -48,12 +49,26 @@ button {
   --bg-color-success-emphasis: #1F883D;
   --bg-color-success-muted: #DAFBE1;
 
-  --border-color-default: #E4E4E4;
+  --border-color-default: #D1D9E0;
 
   --overlay-bg-color: #C8D1DA80;
 
-  --button-invisible-icon-color-rest: #212121;
-  --button-default-border-color-rest: #E4E4E4;
+  --button-default-bg-color-rest: #F6F8FA;
+  --button-default-bg-color-hover: #EFF2F5;
+  --button-default-fg-color-rest: #212121;
+  --button-default-fg-color-hover: #212121;
+  --button-default-border-color-rest: #D1D9E0;
+  --button-default-border-color-hover: #D1D9E0;
+  --button-primary-bg-color-rest: #0969DA;
+  --button-primary-bg-color-hover: #1163c0;
+  --button-primary-fg-color-rest: #FFFFFF;
+  --button-primary-fg-color-hover: #FFFFFF;
+  --button-primary-border-color-rest: #0969DA;
+  --button-primary-border-color-hover: #1163c0;
+  --button-white-bg-color-rest: #FFFFFF;
+  --button-white-fg-color-rest: #212121;
+  --button-white-border-color-rest: #D1D9E0;
+  --button-white-border-color-hover: #D1D9E0;
 
   --control-bg-color-rest: #F6F8FA;
   --control-bg-color-hover: #EFF2F5;
@@ -66,10 +81,6 @@ button {
   --control-border-color-emphasis: #818B98;
   --control-border-color-disabled: #818B981A;
   --control-border-color-selected: #F6F8FA;
-
-  --button-primary-bg-color-rest: #212121;
-  --button-primary-bg-color-hover: #000000;
-  --button-primary-fg-color-rest: #FFFFFF;
 
   --data-blue-color: #18A0FB;
   --data-purple-color: #894CEB;
@@ -84,7 +95,7 @@ button {
   --data-lime-green-color: #27AE60;
   --data-lavender-color: #9B59B6;
 
-  --chart-line-color: #90909033;
+  --chart-line-color: #21212110;
 
   --bg-blur-default: blur(5px);
 
@@ -92,6 +103,7 @@ button {
   --shadow-resting-small: 0 0 4px rgba(0, 0, 0, 0.1);
 
   --focus-outline-color: #0969DA;
+  --focus-shadow-color: #0969DA1A;
 }
 
 /* :root {

@@ -11,7 +11,10 @@ const template: HTMLTemplateElement = document.createElement('template');
 template.innerHTML =
     `
     <div class="dashboard">
-        <draggable-grid></draggable-grid>
+        <navigation-topbar></navigation-topbar>
+        <div class="grid">
+            <draggable-grid></draggable-grid>
+        </div>
         <dialog class="dialog"></dialog>
     </div>
     `
@@ -24,15 +27,19 @@ style.innerHTML =
     @import "/src/style.css";
 
     .dashboard {
-        display: block;
-        padding: 16px;
+        display: block;        
         min-height: 100dvh;
+    }
+
+    .grid {
+        padding: 16px;
     }
 
     .widget-icons {
         position: fixed;
         bottom: 24px;
         right: 24px;
+        z-index: 999;
     }
 
     .dialog {
@@ -41,7 +48,7 @@ style.innerHTML =
         padding: 32px;
         box-sizing: border-box;
         border: 1px solid var(--border-color-default);
-        box-shadow: var(--shadow-resting-small);
+        max-height: 100dvh;
         width: 350px;
         transition: display .2s allow-discrete, overlay .2s allow-discrete;      
         animation: bounce-out .2s forwards;
@@ -104,7 +111,15 @@ export default class DashboardPage extends HTMLElement {
     // Component callbacks
     public async connectedCallback(): Promise<void> {
         const appConfig: AppConfig = await ConfigService.instance.getAppConfig();
-        const gridConfig: GridConfig = await ConfigService.instance.getGridConfig();
+        // console.log('App config', appConfig);        
+        const allGridConfigs: GridConfig[] = await ConfigService.instance.getAllGridConfigs();
+        // console.log('All grid configs', allGridConfigs);
+        // const gridConfig: GridConfig = await ConfigService.instance.getGridConfig();
+        // console.log('Grid config', gridConfig);
+
+        let gridConfig: GridConfig | null = ConfigService.instance.getCustomGridConfig();
+        if (!gridConfig) gridConfig = await ConfigService.instance.getGridConfig();        
+        
         this._render();
         this._setup();
         this._fillGrid(gridConfig.grid);
@@ -118,27 +133,45 @@ export default class DashboardPage extends HTMLElement {
         this._renderWidgetIcons();
     }
 
+    private async _reload(id: string): Promise<void> {
+        this._removeEventListeners();
+        const gridConfig: GridConfig = await ConfigService.instance.getGridConfig(id);   
+        this._render();
+        this._setup();
+        this._fillGrid(gridConfig.grid);
+    }
+
     private _setup(): void {
-        this._configAutosave = setInterval(this._handleGridChange.bind(this), 5000);
+        this._configAutosave = setInterval(this._handleGridChange, 5000);
         this._setupWidgetIcons();
-        this.addEventListener('form-submit', this._handleWizardFormSubmit.bind(this));
+        this.addEventListener('form-submit', this._handleWizardFormSubmit);
+        this.addEventListener('grid-config-change', this._handleGridConfigChange);
     }
 
     private _removeEventListeners(): void {
         clearInterval(this._configAutosave);
         const dashboard: HTMLElement | null = this.shadowRoot.querySelector('.dashboard');
         if (dashboard) {
-            dashboard.removeEventListener('dragover', this._handleGridDragOver.bind(this));
-            dashboard.removeEventListener('drop', this._handleGridDrop.bind(this));
+            dashboard.removeEventListener('dragover', this._handleGridDragOver);
+            dashboard.removeEventListener('drop', this._handleGridDrop);
         }
-        this.removeEventListener('form-submit', this._handleWizardFormSubmit.bind(this));
+        this.removeEventListener('form-submit', this._handleWizardFormSubmit);
+        this.removeEventListener('grid-config-change', this._handleGridConfigChange);
     }
 
     // Methods
+    // Change grid layout
+    private _handleGridConfigChange = (event: Event): void => {
+        const e: CustomEvent = event as CustomEvent;
+        this._reload(e.detail);
+    }
+
     // Render draggable grid
     private _fillGrid(widgets: GridConfigWidget[]): void {
         const grid: GridComponent | null = this.shadowRoot.querySelector('draggable-grid');
         if (!grid) return;
+
+        grid.innerHTML = '';
 
         widgets.forEach((widget: GridConfigWidget) => {
             let card: CardComponent = new CardComponent();
@@ -227,7 +260,7 @@ export default class DashboardPage extends HTMLElement {
         }, {} as { [key: string]: string });
     }
 
-    private _handleGridChange(): void {
+    private _handleGridChange = (): void => {
         const widgets: any[] = this._getGridContent();
         const config = new GridConfig();
         config.id = 'custom';
@@ -240,6 +273,9 @@ export default class DashboardPage extends HTMLElement {
     private _renderWidgetIcons() {
         const dashboard: HTMLElement | null = this.shadowRoot.querySelector('.dashboard');
         if (!dashboard) return;
+
+        const oldIcons: HTMLElement | null = dashboard.querySelector('ettdash-widget-icons');
+        if (oldIcons) oldIcons.remove();
 
         const icons: WidgetIconsComponent = new WidgetIconsComponent();
         const config: AppConfig | null = ConfigService.instance.appConfig;
@@ -259,14 +295,14 @@ export default class DashboardPage extends HTMLElement {
         const icons: NodeListOf<HTMLElement> = this.shadowRoot.querySelectorAll('ettdash-widget-icons>*');
 
         if (dashboard) {
-            dashboard.addEventListener('dragover', this._handleGridDragOver.bind(this));
-            dashboard.addEventListener('drop', this._handleGridDrop.bind(this));
+            dashboard.addEventListener('dragover', this._handleGridDragOver);
+            dashboard.addEventListener('drop', this._handleGridDrop);
 
-            icons.forEach((icon: HTMLElement) => icon.addEventListener('dragstart', this._handleIconDragStart.bind(this)))
+            icons.forEach((icon: HTMLElement) => icon.addEventListener('dragstart', this._handleIconDragStart))
         }
     }
 
-    private _handleIconDragStart(event: DragEvent): void {
+    private _handleIconDragStart = (event: DragEvent): void => {
         const target = event.target as HTMLElement;
         if (target && target.id) {
             const id: string | undefined = target.id.split('#').pop();
@@ -274,7 +310,7 @@ export default class DashboardPage extends HTMLElement {
         }
     }
 
-    private _handleGridDragOver(event: DragEvent): void {
+    private _handleGridDragOver = (event: DragEvent): void => {
         event.preventDefault();
 
         const grid: HTMLElement | null = this.shadowRoot.querySelector('draggable-grid');
@@ -292,7 +328,7 @@ export default class DashboardPage extends HTMLElement {
         }
     }
 
-    private _handleGridDrop(event: DragEvent): void {
+    private _handleGridDrop = (event: DragEvent): void => {
         // console.log(event.dataTransfer);
         const grid: HTMLElement | null = this.shadowRoot.querySelector('draggable-grid');
         if (!grid) return;
@@ -305,17 +341,6 @@ export default class DashboardPage extends HTMLElement {
 
         this._openDialog();
         this._createWizardForm(widgetData);
-
-        // const dropTargetRect = grid.getBoundingClientRect();
-
-        // if (event.clientX >= dropTargetRect.left &&
-        //     event.clientX <= dropTargetRect.right &&
-        //     event.clientY >= dropTargetRect.top &&
-        //     event.clientY <= dropTargetRect.bottom) {
-        //     console.log('Element dropped on the target');
-        // } else {
-        //     console.log('Element not dropped on the target');
-        // }
     }
 
     private _getWidgetData(tag: string): AppConfigWidget | null {
@@ -342,7 +367,7 @@ export default class DashboardPage extends HTMLElement {
         dialog.appendChild(form);
     }
 
-    private _handleWizardFormSubmit(e: Event) {
+    private _handleWizardFormSubmit = (e: Event) => {
         e.stopPropagation();
 
         const dialog: HTMLDialogElement | null = this.shadowRoot.querySelector('dialog');

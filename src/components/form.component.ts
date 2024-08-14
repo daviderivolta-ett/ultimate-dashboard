@@ -21,7 +21,7 @@ style.innerHTML =
     `
     .form__title {
         text-align: center;
-        font-weight: 600;
+        font-weight: 700;
         font-size: 1.143rem;
         margin: 0 0 24px 0;
     }
@@ -29,8 +29,8 @@ style.innerHTML =
     .form__fields {
         display: flex;
         flex-direction: column;
-        gap: 8px;
-        margin: 0 0 24px 0;
+        gap: 16px;
+        margin: 0 0 16px 0;
     }
 
     .form__button {
@@ -43,7 +43,7 @@ style.innerHTML =
         width: 100%;
         border: none;
         border-radius: 4px;
-        height: 32px;
+        height: 40px;
 
         &:hover {
             background-color: var(--button-primary-bg-color-hover);

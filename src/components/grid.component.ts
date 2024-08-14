@@ -62,8 +62,9 @@ style.innerHTML =
 
     ::slotted(.dropzone) {
         border-radius: var(--border-radius);
+        border: 1px solid var(--border-color-default);
         background-color: var(--bg-color-inset-emphasis);
-        box-shadow: var(--shadow-inset-small);
+        // box-shadow: var(--shadow-inset-small);
     }
 
     @media (max-width: 1400px) {

@@ -57,6 +57,49 @@
                     ]
                 }
             ]
+        },
+        {
+            "id": "double-map",
+            "label": "Double map",
+            "icon": "",
+            "grid": [
+                {
+                    "attributes": {
+                        "size": "square-small"
+                    },
+                    "slots": [
+                        {
+                            "name": "content",
+                            "tag": "ettdash-map",
+                            "attributes": {
+                                "lat": 43.116752956131826,
+                                "lng": 12.365259516889365,
+                                "zoom": 4
+                            },
+                            "slots": [],
+                            "content": ""
+                        }
+                    ]
+                },
+                {
+                    "attributes": {
+                        "size": "square-small"
+                    },
+                    "slots": [
+                        {
+                            "name": "content",
+                            "tag": "ettdash-map",
+                            "attributes": {
+                                "lat": 43.116752956131826,
+                                "lng": 12.365259516889365,
+                                "zoom": 4
+                            },
+                            "slots": [],
+                            "content": ""
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }

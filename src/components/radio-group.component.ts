@@ -20,6 +20,16 @@ style.innerHTML =
         align-items: center;
         gap: 2px;
     }
+
+    .radio-group--horizontal {
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .radio-group--vertical {
+        flex-direction: column;
+        align-items: start;
+    }
     `
     ;
 
@@ -27,7 +37,8 @@ style.innerHTML =
 export default class RadioGroupComponent extends HTMLElement {
     public shadowRoot: ShadowRoot;
 
-    public name: string = 'radio';
+    private _name: string = 'radio';
+    private _layout: 'horizontal' | 'vertical' = 'horizontal';
 
     constructor() {
         super();
@@ -37,9 +48,17 @@ export default class RadioGroupComponent extends HTMLElement {
         this.shadowRoot.appendChild(style.cloneNode(true));
     }
 
+    public get name(): string { return this._name }
+    public set name(value: string) { this._name = value }
+
+    public get layout(): 'horizontal' | 'vertical' { return this._layout }
+    public set layout(value: 'horizontal' | 'vertical') {
+        this._layout = value;
+        value === 'horizontal' ? this._setHorizontalLayout() : this._setVerticalLayout();
+    }
+
     // Component callbacks
-    public connectedCallback(): void {        
-        this.getCustomAttributes();
+    public connectedCallback(): void {
         this.setup();
     }
 
@@ -48,10 +67,10 @@ export default class RadioGroupComponent extends HTMLElement {
         if (slot) slot.removeEventListener('slotchange', this._handleSlotChange.bind(this));
     }
 
-    // Methods
-    private getCustomAttributes(): void {
-        const name: string | null = this.getAttribute('name');
-        if (name) this.name = name;
+    static observedAttributes: string[] = ['name', 'layout-orientation'];
+    public attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
+        if (name === 'name') this.name = newValue;
+        if (name === 'layout-orientation' && (newValue === 'horizontal' || newValue === 'vertical')) this.layout = newValue;
     }
 
     private setup(): void {
@@ -59,23 +78,40 @@ export default class RadioGroupComponent extends HTMLElement {
         if (slot) slot.addEventListener('slotchange', this._handleSlotChange.bind(this));
     }
 
+    // Methods
     private _handleSlotChange(): void {
         const radioButtons: RadioButton[] = Array.from(this.querySelectorAll('radio-button'));
 
-        radioButtons.forEach((radioButton: RadioButton) => {          
+        radioButtons.forEach((radioButton: RadioButton) => {
             radioButton.addEventListener('radio-change', (e) => this.handleRadioChange(e));
         });
     }
 
-    private handleRadioChange(event: Event): void {              
-        const e: CustomEvent = event as CustomEvent;     
+    private handleRadioChange(event: Event): void {
+        const e: CustomEvent = event as CustomEvent;
         const radioButtons: RadioButton[] = Array.from(this.querySelectorAll('radio-button'));
 
-        radioButtons.forEach((radioButton: RadioButton) => {                    
+        radioButtons.forEach((radioButton: RadioButton) => {
             if (radioButton.value !== e.detail) radioButton.checked = false;
         });
-     
+
         this.dispatchEvent(new CustomEvent(`${this.name}-change`, { bubbles: true, composed: true, detail: e.detail }));
+    }
+
+    private _setHorizontalLayout(): void {
+        const group: HTMLDivElement | null = this.shadowRoot.querySelector('.radio-group');
+        if (group) {
+            group.classList.remove('radio-group--vertical');
+            group.classList.add('radio-group--horizontal');
+        }
+    }
+
+    private _setVerticalLayout(): void {
+        const group: HTMLDivElement | null = this.shadowRoot.querySelector('.radio-group');
+        if (group) {
+            group.classList.remove('radio-group--horizontal');
+            group.classList.add('radio-group--vertical');
+        }
     }
 }
 

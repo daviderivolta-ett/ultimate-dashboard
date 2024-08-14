@@ -36,10 +36,10 @@ style.innerHTML =
         width: 40px;
         height: 40px;
         padding: 8px;
-        background-color: var(--bg-color-default);
-        border: 1px solid var(--button-default-border-color-rest);
+        color_ var(--button-white-fg-color-rest);
+        background-color: var(--button-white-bg-color-rest);
+        border: 1px solid var(--button-white-border-color-rest);
         border-radius: var(--border-radius);
-        box-shadow: var(--shadow-resting-small);
     }
 
     .toggle-btn__icon {
@@ -63,10 +63,9 @@ style.innerHTML =
         list-style-type: none;
         padding: 0px 16px;
         border-radius: var(--border-radius);
-        box-shadow: var(--shadow-resting-small);
+        // box-shadow: var(--shadow-resting-small);
         border: 1px solid var(--border-color-default);
         box-sizing: border-box;
-        backdrop-filter: blur(5px) saturate(2.5);
     }
     
     .list--visible {

@@ -9,3 +9,5 @@ import './components/icon-btn.component';
 import './components/widget-icons.component';
 import './components/form.component';
 import './components/label-input.component';
+import './components/topbar.component';
+import './components/expandable-list.component';

@@ -52,7 +52,7 @@ export class ConfigService {
         if (foundConfig.icon) config.icon = foundConfig.icon;
         if (foundConfig.widgets && Array.isArray(foundConfig.widgets)) {
             config.widgets = foundConfig.widgets.map((widget: any) => this._parseAppConfigWidget(widget));
-        }     
+        }
 
         return config;
     }
@@ -95,23 +95,24 @@ export class ConfigService {
     }
 
     // Grid config
-    public async getGridConfig(id: string = 'standard'): Promise<GridConfig> {
-        if (this.gridConfig) return this.gridConfig;
-
-        const customGridConfig: GridConfig | null = this._getCustomGridConfig();
-        if (customGridConfig) {
-            this._gridConfig = customGridConfig;
-            return customGridConfig;
-        }
-
+    public async getAllGridConfigs(): Promise<GridConfig[]> {
         const data: any = await fetch(this.GRID_CONFIG_URL).then((res: Response) => res.json());
-        const gridConfig: GridConfig = this._parseGridConfig(data, id);
-        this._gridConfig = gridConfig;
+        let configs: GridConfig[] = [];
+        if (data.configs && Array.isArray(data.configs)) {
+            configs = data.configs.map((d: any) => this._parseGridConfig(d));
+        }
+        return configs;
+    }
 
+    public async getGridConfig(id: string = 'standard'): Promise<GridConfig> {
+        const data: any = await fetch(this.GRID_CONFIG_URL).then((res: Response) => res.json());
+        const configData: any = data.configs.find((config: any) => config.id === id);
+        if (!configData) throw new Error(`Grid configuration with id "${id}" not found`);
+        const gridConfig: GridConfig = this._parseGridConfig(configData);
         return gridConfig;
     }
 
-    private _getCustomGridConfig(): GridConfig | null {
+    public getCustomGridConfig(): GridConfig | null {
         const configJson: string | null = localStorage.getItem('grid');
         if (!configJson) return null;
         const config: GridConfig = JSON.parse(configJson);
@@ -122,19 +123,14 @@ export class ConfigService {
         localStorage.setItem('grid', JSON.stringify(config));
     }
 
-    private _parseGridConfig(data: any, id: string = 'standard'): GridConfig {
+    private _parseGridConfig(data: any): GridConfig {
         const config: GridConfig = new GridConfig();
+        if (!data) return config;
 
-        if (!data.configs && !Array.isArray(data.configs)) return config;
-
-        data.configs = data.configs.filter((config: any) => config.id === id);
-
-        for (const c of data.configs) {
-            if (c.id) config.id = c.id;
-            if (c.label) config.label = c.label;
-            if (c.icon) config.icon = c.icon;
-            if (c.grid) config.grid = c.grid;
-        }
+        if (data.id) config.id = data.id;
+        if (data.label) config.label = data.label;
+        if (data.icon) config.icon = data.icon;
+        if (data.grid) config.grid = data.grid;
 
         return config;
     }

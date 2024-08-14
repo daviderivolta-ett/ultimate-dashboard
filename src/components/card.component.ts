@@ -36,8 +36,8 @@ style.innerHTML =
         border: 1px solid var(--border-color-default);
         border-radius: var(--border-radius);
         background-color: var(--bg-color-default);
-        box-shadow: var(--shadow-resting-small);
-        backdrop-filter: var(--bg-blur-default);
+        // box-shadow: var(--shadow-resting-small);
+        // backdrop-filter: var(--bg-blur-default);
     }
 
     slot[name="content"] {
@@ -69,7 +69,8 @@ style.innerHTML =
         display: flex;
         justify-content: center;
         align-items: center;
-        color: var(--button-invisible-icon-color-rest);
+        color: var(--button-white-fg-color-rest);
+        background-color: var(--button-white-bg-color-rest);
     }
     `
     ;

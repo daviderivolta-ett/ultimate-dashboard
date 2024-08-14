@@ -338,7 +338,7 @@ export default class LineChartComponent extends HTMLElement {
 
         const xScale = d3.scaleLinear()
             .domain([d3.min(data, (d: number[]) => d[0] ?? 0)!, d3.max(data, (d: number[]) => d[0] ?? 0)!])
-            .range([padding, currentWidth - 8]);
+            .range([padding, currentWidth - padding]);
 
         const yScale = d3.scaleLinear()
             .domain([0, d3.max(data, (d: number[]) => d[1] ?? 0)!])

@@ -20,6 +20,7 @@ style.innerHTML =
     .input-group__label {
         color: var(--fg-color-rest);
         font-size: 0.857rem;
+        font-weight: 600;
         margin: 0 0 4px 0;
     }
 
@@ -31,10 +32,16 @@ style.innerHTML =
         border-radius: 4px;
         padding: 8px;
         box-sizing: border-box;
-        height: 32px;
+        height: 40px;
+        transition: .2s ease-in-out;
+
+        &:hover {
+            box-shadow: 0 0 0 4px var(--focus-shadow-color);
+        }
 
         &:focus {
-            outline: 2px solid var(--focus-outline-color);
+            outline: 1px solid var(--focus-outline-color);
+            box-shadow: 0 0 0 4px var(--focus-shadow-color);
         }
     }
     `
