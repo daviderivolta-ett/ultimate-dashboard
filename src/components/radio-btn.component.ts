@@ -14,6 +14,7 @@ style.innerHTML =
     `
     .radio {
         cursor: pointer;
+        position: relative;
         display: flex;
         align-items: center;
     }
@@ -36,6 +37,10 @@ style.innerHTML =
         color: white;
         border-radius: 4px;
         transition: .2s ease-in-out;
+    }
+
+    .radio__icon--hidden {
+        display: none;
     }
 
     .radio__icon--checked {
@@ -92,7 +97,15 @@ export default class RadioButtonComponent extends HTMLElement {
         this._setup();
     }
 
-    static observedAttributes: string[] = ['value', 'name', 'label', 'label'];
+    public disconnectedCallback(): void {
+        const input: HTMLInputElement | null = this.shadowRoot.querySelector('input');
+        if (input) input.removeEventListener('change', this._handleChange);
+
+        const slot: HTMLSlotElement | null = this.shadowRoot.querySelector('slot[name="radio-icon"]');
+        if (slot) slot.removeEventListener('slotchange', this._handleIconSlot);
+    }
+
+    static observedAttributes: string[] = ['value', 'name', 'label'];
     public attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
         if (name === 'value') this.value = newValue;
         if (name === 'name') this.name = newValue;
@@ -102,9 +115,9 @@ export default class RadioButtonComponent extends HTMLElement {
     private _render(): void {
         const input: HTMLInputElement | null = this.shadowRoot.querySelector('input');
         if (input) this.input = input;
-
-        this._updateInputValue();
-        this._updateInputName();
+        this._handleIconSlot();
+        // this._updateInputValue();
+        // this._updateInputName();
     }
 
     private _updateInputValue(): void {
@@ -124,12 +137,22 @@ export default class RadioButtonComponent extends HTMLElement {
 
     private _setup(): void {
         const input: HTMLInputElement | null = this.shadowRoot.querySelector('input');
-        if (input) input.addEventListener('change', this._handleChange.bind(this));
+        if (input) input.addEventListener('change', this._handleChange);
+
+        const slot: HTMLSlotElement | null = this.shadowRoot.querySelector('slot[name="radio-icon"]');
+        if (slot) slot.addEventListener('slotchange', this._handleIconSlot);
     }
 
-    private _handleChange(): void {
+    private _handleChange = (): void => {
         this.checked = true;
         this.dispatchEvent(new CustomEvent('radio-change', { detail: this.value }));
+    }
+
+    private _handleIconSlot = (): void => {
+        const slot: HTMLSlotElement | null = this.shadowRoot.querySelector('slot[name="radio-icon"]');
+        if (!slot) return;
+
+        slot.assignedNodes().length === 0 ? slot.classList.add('radio__icon--hidden') : slot.classList.remove('radio__icon--hidden');
     }
 }
 

@@ -3,7 +3,7 @@
         {
             "id": "standard",
             "label": "Standard",
-            "icon": "",
+            "icon": "./icons/line-chart.svg",
             "grid": [
                 {
                     "attributes": {
@@ -61,7 +61,7 @@
         {
             "id": "double-map",
             "label": "Double map",
-            "icon": "",
+            "icon": "./icons/line-chart.svg",
             "grid": [
                 {
                     "attributes": {

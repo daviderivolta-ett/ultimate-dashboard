@@ -29,6 +29,7 @@ style.innerHTML =
     .radio-group--vertical {
         flex-direction: column;
         align-items: start;
+        gap: 16px;
     }
     `
     ;

@@ -5,13 +5,20 @@ import { AppConfig, AppConfigWidget, GridConfig, GridConfigWidget, GridConfigWid
 import { ConfigService } from '../services/config.service';
 import { WidgetIcon, WidgetIconsComponent } from '../components/widget-icons.component';
 import WizardFormComponent from '../components/form.component';
+import RadioGroupComponent from '../components/radio-group.component';
+import RadioButtonComponent from '../components/radio-btn.component';
 
 // Template
 const template: HTMLTemplateElement = document.createElement('template');
 template.innerHTML =
     `
     <div class="dashboard">
-        <navigation-topbar></navigation-topbar>
+        <navigation-topbar>
+            <expandable-list slot="topbar-menu">
+                <span slot="button-label">Grid</span>
+                <radio-group slot="panel-content" name="grid-config" layout-orientation="vertical"></radio-group>
+            </expandable-list>
+        </navigation-topbar>
         <div class="grid">
             <draggable-grid></draggable-grid>
         </div>
@@ -112,14 +119,15 @@ export default class DashboardPage extends HTMLElement {
     public async connectedCallback(): Promise<void> {
         const appConfig: AppConfig = await ConfigService.instance.getAppConfig();
         // console.log('App config', appConfig);        
-        const allGridConfigs: GridConfig[] = await ConfigService.instance.getAllGridConfigs();
+
         // console.log('All grid configs', allGridConfigs);
         // const gridConfig: GridConfig = await ConfigService.instance.getGridConfig();
         // console.log('Grid config', gridConfig);
 
         let gridConfig: GridConfig | null = ConfigService.instance.getCustomGridConfig();
-        if (!gridConfig) gridConfig = await ConfigService.instance.getGridConfig();        
-        
+        if (!gridConfig) gridConfig = await ConfigService.instance.getGridConfig();
+        ConfigService.instance.gridConfig = gridConfig;
+
         this._render();
         this._setup();
         this._fillGrid(gridConfig.grid);
@@ -130,13 +138,13 @@ export default class DashboardPage extends HTMLElement {
     }
 
     private _render(): void {
+        this._renderChangeGridLayoutButton();
         this._renderWidgetIcons();
     }
 
     private async _reload(id: string): Promise<void> {
         this._removeEventListeners();
-        const gridConfig: GridConfig = await ConfigService.instance.getGridConfig(id);   
-        this._render();
+        const gridConfig: GridConfig = await ConfigService.instance.getGridConfig(id);
         this._setup();
         this._fillGrid(gridConfig.grid);
     }
@@ -219,7 +227,7 @@ export default class DashboardPage extends HTMLElement {
             };
             return widget;
         });
-        
+
         return widgets;
     }
 
@@ -269,13 +277,37 @@ export default class DashboardPage extends HTMLElement {
         ConfigService.instance.gridConfig = config;
     }
 
+    // Render change grid layout button
+    private async _renderChangeGridLayoutButton(): Promise<void> {
+        const radioGroup: RadioGroupComponent | null = this.shadowRoot.querySelector('radio-group[slot="panel-content"]');
+        if (!radioGroup) return;
+
+        const allGridConfigs: GridConfig[] = await ConfigService.instance.getAllGridConfigs();
+        allGridConfigs.forEach((config: GridConfig) => {
+            const radioButton: RadioButtonComponent = new RadioButtonComponent();
+
+            radioButton.value = config.id;
+            radioButton.name = 'grid-config';
+            radioButton.label = config.label;
+
+            fetch(config.icon)
+                .then((res: Response) => res.text())
+                .then((iconString: string) => {
+                    const icon = document.createElement('span');
+                    icon.setAttribute('slot', 'radio-icon');
+                    icon.innerHTML = iconString;
+                    radioButton.appendChild(icon);
+                })
+                .catch(() => { throw new Error('Icon not found') })
+
+            radioGroup.appendChild(radioButton);
+        });
+    }
+
     // Render widget creation icons
-    private _renderWidgetIcons() {
+    private _renderWidgetIcons(): void {
         const dashboard: HTMLElement | null = this.shadowRoot.querySelector('.dashboard');
         if (!dashboard) return;
-
-        const oldIcons: HTMLElement | null = dashboard.querySelector('ettdash-widget-icons');
-        if (oldIcons) oldIcons.remove();
 
         const icons: WidgetIconsComponent = new WidgetIconsComponent();
         const config: AppConfig | null = ConfigService.instance.appConfig;
@@ -389,7 +421,7 @@ export default class DashboardPage extends HTMLElement {
 
         const grid: HTMLElement | null = this.shadowRoot.querySelector('draggable-grid');
         if (!grid) return;
-        
+
         grid.appendChild(card);
     }
 

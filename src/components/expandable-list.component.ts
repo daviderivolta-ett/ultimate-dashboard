@@ -109,7 +109,8 @@ export default class ExpandableListComponent extends HTMLElement {
     }
 
     public disconnectedCallback(): void {
-
+        const btn = this.shadowRoot.querySelector('.toggle');
+        if (btn) btn.removeEventListener('click', this._onToggleClick);
     }
 
     static observedAttributes: string[] = [];
@@ -122,7 +123,9 @@ export default class ExpandableListComponent extends HTMLElement {
         if (btn) btn.addEventListener('click', this._onToggleClick);
     }
 
-    private _onToggleClick = (): void => {
+    // Methods
+    private _onToggleClick = (event: Event): void => {
+        event.stopPropagation();
         this.isOpen = !this.isOpen;
     }
 

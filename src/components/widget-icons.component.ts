@@ -63,7 +63,6 @@ style.innerHTML =
         list-style-type: none;
         padding: 0px 16px;
         border-radius: var(--border-radius);
-        // box-shadow: var(--shadow-resting-small);
         border: 1px solid var(--border-color-default);
         box-sizing: border-box;
     }
@@ -116,20 +115,12 @@ export class WidgetIconsComponent extends HTMLElement {
     }
 
     public disconnectedCallback(): void {
-
+        const toggle: HTMLButtonElement | null = this.shadowRoot.querySelector('.toggle-btn');
+        if (toggle) toggle.removeEventListener('click', this._onToggleBtnClick);
+        document.removeEventListener('click', this._onDocumentClick);
     }
 
     private _render(): void {
-        // this._widgets.forEach((widget: any) => {
-        //     const el: HTMLLIElement = document.createElement('li');
-        //     el.classList.add('list__el')
-        //     el.id = `widget-icon#${widget.tag}`;
-        //     el.innerHTML = widget.icon;
-        //     el.setAttribute('draggable', 'true');
-        //     el.setAttribute('slot', 'list');
-        //     this.appendChild(el);
-        // });
-
         this._widgetIcons.forEach((icon: WidgetIcon) => {
             const el: HTMLLIElement = document.createElement('li');
             el.classList.add('list__el')
@@ -146,7 +137,8 @@ export class WidgetIconsComponent extends HTMLElement {
 
     private _setup(): void {
         const toggle: HTMLButtonElement | null = this.shadowRoot.querySelector('.toggle-btn');
-        if (toggle) toggle.addEventListener('click', this._onToggleBtnClick.bind(this));
+        if (toggle) toggle.addEventListener('click', this._onToggleBtnClick);
+        document.addEventListener('click', this._onDocumentClick);
     }
 
     static observedAttributes: string[] = ['is-open'];
@@ -157,10 +149,18 @@ export class WidgetIconsComponent extends HTMLElement {
     }
 
     // Methods
-    private _onToggleBtnClick() {
+    private _onToggleBtnClick = (event: MouseEvent): void => {
+        event.stopPropagation();
         const isOpenAttr: string | null = this.getAttribute('is-open');
         !isOpenAttr || isOpenAttr === 'false' ? this.setAttribute('is-open', 'true') : this.setAttribute('is-open', 'false');
 
+    }
+
+    private _onDocumentClick = (event: MouseEvent): void => { 
+        const component = this.shadowRoot.querySelector('.component');
+        if (component && !component.contains(event.target as Node)) {
+            this.setAttribute('is-open', 'false');
+        }
     }
 
     private _toggleVisibility(): void {

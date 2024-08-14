@@ -3,13 +3,9 @@ const template: HTMLTemplateElement = document.createElement('template');
 template.innerHTML =
     `
     <div class="topbar">
-        <expandable-list>
-            <span slot="button-label">Grid</span>
-            <radio-group slot="panel-content" name="grid-config" layout-orientation="vertical">
-                <radio-button value="standard" name="grid-config" label="Standard" icon-url="/icons/square.svg#square"></radio-button>
-                <radio-button value="double-map" name="grid-config" label="Double map" icon-url="/icons/map.svg#map"></radio-button>
-            </radio-group>
-        </expandable-list>
+        <div class="topbar__menu">
+            <slot name="topbar-menu"></slot>
+        </div>
     </div>
     `
     ;
