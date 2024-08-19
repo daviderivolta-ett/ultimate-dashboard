@@ -16,14 +16,6 @@ template.innerHTML =
         </div>
         <hover-tooltip>
             <radio-group name="size"></radio-group>
-            <expandable-list>
-                <span slot="button-icon">O</span>
-                <radio-group slot="panel-content" name="map-dataset" layout-orientation="vertical">
-                    <radio-button label="Pippo" value="pippo"></radio-button>
-                    <radio-button label="Pippo" value="pippo"></radio-button>
-                    <radio-button label="Pippo" value="pippo"></radio-button>
-                </radio-group>
-            </expandable-list>
         </hover-tooltip>
         <slot name="content"></slot>
     </div>

@@ -14,10 +14,6 @@ template.innerHTML =
     `
     <div class="dashboard">
         <navigation-topbar>
-            <expandable-list slot="topbar-menu" class="change-grid-layout-button">
-                <span slot="button-label">Test</span>
-                <span slot="panel-content">PIPPO</span>
-            </expandable-list>
             <expandable-list slot="topbar-menu" class="change-grid-layout-button" show-arrow="true">
                 <span slot="button-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
@@ -419,7 +415,7 @@ export default class DashboardPage extends HTMLElement {
         this._addWidget(widgetData);
     }
 
-    private _addWidget(data: GridConfigWidget): void {
+    private _addWidget(data: GridConfigWidget): void {       
         const card: CardComponent = new CardComponent();
 
         for (const key in data.attributes) {

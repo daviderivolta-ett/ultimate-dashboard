@@ -28,6 +28,7 @@ style.innerHTML =
         font-family: "Inter", sans-serif;
         font-size: 1rem;
         color: var(--control-fg-color-rest);
+        background-color: var(--control-bg-color-rest);
         border: 1px solid var(--control-border-color-rest);
         border-radius: 4px;
         padding: 8px;

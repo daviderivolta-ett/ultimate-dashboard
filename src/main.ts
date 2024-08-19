@@ -11,3 +11,4 @@ import './components/form.component';
 import './components/label-input.component';
 import './components/topbar.component';
 import './components/expandable-list.component';
+import './components/label-select.component';

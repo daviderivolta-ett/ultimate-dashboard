@@ -13,24 +13,15 @@ export class AppConfigWidget {
     icon: string = './icons/map.svg';
     cardAttributes: Record<string, any> = {};
     widgetAttributes: Record<string, any> = {};
-    options: AppConfigWidgetSlot[] = [];
     wizard: WizardItem[] = [];
 
     constructor() { }
 }
 
-export type AppConfigWidgetSlot = {
-    name: string;
-    tag: string;
-    attributes: any;
-    slots: AppConfigWidgetSlot[];
-    content: string;
-}
-
 export type WizardItem = WizardItemWithAttribute | WizardItemWithSlot;
 
 export interface WizardBaseItem {
-    input: 'text' | 'number';
+    input: 'text' | 'number' | 'select';
     label: string;
     value: any;
 }

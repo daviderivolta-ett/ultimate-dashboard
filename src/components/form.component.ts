@@ -1,5 +1,6 @@
 import { AppConfigWidget, GridConfigWidget, GridConfigWidgetSlot, WizardItem } from '../models/config.model';
 import LabelInput from './label-input.component';
+import { LabelSelect } from './label-select.component';
 
 // Template
 const template: HTMLTemplateElement = document.createElement('template');
@@ -93,48 +94,72 @@ export default class WizardFormComponent extends HTMLElement {
 
     // Methods
     private _createWizardInputs(data: AppConfigWidget): HTMLElement[] {
-        console.log(data);
         const items: HTMLElement[] = [];
 
         for (const key in data.cardAttributes) {
-            const div = document.createElement('div');
             const input: LabelInput = new LabelInput();
             input.setAttribute('data-type', 'card-attribute');
             input.setAttribute('type', 'hidden');
             input.setAttribute('name', key);
             input.setAttribute('value', data.cardAttributes[key]);
-            div.appendChild(input);
-            items.push(div);
+            items.push(input);
         }
 
         for (const key in data.widgetAttributes) {
-            const div = document.createElement('div');
             const input: LabelInput = new LabelInput();
             input.setAttribute('data-type', 'widget-attribute');
             input.setAttribute('type', 'hidden');
             input.setAttribute('name', key);
             input.setAttribute('value', data.widgetAttributes[key]);
-            div.appendChild(input);
-            items.push(div);
+            items.push(input);
         }
 
         data.wizard.forEach((item: WizardItem) => {
-            const div = document.createElement('div');
+            if (item.input === 'number' || item.input === 'text') {
+                const input: LabelInput = new LabelInput();
+                input.setAttribute('label', item.label);
+                input.setAttribute('type', item.input);
 
-            const input: LabelInput = new LabelInput();
-            input.setAttribute('label', item.label);
-            input.setAttribute('type', item.input);
-            if (item.attribute) {
-                input.setAttribute('name', item.attribute);
-                input.setAttribute('data-type', 'widget-attribute');
-            }
-            if (item.slot) {
-                input.setAttribute('name', item.slot);
-                input.setAttribute('data-type', 'slot');
+                if (typeof item.value === 'string' || typeof item.value === 'number') input.setAttribute('value', item.value.toString());
+
+                if (item.attribute) {
+                    input.setAttribute('name', item.attribute);
+                    input.setAttribute('data-type', 'widget-attribute');
+                }
+                if (item.slot) {
+                    input.setAttribute('name', item.slot);
+                    input.setAttribute('data-type', 'slot');
+                }
+
+                items.push(input);
             }
 
-            div.appendChild(input);            
-            items.push(div);
+            if (item.input === 'select') {
+                const select: LabelSelect = new LabelSelect();
+                const label: HTMLSpanElement = document.createElement('span');
+
+                if (item.attribute) {
+                    select.setAttribute('name', item.attribute);
+                    select.setAttribute('data-type', 'widget-attribute');
+                }
+
+                label.setAttribute('slot', 'label');
+                label.innerHTML = item.label;
+                select.appendChild(label);
+
+                if (Array.isArray(item.value)) {
+                    item.value.forEach((obj: any) => {
+                        const option: HTMLSpanElement = document.createElement('span');
+                        option.setAttribute('slot', 'select');
+                        option.setAttribute('value', obj.attribute);
+                        option.innerHTML = obj.label;
+
+                        select.appendChild(option);
+                    });
+                }
+
+                items.push(select);
+            }
         });
 
         return items;
@@ -167,40 +192,47 @@ export default class WizardFormComponent extends HTMLElement {
             content: ''
         }
 
-        const inputs: NodeListOf<LabelInput> = form.querySelectorAll('label-input');
+        this._processFormElements('label-select', formData, widget, slot);
+        this._processFormElements('label-input', formData, widget, slot);
 
-        inputs.forEach((input: LabelInput) => {
-            const type: string | undefined = input.dataset.type;
-            const name: string = input.name;
+        widget.slots.push(slot);
+        this.dispatchEvent(new CustomEvent('form-submit', { composed: true, detail: widget }));
+    }
+
+    private _processFormElements(selector: string, formData: FormData, widget: GridConfigWidget, slot: GridConfigWidgetSlot): void {
+        const elements: NodeListOf<HTMLElement> = this.shadowRoot.querySelectorAll(selector);
+
+        elements.forEach((element: HTMLElement) => {
+            const type: string | undefined = (element as any).dataset.type;
+            const name: string = (element as any).name;
             const value: FormDataEntryValue | null = formData.get(name);
 
-            switch (type) {
-                case 'card-attribute':
-                    widget.attributes[name] = value;
-                    break;
+            if (type) {
+                switch (type) {
+                    case 'card-attribute':
+                        widget.attributes[name] = value;
+                        break;
 
-                case 'widget-attribute':
-                    slot.attributes[name] = value;
-                    break;
+                    case 'widget-attribute':
+                        slot.attributes[name] = value;
+                        break;
 
-                case 'slot':
-                    const subSlot: GridConfigWidgetSlot = {
-                        name,
-                        tag: 'span',
-                        attributes: {},
-                        slots: [],
-                        content: value ? value.toString() : ''
-                    }
-                    slot.slots.push(subSlot);
-                    break;
+                    case 'slot':
+                        const subSlot: GridConfigWidgetSlot = {
+                            name,
+                            tag: 'span',
+                            attributes: {},
+                            slots: [],
+                            content: value ? value.toString() : ''
+                        };
+                        slot.slots.push(subSlot);
+                        break;
 
-                default:
-                    break;
+                    default:
+                        break;
+                }
             }
         });
-
-        widget.slots.push(slot);          
-        this.dispatchEvent(new CustomEvent('form-submit', { composed: true, detail: widget }));
     }
 
 }
