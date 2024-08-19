@@ -31,11 +31,11 @@
                             "value": [
                                 {
                                     "label": "Qualità dell'aria",
-                                    "attribute": "./geojson/air_quality.json"
+                                    "attribute": "./geojson/air_quality.geojson"
                                 },
                                 {
                                     "label": "Stazioni meteo",
-                                    "attribute": "./geojson/weather_station.json"
+                                    "attribute": "./geojson/weather_station.geojson"
                                 }
                             ],
                             "attribute": "layer-url"
