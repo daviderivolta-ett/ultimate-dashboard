@@ -4,13 +4,9 @@ template.innerHTML =
     `
     <div class="expandable-list">
         <button type="button" class="toggle">
-            <slot name="button-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
-                    <path fill="currentColor" d="M200-520q-24.54 0-42.27-17.73Q140-555.46 140-580v-180q0-24.54 17.73-42.27Q175.46-820 200-820h180q24.54 0 42.27 17.73Q440-784.54 440-760v180q0 24.54-17.73 42.27Q404.54-520 380-520H200Zm0 380q-24.54 0-42.27-17.73Q140-175.46 140-200v-180q0-24.54 17.73-42.27Q175.46-440 200-440h180q24.54 0 42.27 17.73Q440-404.54 440-380v180q0 24.54-17.73 42.27Q404.54-140 380-140H200Zm380-380q-24.54 0-42.27-17.73Q520-555.46 520-580v-180q0-24.54 17.73-42.27Q555.46-820 580-820h180q24.54 0 42.27 17.73Q820-784.54 820-760v180q0 24.54-17.73 42.27Q784.54-520 760-520H580Zm0 380q-24.54 0-42.27-17.73Q520-175.46 520-200v-180q0-24.54 17.73-42.27Q555.46-440 580-440h180q24.54 0 42.27 17.73Q820-404.54 820-380v180q0 24.54-17.73 42.27Q784.54-140 760-140H580ZM200-580h180v-180H200v180Zm380 0h180v-180H580v180Zm0 380h180v-180H580v180Zm-380 0h180v-180H200v180Zm380-380Zm0 200Zm-200 0Zm0-200Z"/>
-                </svg>
-            </slot>
-            <slot name="button-label">Click me</slot>
-            <span class="toggle__arrow">
+            <slot name="button-icon"></slot>
+            <slot name="button-label"></slot>
+            <span class="toggle__arrow toggle__arrow--hidden">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
                     <path fill="currentColor" d="M459-381 314-526q-3-3-4.5-6.5T308-540q0-8 5.5-14t14.5-6h304q9 0 14.5 6t5.5 14q0 2-6 14L501-381q-5 5-10 7t-11 2q-6 0-11-2t-10-7Z"/>
                 </svg>
@@ -58,6 +54,10 @@ style.innerHTML =
         align-items: center;
     }
 
+    .toggle__arrow--hidden {
+        display: none;
+    }
+
     .toggle__arrow--open {
         transform: rotate(180deg);
     }
@@ -87,7 +87,9 @@ style.innerHTML =
 // Component
 export default class ExpandableListComponent extends HTMLElement {
     public shadowRoot: ShadowRoot;
-    public _isOpen: boolean = false;
+    private _isOpen: boolean = false;
+    private _showArrow: boolean = false;
+
 
     constructor() {
         super();
@@ -103,6 +105,12 @@ export default class ExpandableListComponent extends HTMLElement {
         value ? this._openPanel() : this._closePanel();
     }
 
+    public get showArrow(): boolean { return this._showArrow }
+    public set showArrow(value: boolean) {
+        this._showArrow = value;
+        value ? this._showArrowIcon() : this._hideArrowIcon();
+    }
+
     // Component callbacks
     public connectedCallback(): void {
         this._setup();
@@ -113,9 +121,11 @@ export default class ExpandableListComponent extends HTMLElement {
         if (btn) btn.removeEventListener('click', this._onToggleClick);
     }
 
-    static observedAttributes: string[] = [];
-    public attributeChangedCallback(): void {
-
+    static observedAttributes: string[] = ['show-arrow'];
+    public attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
+        if (name === 'show-arrow' && (newValue === 'true' || newValue === 'false')) {        
+            newValue === 'true' ? this.showArrow = true : this.showArrow = false;
+        }
     }
 
     private _setup(): void {
@@ -141,6 +151,16 @@ export default class ExpandableListComponent extends HTMLElement {
         if (panel) panel.classList.remove('panel--open');
         const icon: HTMLSpanElement | null = this.shadowRoot.querySelector('.toggle__arrow');
         if (icon) icon.classList.remove('toggle__arrow--open');
+    }
+
+    private _showArrowIcon(): void {
+        const arrow: HTMLSpanElement | null = this.shadowRoot.querySelector('.toggle__arrow');
+        if (arrow) arrow.classList.remove('toggle__arrow--hidden');
+    }
+
+    private _hideArrowIcon(): void {
+        const arrow: HTMLSpanElement | null = this.shadowRoot.querySelector('.toggle__arrow');
+        if (arrow) arrow.classList.add('toggle__arrow--hidden');
     }
 }
 
