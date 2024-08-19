@@ -34,7 +34,6 @@ style.innerHTML =
         height: 24px;
         padding: 2px;
         box-sizing: border-box;
-        color: white;
         border-radius: 4px;
         transition: .2s ease-in-out;
     }
@@ -47,6 +46,14 @@ style.innerHTML =
         background-color: white;
         color: black;
         transition: .2s ease-in-out;
+    }
+
+    .radio__label {
+        margin: 0 0 0 8px;
+    }
+
+    .radio__label--hidden {
+        display: none;
     }
     `
     ;
@@ -133,14 +140,17 @@ export default class RadioButtonComponent extends HTMLElement {
     private _updateLabel(): void {
         const label = this.shadowRoot.querySelector('.radio__label');
         if (label) label.innerHTML = this.label;
+        this._handleLabelSlot();
     }
 
     private _setup(): void {
         const input: HTMLInputElement | null = this.shadowRoot.querySelector('input');
         if (input) input.addEventListener('change', this._handleChange);
 
-        const slot: HTMLSlotElement | null = this.shadowRoot.querySelector('slot[name="radio-icon"]');
-        if (slot) slot.addEventListener('slotchange', this._handleIconSlot);
+        const iconSlot: HTMLSlotElement | null = this.shadowRoot.querySelector('slot[name="radio-icon"]');
+        if (iconSlot) iconSlot.addEventListener('slotchange', this._handleIconSlot);
+
+        this._handleLabelSlot();
     }
 
     private _handleChange = (): void => {
@@ -153,6 +163,13 @@ export default class RadioButtonComponent extends HTMLElement {
         if (!slot) return;
 
         slot.assignedNodes().length === 0 ? slot.classList.add('radio__icon--hidden') : slot.classList.remove('radio__icon--hidden');
+    }
+
+    private _handleLabelSlot = (): void => {
+        const slot: HTMLSpanElement | null = this.shadowRoot.querySelector('.radio__label');
+        if (!slot) return;
+
+        this.label.length !== 0 ? slot.classList.remove('radio__label--hidden') : slot.classList.add('radio__label--hidden');
     }
 }
 

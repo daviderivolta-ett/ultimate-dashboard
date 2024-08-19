@@ -1,0 +1,18 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Centralina Meteo"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    8.922596,
+                    44.40827
+                ]
+            }
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Qualità dell'aria"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    8.922269,
+                    44.40823
+                ]
+            }
+        }
+    ]
+}

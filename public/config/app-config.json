@@ -12,6 +12,48 @@
                     "widgetAttributes": {
                         "zoom": 12
                     },
+                    "options": [
+                        {
+                            "name": "",
+                            "tag": "expandable-list",
+                            "attributes": {
+                                "show-arrow": false
+                            },
+                            "slots": [
+                                {
+                                    "name": "panel-content",
+                                    "tag": "radio-group",
+                                    "attributes": {
+                                        "name": "map-dataset",
+                                        "layout-orientation": "vertical"
+                                    },
+                                    "slots": [
+                                        {
+                                            "name": "",
+                                            "tag": "radio-button",
+                                            "attributes": {
+                                                "label": "Pippo",
+                                                "value": "pippo"
+                                            },
+                                            "slots": [],
+                                            "content": ""
+                                        },
+                                        {
+                                            "name": "",
+                                            "tag": "radio-button",
+                                            "attributes": {
+                                                "label": "Topolino",
+                                                "value": "topolino"
+                                            },
+                                            "slots": [],
+                                            "content": ""
+                                        }
+                                    ],
+                                    "content": ""
+                                }
+                            ]
+                        }
+                    ],
                     "wizard": [
                         {
                             "input": "number",
@@ -32,6 +74,7 @@
                     "icon": "./icons/line-chart.svg",
                     "cardAttributes": {},
                     "widgetAttributes": {},
+                    "options": [],
                     "wizard": [
                         {
                             "input": "text",

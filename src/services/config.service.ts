@@ -1,4 +1,4 @@
-import { AppConfig, AppConfigWidget, GridConfig, WizardItemWithAttribute, WizardItemWithSlot } from '../models/config.model';
+import { AppConfig, AppConfigWidget, AppConfigWidgetSlot, GridConfig, WizardItemWithAttribute, WizardItemWithSlot } from '../models/config.model';
 
 export class ConfigService {
     private static _instance: ConfigService;
@@ -36,6 +36,7 @@ export class ConfigService {
         const appConfig: AppConfig = this._parseAppConfig(data, id);
         this._appConfig = appConfig;
 
+        console.log(appConfig);
         return appConfig;
     }
 
@@ -58,18 +59,34 @@ export class ConfigService {
     }
 
     private _parseAppConfigWidget(data: any): AppConfigWidget {
-
         const widget: AppConfigWidget = new AppConfigWidget();
 
         if (data.tag) widget.tag = data.tag;
         if (data.icon) widget.icon = data.icon;
         if (data.cardAttributes) widget.cardAttributes = { ...data.cardAttributes };
         if (data.widgetAttributes) widget.widgetAttributes = { ...data.widgetAttributes };
+        if (data.options && Array.isArray(data.options)) {
+            widget.options = data.options.map((item: any) => this._parseAppConfigWidgetSlot(item));
+        }
         if (data.wizard && Array.isArray(data.wizard)) {
             widget.wizard = data.wizard.map((item: any) => this._parseAppConfigWidgetWizard(item));
         }
 
         return widget;
+    }
+
+    private _parseAppConfigWidgetSlot(data: any): AppConfigWidgetSlot {
+        const parsedSlots = data.slots ? data.slots.map((slot: any) => this._parseAppConfigWidgetSlot(slot)) : [];
+
+        let slot: AppConfigWidgetSlot = {
+            name: data.name ? data.name : '',
+            tag: data.tag ? data.tag : '',
+            attributes: data.attributes ? { ...data.attributes } : {},
+            slots: parsedSlots,
+            content: data.content ? data.content : ''
+        }
+        
+        return slot;
     }
 
     private _parseAppConfigWidgetWizard(data: any): WizardItemWithAttribute | WizardItemWithSlot {
