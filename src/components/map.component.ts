@@ -1,4 +1,4 @@
-import { LngLat, LngLatBounds, Map } from 'maplibre-gl';
+import { LngLat, LngLatBounds, Map, Popup } from 'maplibre-gl';
 import maplibreStyle from 'maplibre-gl/dist/maplibre-gl.css?raw';
 
 // Template
@@ -91,41 +91,140 @@ export default class MapComponent extends HTMLElement {
         this._map.on('load', () => {
             this._map.resize();
             if (this.layerUrl.length > 0) this._addGeoJsonLayer();
+
+            const layers: string[] = ['points-layer', 'lines-layer', 'polygons-layer'];
+
+            layers.forEach((id: string) => {
+                this._setCursor(id);
+                this._map.on('click', id, (e: any) => {
+                    if (e.features && e.features.length > 0) this._onClickOnFeature(e);
+                });
+            });
+        });
+    }
+
+    private _onClickOnFeature(e: any): void {
+        const feature: any = e.features[0];
+        const properties: any = feature.properties;
+        const content: HTMLDivElement = document.createElement('div');
+
+        for (const key in properties) {
+            content.innerHTML = `<p><strong>${key.charAt(0).toUpperCase() + key.slice(1)}:</strong> ${properties[key]}</p>`;
+        }
+
+        new Popup()
+            .setLngLat(e.lngLat)
+            .setHTML(content.outerHTML)
+            .addTo(this._map)
+    }
+
+    private _setCursor(layerId: string): void {
+        this._map.on('mouseenter', layerId, () => {
+            this._map.getCanvas().style.cursor = 'pointer';
+        });
+
+        this._map.on('mouseleave', layerId, () => {
+            this._map.getCanvas().style.cursor = '';
         });
     }
 
     private async _addGeoJsonLayer(): Promise<void> {
         const geojson = await this._fetchLayer(this.layerUrl);
-        console.log(geojson);
 
-        this._map.addSource('layer', {
-            type: 'geojson',
-            data: geojson
-        })
+        const pointFeatures: any[] = geojson.features.filter((feature: any) => feature.geometry && feature.geometry.type === 'Point');
+        const lineStringFeatures: any[] = geojson.features.filter((feature: any) => feature.geometry && feature.geometry.type === 'LineString');
+        const polygonFeatures: any[] = geojson.features.filter((feature: any) => feature.geometry && feature.geometry.type === 'Polygon');
 
-        this._map.addLayer({
-            id: 'layer',
-            type: 'circle',
-            source: 'layer',
-            paint: {
-                'circle-radius': 6,
-                'circle-color': '#FF0000'
-            }
-        });
+        if (pointFeatures.length > 0) this._addGeoJsonCircleLayer(pointFeatures);
+        if (lineStringFeatures.length > 0) this._addGeoJsonLineLayer(lineStringFeatures);
+        if (polygonFeatures.length > 0) this._addGeoJsonPolygonLayer(polygonFeatures);
 
         this._fitMapToGeoJson(geojson);
     }
 
     private async _fetchLayer(url: string): Promise<any> {
-        const res: Response = await fetch(url);
-        const data: any = await res.json();
-        return data;
+        try {
+            const res: Response = await fetch(url);
+            if (!res.ok) throw new Error(`Errore nel recuper del layer ${res.statusText}`);
+
+            const data: any = await res.json();
+            if (!data || data.type !== 'FeatureCollection' || !Array.isArray(data.features)) throw new Error('Il file non è un GeoJSON valido');
+
+            return data;
+
+        } catch (error) {
+            throw new Error(`Errore sconosciuto nel recupero del layer da ${this.layerUrl}`);
+        }
+    }
+
+    private _addGeoJsonCircleLayer(features: any[]): void {
+        this._map.addSource('points', {
+            type: 'geojson',
+            data: {
+                type: 'FeatureCollection',
+                features: features
+            }
+        });
+
+        this._map.addLayer({
+            id: 'points-layer',
+            type: 'circle',
+            source: 'points',
+            paint: {
+                'circle-radius': 6,
+                'circle-color': '#18A0FB',
+                'circle-opacity': .5,
+                'circle-stroke-color': '#18A0FB',
+                'circle-stroke-opacity': 1,
+                'circle-stroke-width': 2
+            }
+        });
+    }
+
+    private _addGeoJsonLineLayer(features: any[]) {
+        this._map.addSource('lines', {
+            type: 'geojson',
+            data: {
+                type: 'FeatureCollection',
+                features: features
+            }
+        });
+
+        this._map.addLayer({
+            id: 'lines-layer',
+            type: 'line',
+            source: 'lines',
+            paint: {
+                'line-width': 2,
+                'line-color': '#18A0FB'
+            }
+        });
+    }
+
+    private _addGeoJsonPolygonLayer(features: any[]) {
+        this._map.addSource('polygons', {
+            type: 'geojson',
+            data: {
+                type: 'FeatureCollection',
+                features: features
+            }
+        });
+
+        this._map.addLayer({
+            id: 'polygons-layer',
+            type: 'fill',
+            source: 'polygons',
+            paint: {
+                'fill-color': '#18A0FB',
+                'fill-opacity': .5
+            }
+        })
     }
 
     private _fitMapToGeoJson(geojson: any): void {
         if (!geojson || !geojson.features || geojson.features.length === 0) return;
 
-        const bounds = new LngLatBounds();
+        const bounds: LngLatBounds = new LngLatBounds();
 
         geojson.features.forEach((feature: any) => {
             if (feature.geometry && feature.geometry.type === 'Point') {
@@ -137,7 +236,8 @@ export default class MapComponent extends HTMLElement {
             }
         });
 
-        this._map.fitBounds(bounds);
+        const center: LngLat = bounds.getCenter();
+        this.center = [center.lat, center.lng];
         this.zoom = 16;
     }
 }
