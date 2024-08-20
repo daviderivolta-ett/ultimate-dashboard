@@ -18,7 +18,16 @@ style.innerHTML =
         cursor: pointer;
         width: 32px;
         height: 32px;
-        padding: 8px;
+        padding: 0px;
+        color: var(--button-default-fg-color-rest);
+        background-color: var(--button-default-bg-color-rest);
+        border: 1px solid var(--button-default-border-color-rest);
+        border-radius: var(--border-radius-small);
+
+        &:hover {
+            color: var(--button-default-fg-color-hover);
+            background-color: var(--button-default-bg-color-hover);
+        }
     }
 
     .button__icon {
