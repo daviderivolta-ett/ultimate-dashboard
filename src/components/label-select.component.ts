@@ -76,10 +76,35 @@ style.innerHTML =
         display: none;
         padding: 0;
         list-style-type: none;
+        border: 1px solid var(--border-color-default);
+        border-radius: 4px;
+        margin: 8px 0;
     }
 
     .select-group__list--open {
         display: block;
+    }
+
+    .select-item {
+        position: relative;
+    }
+
+    .select-item__label {
+        display: block;
+        padding: 8px;
+
+        &:hover {
+            cursor: pointer;
+            background-color: var(--control-bg-color-hover);
+        }
+    }
+
+    .select-item__radio {
+        position: absolute;
+        width: 0;
+        height: 0;
+        visibility: hidden;
+        opacity: 0;
     }
     `
     ;
