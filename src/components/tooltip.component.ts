@@ -23,7 +23,6 @@ style.innerHTML =
         transform: translateX(-50%);
         opacity: 0;
         transition: .4s ease-in-out;
-        // overflow: hidden;
         z-index: 99;
     }
         

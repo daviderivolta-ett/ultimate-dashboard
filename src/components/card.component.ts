@@ -7,6 +7,13 @@ const template: HTMLTemplateElement = document.createElement('template');
 template.innerHTML =
     `
     <div class="card">
+        <icon-button class="delete-button">
+            <span slot="icon">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
+                    <path fill="currentColor" d="M280-120q-33 0-56.5-23.5T200-200v-520q-17 0-28.5-11.5T160-760q0-17 11.5-28.5T200-800h160q0-17 11.5-28.5T400-840h160q17 0 28.5 11.5T600-800h160q17 0 28.5 11.5T800-760q0 17-11.5 28.5T760-720v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM400-280q17 0 28.5-11.5T440-320v-280q0-17-11.5-28.5T400-640q-17 0-28.5 11.5T360-600v280q0 17 11.5 28.5T400-280Zm160 0q17 0 28.5-11.5T600-320v-280q0-17-11.5-28.5T560-640q-17 0-28.5 11.5T520-600v280q0 17 11.5 28.5T560-280ZM280-720v520-520Z"/>
+                </svg>
+            </span>
+        </icon-button>
         <div class="draggable">
             <span class="draggable__icon">
                 <svg xmlns="http://www.w3.org/2000/svg" id="drag-indicator" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
@@ -36,17 +43,25 @@ style.innerHTML =
         border: 1px solid var(--border-color-default);
         border-radius: var(--border-radius);
         background-color: var(--bg-color-default);
-        // box-shadow: var(--shadow-resting-small);
-        // backdrop-filter: var(--bg-blur-default);
-    }
-
-    slot[name="content"] {
-        display: block;
-        flex-grow: 1;
     }
 
     .card--fullwidth {
         padding: 0;
+    }
+
+    .delete-button {
+        opacity: 0;
+        width: fit-content;
+        position: absolute;
+        z-index: 9;
+        bottom: -16px;
+        left: -16px;
+        transition: .4s ease-in-out;
+    }
+
+    .delete-button--visible {
+        opacity: 1;
+        transition: .4s ease-in-out;
     }
 
     .draggable {
@@ -71,6 +86,11 @@ style.innerHTML =
         align-items: center;
         color: var(--button-white-fg-color-rest);
         background-color: var(--button-white-bg-color-rest);
+    }
+
+    slot[name="content"] {
+        display: block;
+        flex-grow: 1;
     }
     `
     ;
@@ -104,6 +124,13 @@ export default class CardComponent extends HTMLElement {
         this._toggleMinimal(this.size);
     }
 
+    public disconnectedCallback(): void {
+        this.removeEventListener('size-change', this._handleWidgetResize);
+        this.removeEventListener('mouseover', this._handleMouseOver);
+        this.removeEventListener('mouseout', this._handleMouseOut);
+        this.removeEventListener('icon-btn-click', this._handleDeleteButtonClick);
+    }
+
     static observedAttributes: string[] = ['size'];
     public attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
         if (name === 'size' && Object.values(WidgetSize).includes(newValue as WidgetSize)) {
@@ -116,7 +143,10 @@ export default class CardComponent extends HTMLElement {
     }
 
     private _setup(): void {
-        this.addEventListener('size-change', this._handleWidgetResize.bind(this));
+        this.addEventListener('size-change', this._handleWidgetResize);
+        this.addEventListener('mouseover', this._handleMouseOver);
+        this.addEventListener('mouseout', this._handleMouseOut);
+        this.addEventListener('icon-btn-click', this._handleDeleteButtonClick);
     }
 
     // Methods
@@ -172,7 +202,7 @@ export default class CardComponent extends HTMLElement {
         else this._createResizeController('desktop');
     }
 
-    private _handleWidgetResize(event: Event): void {
+    private _handleWidgetResize = (event: Event): void => {
         const e: CustomEvent = event as CustomEvent;
         this.setAttribute('size', e.detail);
         event.stopPropagation();
@@ -194,6 +224,21 @@ export default class CardComponent extends HTMLElement {
         if (slottedElement.length === 0) return;
         const content: Element = slottedElement[0];
         size === WidgetSize.SquareSm ? content.setAttribute('is-minimal', 'true') : content.setAttribute('is-minimal', 'false');
+    }
+
+    private _handleMouseOver = (): void => {
+        const deleteButton = this.shadowRoot.querySelector('.delete-button');
+        if (deleteButton) deleteButton.classList.add('delete-button--visible');
+    }
+
+    private _handleMouseOut = (): void => {
+        const deleteButton = this.shadowRoot.querySelector('.delete-button');
+        if (deleteButton) deleteButton.classList.remove('delete-button--visible');
+    }
+
+    private _handleDeleteButtonClick = (e: Event): void => {
+        e.stopPropagation();
+        this.remove();
     }
 }
 

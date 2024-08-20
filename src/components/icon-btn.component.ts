@@ -4,7 +4,7 @@ template.innerHTML =
     `
     <button type="button" class="button">
         <span class="button__icon">
-            <slot></slot>
+            <slot name="icon"></slot>
         </span>
     </button>
     `
@@ -14,14 +14,10 @@ template.innerHTML =
 const style: HTMLStyleElement = document.createElement('style');
 style.innerHTML =
     `
-    :host {
-        display: inline-block;
-    }
-
     .button {
         cursor: pointer;
-        width: 40px;
-        height: 40px;
+        width: 32px;
+        height: 32px;
         padding: 8px;
     }
 
@@ -31,6 +27,12 @@ style.innerHTML =
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+
+    slot[name="icon"] {
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     `
     ;
@@ -54,16 +56,16 @@ export class IconBtnComponent extends HTMLElement {
 
     public disconnectedCallback(): void {
         const button: HTMLButtonElement | null = this.shadowRoot.querySelector('.button');
-        if (button) button.removeEventListener('click', this._onClick.bind(this));
+        if (button) button.removeEventListener('click', this._onClick);
     }
 
     private _setup(): void {
         const button: HTMLButtonElement | null = this.shadowRoot.querySelector('.button');
-        if (button) button.addEventListener('click', this._onClick.bind(this));
+        if (button) button.addEventListener('click', this._onClick);
     }
 
-    private _onClick(): void {
-        this.dispatchEvent(new CustomEvent('icon-btn-click'));
+    private _onClick = (): void => {
+        this.dispatchEvent(new CustomEvent('icon-btn-click', { bubbles: true, composed: true }));
     }
 }
 
