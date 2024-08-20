@@ -366,7 +366,6 @@ export default class DashboardPage extends HTMLElement {
     }
 
     private _handleGridDrop = (event: DragEvent): void => {
-        // console.log(event.dataTransfer);
         const grid: HTMLElement | null = this.shadowRoot.querySelector('draggable-grid');
         if (!grid) return;
 
@@ -415,7 +414,7 @@ export default class DashboardPage extends HTMLElement {
         this._addWidget(widgetData);
     }
 
-    private _addWidget(data: GridConfigWidget): void {       
+    private _addWidget(data: GridConfigWidget): void {
         const card: CardComponent = new CardComponent();
 
         for (const key in data.attributes) {
@@ -436,13 +435,24 @@ export default class DashboardPage extends HTMLElement {
             el.setAttribute('slot', slot.name);
             el.innerHTML = slot.content;
             for (const key in slot.attributes) {
-                el.setAttribute(key, slot.attributes[key]);
+                if (key === 'dataset-data') {
+                    el.setAttribute('dataset-url', this._handleDataset(slot.attributes[key])[0]);
+                    el.setAttribute('parser-url', this._handleDataset(slot.attributes[key])[1]);
+                } else {
+                    el.setAttribute(key, slot.attributes[key]);
+                }
             }
             parentEl.appendChild(el);
             if (slot.slots && slot.slots.length > 0) {
                 this._addSlots(el, slot.slots);
             }
         });
+    }
+
+    private _handleDataset(attribute: string): [string, string] {
+        const dataUrl: string = attribute.split('##')[0];
+        const parserUrl: string = attribute.split('##')[1];
+        return [dataUrl, parserUrl];
     }
 }
 

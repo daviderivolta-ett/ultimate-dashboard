@@ -120,6 +120,10 @@ export default class LineChartComponent extends HTMLElement {
     private _yUnit: string = '';
     private _xUnit: string = '';
 
+    private _dataUrl: string = '';
+    private _parserUrl: string = '';
+    private _rawData: any = null;
+    private _parser: any = null;
     private _data: LineChartDataset[] = [
         {
             label: 'Example label',
@@ -207,9 +211,34 @@ export default class LineChartComponent extends HTMLElement {
         this._drawChart();
     }
 
+    public get dataUrl(): string { return this._dataUrl }
+    public set dataUrl(value: string) {
+        this._dataUrl = value;
+        this._getDataFromUrl(value).then((data: any) => this.rawData = data);
+    }
+
+    public get parserUrl(): string { return this._parserUrl }
+    public set parserUrl(value: string) {
+        this._parserUrl = value;
+        this._getParserFromUrl(value).then((parser: any) => this.parser = parser);
+    }
+
+    public get rawData(): any { return this._rawData }
+    public set rawData(value: any) {
+        this._rawData = value;
+        console.log(this.rawData);        
+        this.data = this._parseRawData();
+    }
+
+    public get parser(): any { return this._parser }
+    public set parser(value: any) {
+        this._parser = value;
+        this.data = this._parseRawData();
+    }
+
     public get data(): LineChartDataset[] { return this._data }
     public set data(value: LineChartDataset[]) {
-        this._data = value;
+        this._data = value;      
         this._drawLegend();
         this._drawChart();
     }
@@ -221,7 +250,7 @@ export default class LineChartComponent extends HTMLElement {
         this._setup();
     }
 
-    static observedAttributes: string[] = ['is-minimal', 'show-legend', 'show-title', 'show-desc', 'x-unit', 'y-unit'];
+    static observedAttributes: string[] = ['is-minimal', 'show-legend', 'show-title', 'show-desc', 'x-unit', 'y-unit', 'dataset-url', 'parser-url'];
     public attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
         if (name === 'is-minimal' && (newValue === 'true' || newValue === 'false')) {
             newValue === 'true' ? this.isMinimal = true : this.isMinimal = false;
@@ -237,6 +266,8 @@ export default class LineChartComponent extends HTMLElement {
         }
         if (name === 'x-unit') this.xUnit = newValue;
         if (name === 'y-unit') this.yUnit = newValue;
+        if (name === 'dataset-url') this.dataUrl = newValue;
+        if (name === 'parser-url') this.parserUrl = newValue;
     }
 
     public disconnectedCallback(): void {
@@ -502,6 +533,38 @@ export default class LineChartComponent extends HTMLElement {
             dataset.dataset.sort((a, b) => a[0] - b[0]);
             return dataset;
         });
+    }
+
+    private async _getDataFromUrl(url: string): Promise<any> {
+        try {
+            const res: Response = await fetch(url);
+            if (!res.ok) throw new Error(`Errore nel recupero dei dati ${res.statusText}`);
+            const data: any = await res.json();
+            return data;
+
+        } catch (error) {
+            throw new Error(`Errore sconosciuto nel recupero dei dati da ${url}`);
+        }
+    }
+
+    private async _getParserFromUrl(url: string): Promise<any> {
+        try {
+            const module: any = await import(url);
+            return module.default;
+        } catch (error) {
+            throw new Error('Errore nel recupero del modulo del parser');
+        }
+    }
+
+    private _parseRawData(): any {
+        if (this.rawData && this.parser) {
+            try {
+                const data: any = this.parser(this.rawData);                
+                return data;
+            } catch (error) {
+                throw new Error('Errore nel parsing dei dati');
+            }
+        }
     }
 }
 

@@ -114,7 +114,7 @@ export default class WizardFormComponent extends HTMLElement {
             items.push(input);
         }
 
-        data.wizard.forEach((item: WizardItem) => {
+        data.wizard.forEach((item: WizardItem) => {            
             if (item.input === 'number' || item.input === 'text') {
                 const input: LabelInput = new LabelInput();
                 input.setAttribute('label', item.label);
@@ -150,8 +150,8 @@ export default class WizardFormComponent extends HTMLElement {
                 if (Array.isArray(item.value)) {
                     item.value.forEach((obj: any) => {
                         const option: HTMLSpanElement = document.createElement('span');
-                        option.setAttribute('slot', 'select');
-                        option.setAttribute('value', obj.attribute);
+                        option.setAttribute('slot', 'select');                        
+                        obj.parser ? option.setAttribute('value', `${obj.attribute}##${obj.parser}`) : option.setAttribute('value', obj.attribute);
                         option.innerHTML = obj.label;
 
                         select.appendChild(option);

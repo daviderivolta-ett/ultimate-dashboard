@@ -71,6 +71,22 @@
                             "label": "Unità di misura ordinate",
                             "value": "",
                             "attribute": "y-unit"
+                        },
+                        {
+                            "input": "select",
+                            "label": "Scegliere un dataset",
+                            "value": [
+                                {
+                                    "label": "Qualità dell'aria",
+                                    "attribute": "./datasets/line-chart-not-standard.dataset.json",
+                                    "parser": "/src/parsers/dsh.parser.js"
+                                },
+                                {
+                                    "label": "Stazioni meteo",
+                                    "attribute": "./datasets/line-chart-standard.dataset.json"
+                                }
+                            ],
+                            "attribute": "dataset-data"
                         }
                     ]
                 }
