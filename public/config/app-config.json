@@ -10,7 +10,7 @@
                     "icon": "./icons/map.svg",
                     "cardAttributes": {},
                     "widgetAttributes": {
-                        "zoom": 12
+                        "zoom": 14
                     },
                     "wizard": [
                         {
@@ -27,14 +27,14 @@
                         },
                         {
                             "input": "select",
-                            "label": "Scegliere un dataset",
+                            "label": "Scegliere un layer",
                             "value": [
                                 {
-                                    "label": "Qualità dell'aria",
+                                    "label": "Stazione rilevamento qualità dell'aria",
                                     "attribute": "./geojson/air_quality.geojson"
                                 },
                                 {
-                                    "label": "Stazioni meteo",
+                                    "label": "Stazione meteo",
                                     "attribute": "./geojson/weather_station.geojson"
                                 }
                             ],
@@ -77,8 +77,8 @@
                             "label": "Scegliere un dataset",
                             "value": [
                                 {
-                                    "label": "Qualità dell'aria",
-                                    "attribute": "./datasets/line-chart-not-standard.dataset.json",
+                                    "label": "Temperatura",
+                                    "attribute": "./datasets/temperature.dataset.json",
                                     "parser": "/src/parsers/dsh.parser.js"
                                 },
                                 {

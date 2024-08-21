@@ -17,7 +17,7 @@
                                 "lat": 43.116752956131826,
                                 "lng": 12.365259516889365,
                                 "zoom": 4,
-                                "layer-url": "./geojson/air_quality.geojson"
+                                "layer-url": "./geojson/weather_station.geojson"
                             },
                             "slots": [],
                             "content": ""
@@ -33,8 +33,8 @@
                             "name": "content",
                             "tag": "ettdash-line-chart",
                             "attributes": {
-                                "x-unit": "m/s",
-                                "y-unit": "Date",
+                                "x-unit": "Date",
+                                "y-unit": "°C",
                                 "show-legend": true
                             },
                             "slots": [
@@ -43,14 +43,14 @@
                                     "tag": "span",
                                     "attributes": {},
                                     "slots": [],
-                                    "content": "Titolo di esempio"
+                                    "content": "Temperatura nel tempo"
                                 },
                                 {
                                     "name": "desc",
                                     "tag": "span",
                                     "attributes": {},
                                     "slots": [],
-                                    "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam tristique ligula eu luctus sollicitudin."
+                                    "content": "Grafico che mostra la temperatura nella centralina di rilevamento del Porto Antico negli ultimi sette giorni."
                                 }
                             ],
                             "content": ""
@@ -76,7 +76,7 @@
                                 "lat": 43.116752956131826,
                                 "lng": 12.365259516889365,
                                 "zoom": 4,
-                                "layer-url": "./geojson/air_quality.geojson"
+                                "layer-url": "./geojson/sindbad.geojson"
                             },
                             "slots": [],
                             "content": ""
