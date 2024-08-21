@@ -1,6 +1,0 @@
-{
-    "x-unit": "Date",
-    "y-unit": "°C",
-    "label": "Porto Antico",
-    "dataset-url": "./datasets/temperature-portoantico.json"
-}

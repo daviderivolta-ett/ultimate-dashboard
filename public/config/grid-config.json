@@ -33,9 +33,12 @@
                             "name": "content",
                             "tag": "ettdash-line-chart",
                             "attributes": {
+                                "show-legend": true,
                                 "x-unit": "Date",
                                 "y-unit": "°C",
-                                "show-legend": true
+                                "label": "Porto Antico",
+                                "dataset-url": "./datasets/temperature-portoantico.json",
+                                "date-unit": "x"
                             },
                             "slots": [
                                 {
