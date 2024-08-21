@@ -94,6 +94,7 @@ export default class WizardFormComponent extends HTMLElement {
 
     // Methods
     private _createWizardInputs(data: AppConfigWidget): HTMLElement[] {
+        console.log(data);
         const items: HTMLElement[] = [];
 
         for (const key in data.cardAttributes) {
@@ -114,7 +115,7 @@ export default class WizardFormComponent extends HTMLElement {
             items.push(input);
         }
 
-        data.wizard.forEach((item: WizardItem) => {            
+        data.wizard.forEach((item: WizardItem) => {
             if (item.input === 'number' || item.input === 'text') {
                 const input: LabelInput = new LabelInput();
                 input.setAttribute('label', item.label);
@@ -150,8 +151,11 @@ export default class WizardFormComponent extends HTMLElement {
                 if (Array.isArray(item.value)) {
                     item.value.forEach((obj: any) => {
                         const option: HTMLSpanElement = document.createElement('span');
-                        option.setAttribute('slot', 'select');                        
-                        obj.parser ? option.setAttribute('value', `${obj.attribute}##${obj.parser}`) : option.setAttribute('value', obj.attribute);
+                        option.setAttribute('slot', 'select');
+
+                        if (typeof obj.attribute === 'string') option.setAttribute('value', obj.attribute);
+                        if (typeof obj.attribute === 'object') option.setAttribute('value', JSON.stringify(obj.attribute));
+
                         option.innerHTML = obj.label;
 
                         select.appendChild(option);
@@ -192,25 +196,51 @@ export default class WizardFormComponent extends HTMLElement {
             content: ''
         }
 
-        this._processFormElements('label-select', formData, widget, slot);
-        this._processFormElements('label-input', formData, widget, slot);
+        const selectAttributes: Record<string, any> = this._processFormElements('label-select', formData, slot);
+        const inputAttributes: Record<string, any> = this._processFormElements('label-input', formData, slot);
+
+        widget.attributes = { ...selectAttributes, ...inputAttributes };
 
         widget.slots.push(slot);
         this.dispatchEvent(new CustomEvent('form-submit', { composed: true, detail: widget }));
     }
 
-    private _processFormElements(selector: string, formData: FormData, widget: GridConfigWidget, slot: GridConfigWidgetSlot): void {
-        const elements: NodeListOf<HTMLElement> = this.shadowRoot.querySelectorAll(selector);
+    private _processFormElements(selector: string, formData: FormData, slot: GridConfigWidgetSlot): Record<string, any> {
+        const elements: NodeListOf<HTMLElement> = this.shadowRoot?.querySelectorAll(selector) || [];
+        const attributes: Record<string, any> = {};
 
         elements.forEach((element: HTMLElement) => {
             const type: string | undefined = (element as any).dataset.type;
             const name: string = (element as any).name;
             const value: FormDataEntryValue | null = formData.get(name);
+            if (!value) return;
 
-            if (type) {
+            if (name === 'chart-dataset') {
+                try {
+                    const chartDataset: any = JSON.parse(value.toString().replace(/'/g, '"'));
+
+                    if (type === 'widget-attribute') {
+                        Object.assign(slot.attributes, chartDataset.attributes);
+
+                        for (const key in chartDataset.slots) {
+                            const subSlotData: any = chartDataset.slots[key];
+                            const subSlot: GridConfigWidgetSlot = {
+                                name: subSlotData.name || '',
+                                tag: subSlotData.span || 'span',
+                                attributes: {},
+                                slots: [],
+                                content: subSlotData.content || ''
+                            };
+                            slot.slots.push(subSlot);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Failed to parse chart-dataset:', error);
+                }
+            } else {
                 switch (type) {
                     case 'card-attribute':
-                        widget.attributes[name] = value;
+                        attributes[name] = value;
                         break;
 
                     case 'widget-attribute':
@@ -223,18 +253,20 @@ export default class WizardFormComponent extends HTMLElement {
                             tag: 'span',
                             attributes: {},
                             slots: [],
-                            content: value ? value.toString() : ''
+                            content: value.toString()
                         };
                         slot.slots.push(subSlot);
                         break;
 
                     default:
+                        console.warn(`Unknown type: ${type}`);
                         break;
                 }
             }
         });
-    }
 
+        return attributes;
+    }
 }
 
 customElements.define('wizard-form', WizardFormComponent);

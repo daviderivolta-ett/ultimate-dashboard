@@ -1,0 +1,18 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Genova ISPRA GE25"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    8.9255,
+                    44.4101
+                ]
+            }
+        }
+    ]
+}

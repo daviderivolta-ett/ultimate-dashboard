@@ -16,13 +16,13 @@
                         {
                             "input": "number",
                             "label": "Scegliere la latitudine",
-                            "value": 40,
+                            "value": 44.4071,
                             "attribute": "lat"
                         },
                         {
                             "input": "number",
                             "label": "Scegliere la longitudine",
-                            "value": 8,
+                            "value": 8.9347,
                             "attribute": "lng"
                         },
                         {
@@ -35,7 +35,7 @@
                                 },
                                 {
                                     "label": "Stazione meteo",
-                                    "attribute": "./geojson/weather_station.geojson"
+                                    "attribute": "./geojson/sealevel.geojson"
                                 }
                             ],
                             "attribute": "layer-url"
@@ -78,15 +78,41 @@
                             "value": [
                                 {
                                     "label": "Temperatura",
-                                    "attribute": "./datasets/temperature.dataset.json",
-                                    "parser": "/src/parsers/dsh.parser.js"
+                                    "attribute": "./datasets/temperature-portoantico.json"
                                 },
                                 {
-                                    "label": "Stazioni meteo",
-                                    "attribute": "./datasets/line-chart-standard.dataset.json"
+                                    "label": "TEST",
+                                    "attribute": {
+                                        "attributes": {
+                                            "x-unit": "Date",
+                                            "y-unit": "°C",
+                                            "label": "Porto Antico",
+                                            "dataset-url": "./datasets/temperature-portoantico.json"
+                                        },
+                                        "slots": [
+                                            {
+                                                "attributes": {},
+                                                "content": "Temperatura nel tempo",
+                                                "name": "title",
+                                                "slots": [],
+                                                "tag": "span"
+                                            },
+                                            {
+                                                "attributes": {},
+                                                "content": "Grafico che mostra la temperatura nella centralina di rilevamento del Porto Antico negli ultimi sette giorni.",
+                                                "name": "desc",
+                                                "slots": [],
+                                                "tag": "span"
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "label": "Livello del mare",
+                                    "attribute": "./datasets/sealevel-portoantico.json"
                                 }
                             ],
-                            "attribute": "dataset-data"
+                            "attribute": "chart-dataset"
                         }
                     ]
                 }

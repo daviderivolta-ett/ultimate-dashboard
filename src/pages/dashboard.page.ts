@@ -375,7 +375,7 @@ export default class DashboardPage extends HTMLElement {
         const widgetData: AppConfigWidget | null = this._getWidgetData(tag);
         if (!widgetData) return;
 
-        this._openDialog();
+        this._openDialog();       
         this._createWizardForm(widgetData);
     }
 
@@ -414,7 +414,7 @@ export default class DashboardPage extends HTMLElement {
         this._addWidget(widgetData);
     }
 
-    private _addWidget(data: GridConfigWidget): void {
+    private _addWidget(data: GridConfigWidget): void {     
         const card: CardComponent = new CardComponent();
 
         for (const key in data.attributes) {
@@ -435,9 +435,8 @@ export default class DashboardPage extends HTMLElement {
             el.setAttribute('slot', slot.name);
             el.innerHTML = slot.content;
             for (const key in slot.attributes) {
-                if (key === 'dataset-data') {
+                if (key === 'chart-dataset') {
                     el.setAttribute('dataset-url', this._handleDataset(slot.attributes[key])[0]);
-                    el.setAttribute('parser-url', this._handleDataset(slot.attributes[key])[1]);
                 } else {
                     el.setAttribute(key, slot.attributes[key]);
                 }

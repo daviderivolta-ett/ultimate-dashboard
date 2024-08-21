@@ -76,7 +76,7 @@
                                 "lat": 43.116752956131826,
                                 "lng": 12.365259516889365,
                                 "zoom": 4,
-                                "layer-url": "./geojson/sindbad.geojson"
+                                "layer-url": "./geojson/sealevel.geojson"
                             },
                             "slots": [],
                             "content": ""

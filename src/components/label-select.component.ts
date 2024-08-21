@@ -222,11 +222,16 @@ export class LabelSelect extends HTMLElement {
             const label: string | null = item.textContent;
             const value: string | null = item.getAttribute('value');
 
+            if (!value) return;
+
+            const parsedValue: string = this._parseObjectValue(value);            
+            const id: string = this._generateId();
+
             const html =
                 `
                 <li role="option" class="select-item">
-                    <input type="radio" id="${value}" value="${value}" name="radio" class="select-item__radio" />
-                    <label for="${value}" class="select-item__label">${label}</label>
+                    <input type="radio" id="${id}" value="${parsedValue}" name="radio" class="select-item__radio" />
+                    <label for="${id}" class="select-item__label">${label}</label>
                 </li>
                 `
 
@@ -236,6 +241,28 @@ export class LabelSelect extends HTMLElement {
             childNodes.forEach((node) => list.appendChild(node));
         });
     }
+
+    private _parseObjectValue(value: string): string {
+        try {
+            const parsedValue = JSON.parse(value);
+            return JSON.stringify(parsedValue).replace(/"/g, "'");
+        } catch (error) {
+            return value;
+        }
+    }
+
+    private _generateId(): string {
+        const letters: string = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        let id: string = '';
+        
+        for (let i = 0; i < 10; i++) {
+            const randomLetter: string = letters[Math.floor(Math.random() * letters.length)];
+            id += randomLetter;
+        }
+    
+        return id;
+    }
+    
 }
 
 customElements.define('label-select', LabelSelect);
