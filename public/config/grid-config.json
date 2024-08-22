@@ -68,7 +68,7 @@
                             "attributes": {
                                 "x-unit": "Date",
                                 "y-unit": "kWh",
-                                "label": "Porto Antico",
+                                "label": "Magazzini del cotone",
                                 "dataset-url": "./datasets/nrgprod-portoantico.json"
                             },
                             "slots": [

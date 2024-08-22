@@ -297,7 +297,7 @@ export default class LineChartComponent extends HTMLElement {
         return container;
     }
 
-    private _drawChart(): void {
+    private _drawChart(): void {       
         if (this.data.length === 0) return;
 
         const container: HTMLDivElement | null = this.shadowRoot.querySelector('#line-chart');

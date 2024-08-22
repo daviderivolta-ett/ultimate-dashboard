@@ -56,6 +56,35 @@ style.innerHTML =
         flex-grow: 1;
         overflow: hidden;
     }
+
+    .legend {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .legend__item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 8px 0 0;
+    }
+
+    .legend__item {
+        gap: 8px;
+    }
+
+    .legend__item__circle {
+        width: 8px;
+        height: 8px;
+        border-radius: 100%;
+    }
+
+    .legend__item__label {
+        font-size: .8rem;
+    }
     `
     ;
 
@@ -63,6 +92,7 @@ style.innerHTML =
 export class BarChartComponent extends HTMLElement {
     public shadowRoot: ShadowRoot;
 
+    private _resizeObserver: ResizeObserver;
     private _colors: string[] = [
         'var(--data-blue-color)',
         'var(--data-purple-color)',
@@ -99,41 +129,50 @@ export class BarChartComponent extends HTMLElement {
 
         this.shadowRoot.appendChild(template.content.cloneNode(true));
         this.shadowRoot.appendChild(style.cloneNode(true));
+
+        this._resizeObserver = new ResizeObserver(() => this._drawChart());
     }
 
     public get isMinimal(): boolean { return this._isMinimal }
     public set isMinimal(value: boolean) {
         this._isMinimal = value;
+        this._toggleMinimal(value);
     }
 
     public get showLegend(): boolean { return this._showLegend }
     public set showLegend(value: boolean) {
         this._showLegend = value;
+        this._drawLegend();
     }
 
     public get showTitle(): boolean { return this._showTitle }
     public set showTitle(value: boolean) {
         this._showTitle = value;
+        this._toggleTitle();
     }
 
     public get showDesc(): boolean { return this._showDesc }
     public set showDesc(value: boolean) {
         this._showDesc = value;
+        this._toggleDesc();
     }
 
     public get xUnit(): string { return this._xUnit }
     public set xUnit(value: string) {
         this._xUnit = value;
+        this._drawChart();
     }
 
     public get yUnit(): string { return this._yUnit }
     public set yUnit(value: string) {
         this._yUnit = value;
+        this._drawChart();
     }
 
     public get dateUnit(): 'x' | 'y' | 'none' { return this._dateUnit }
     public set dateUnit(value: 'x' | 'y' | 'none') {
         this._dateUnit = value;
+        this._drawChart();
     }
 
     public get dataUrl(): string { return this._dataUrl }
@@ -151,16 +190,19 @@ export class BarChartComponent extends HTMLElement {
     public get label(): string { return this._label }
     public set label(value: string) {
         this._label = value;
+        this._drawLegend();
     }
 
     // Component callbacks
     public connectedCallback(): void {
+        const container: HTMLDivElement | null = this.shadowRoot.querySelector('#bar-chart');
+        if (container) this._resizeObserver.observe(container);
         this._setup();
-        this._drawChart();
     }
 
     public disconnectedCallback(): void {
-
+        const container: HTMLDivElement | null = this.shadowRoot.querySelector('#line-chart');
+        if (container) this._resizeObserver.unobserve(container);
     }
 
     static observedAttributes: string[] = ['is-minimal', 'show-legend', 'show-title', 'show-desc', 'x-unit', 'y-unit', 'date-unit', 'dataset-url', 'label'];
@@ -199,6 +241,65 @@ export class BarChartComponent extends HTMLElement {
         if (descSlot && descSlot.assignedNodes().length === 0) descSlot.style.display = 'none';
     }
 
+    private _toggleMinimal(isMinimal: boolean): void {
+        const chart: HTMLDivElement | null = this.shadowRoot.querySelector('.bar-chart');
+        if (!chart) return;
+
+        if (isMinimal) {
+            this.setAttribute('show-title', 'false');
+            this.setAttribute('show-desc', 'false');
+            this.setAttribute('show-legend', 'false');
+            chart.classList.add('line-chart--minimal');
+        } else {
+            this.setAttribute('show-title', 'true');
+            this.setAttribute('show-desc', 'true');
+            this.setAttribute('show-legend', 'true');
+            chart.classList.remove('line-chart--minimal');
+        }
+    }
+
+    private _toggleTitle(): void {
+        const title: HTMLSlotElement | null = this.shadowRoot.querySelector('slot[name="title"');
+        if (title) this.showTitle ? title.classList.remove('header__title--hidden') : title.classList.add('header__title--hidden');
+    }
+
+    private _toggleDesc(): void {
+        const desc: HTMLSlotElement | null = this.shadowRoot.querySelector('slot[name="desc"');
+        if (desc) this.showDesc ? desc.classList.remove('header__desc--hidden') : desc.classList.add('header__desc--hidden');
+    }
+
+    private _drawLegend(): void {
+        const legend: HTMLDivElement | null = this.shadowRoot.querySelector('.legend');
+        if (!legend) return;
+
+        legend.removeAttribute('style');
+        legend.innerHTML = '';
+
+        if (this.showLegend) {
+            const color: string = this._colors[0];
+            legend.style.marginTop = '16px';
+            const item: HTMLDivElement = this._drawLegendItem(color, this.label);
+            legend.appendChild(item);
+        }
+    }
+
+    private _drawLegendItem(color: string, labelText: string): HTMLDivElement {
+        const container: HTMLDivElement = document.createElement('div');
+        container.classList.add('legend__item');
+
+        const rect: HTMLDivElement = document.createElement('div');
+        rect.classList.add('legend__item__circle');
+        rect.style.backgroundColor = color;
+        container.appendChild(rect);
+
+        const label: HTMLSpanElement = document.createElement('span');
+        label.classList.add('legend__item__label');
+        label.innerText = labelText;
+        container.appendChild(label);
+
+        return container;
+    }
+
     private _drawChart(): void {
         if (this.data.length === 0) return;
 
@@ -217,13 +318,18 @@ export class BarChartComponent extends HTMLElement {
         const isDateX = this.dateUnit === 'x';
         const isDateY = this.dateUnit === 'y';
 
-        const xScale = d3.scaleBand()
-            .domain(data.map((d: [number, number]) => d[0].toString()))
-            .range([padding, currentWidth - padding])
-            .padding(.4)
+        const xScale =
+            isDateX ?
+                d3.scaleBand()
+                    .domain(data.map((d: [number, number]) => new Date(d[0]).toString()))
+                    .range([padding, currentWidth - padding])
+                    .padding(.4)
+                : d3.scaleBand()
+                    .domain(data.map((d: [number, number]) => d[0].toString()))
+                    .range([padding, currentWidth - padding])
+                    .padding(.4)
 
         const yScale = d3.scaleLinear()
-            // .domain([-(d3.max(data, (d: [number, number]) => Math.abs(d[1])) || 0), d3.max(data, (d: [number, number]) => Math.abs(d[1])) || 0]).nice()
             .domain([
                 Math.min(0, d3.min(data, (d: [number, number]) => d[1]) || 0),
                 d3.max(data, (d: [number, number]) => d[1]) || 0
@@ -261,7 +367,8 @@ export class BarChartComponent extends HTMLElement {
             .selectAll('rect')
             .data(data)
             .join('rect')
-            .attr('x', (d: [number, number]) => xScale(d[0].toString()) || 0)
+            // .attr('x', (d: [number, number]) => xScale(d[0].toString()) || 0)
+            .attr('x', (d: [number, number]) => xScale(isDateX ? new Date(d[0]).toString() : d[0].toString()) || 0)
             .attr('y', (d: [number, number]) => d[1] >= 0 ? yScale(d[1]) : yScale(0))
             .attr('width', xScale.bandwidth())
             .attr('height', (d: [number, number]) => Math.abs(yScale(d[1]) - yScale(0)));
@@ -274,14 +381,6 @@ export class BarChartComponent extends HTMLElement {
         xAxis.selectAll('text')
             .style('font-size', '.6rem')
             .style('font-family', 'Inter');
-
-        // xAxis.selectAll('.tick')
-        //     .filter((d, i) => i === 0)
-        //     .style('display', 'none');
-
-        // xAxis.selectAll('.tick')
-        //     .filter((d, i, nodes) => i === nodes.length - 1)
-        //     .remove();
 
         // Y axis
         const yAxis = svg.append('g')
@@ -336,6 +435,19 @@ export class BarChartComponent extends HTMLElement {
         } catch (error) {
             throw new Error(`Errore sconosciuto nel recupero dei dati da ${url}`);
         }
+    }
+
+    private _formatDate(timestamp: number): string {
+        const date: Date = new Date(timestamp);
+    
+        const day: string = String(date.getDate()).padStart(2, '0');
+        const month: string = String(date.getMonth() + 1).padStart(2, '0');
+        const year: string = String(date.getFullYear());
+    
+        const hours: string = String(date.getHours()).padStart(2, '0');
+        const minutes: string = String(date.getMinutes()).padStart(2, '0');
+    
+        return `${day}/${month}/${year} - ${hours}:${minutes}`;
     }
 }
 
