@@ -23,7 +23,7 @@
                 },
                 {
                     "attributes": {
-                        "size": "square-small"
+                        "size": "row-large"
                     },
                     "slots": [
                         {
@@ -56,6 +56,40 @@
                             "content": ""
                         }
                     ]
+                },
+                {
+                    "attributes": {
+                        "size": "row-large"
+                    },
+                    "slots": [
+                        {
+                            "name": "content",
+                            "tag": "ettdash-bar-chart",
+                            "attributes": {
+                                "x-unit": "Date",
+                                "y-unit": "kWh",
+                                "label": "Porto Antico",
+                                "dataset-url": "./datasets/nrgprod-portoantico.json"
+                            },
+                            "slots": [
+                                {
+                                    "name": "title",
+                                    "tag": "span",
+                                    "attributes": {},
+                                    "slots": [],
+                                    "content": "Produzione energia elettrica"
+                                },
+                                {
+                                    "name": "desc",
+                                    "tag": "span",
+                                    "attributes": {},
+                                    "slots": [],
+                                    "content": "Grafico che mostra la produzione di energia elettrica dei pannelli solari presenti sul tetto dei Magazzini del Cotone."
+                                }
+                            ],
+                            "content": ""
+                        }
+                    ]
                 }
             ]
         },
@@ -82,7 +116,7 @@
                 },
                 {
                     "attributes": {
-                        "size": "square-small"
+                        "size": "row-large"
                     },
                     "slots": [
                         {

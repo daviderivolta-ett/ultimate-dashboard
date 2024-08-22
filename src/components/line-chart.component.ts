@@ -451,7 +451,7 @@ export default class LineChartComponent extends HTMLElement {
         svg.append('path')
             .datum(data)
             .attr('fill', color)
-            .attr('fill-opacity', '.1')
+            .attr('fill-opacity', .25)
             .attr('stroke', 'none')
             .attr('d', d3.area<number[]>()
                 .curve(d3.curveCardinal)
