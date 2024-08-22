@@ -2,8 +2,8 @@
     "configs": [
         {
             "id": "standard",
-            "label": "Standard",
-            "icon": "./icons/line-chart.svg",
+            "label": "Temperatura",
+            "icon": "./icons/thermometer.svg",
             "grid": [
                 {
                     "attributes": {
@@ -14,9 +14,6 @@
                             "name": "content",
                             "tag": "ettdash-map",
                             "attributes": {
-                                "lat": 43.116752956131826,
-                                "lng": 12.365259516889365,
-                                "zoom": 4,
                                 "layer-url": "./geojson/weather_station.geojson"
                             },
                             "slots": [],
@@ -63,9 +60,9 @@
             ]
         },
         {
-            "id": "double-map",
-            "label": "Double map",
-            "icon": "./icons/line-chart.svg",
+            "id": "sealevel",
+            "label": "Livello del mare",
+            "icon": "./icons/waves.svg",
             "grid": [
                 {
                     "attributes": {
@@ -76,9 +73,6 @@
                             "name": "content",
                             "tag": "ettdash-map",
                             "attributes": {
-                                "lat": 43.116752956131826,
-                                "lng": 12.365259516889365,
-                                "zoom": 4,
                                 "layer-url": "./geojson/sealevel.geojson"
                             },
                             "slots": [],
@@ -93,14 +87,31 @@
                     "slots": [
                         {
                             "name": "content",
-                            "tag": "ettdash-map",
+                            "tag": "ettdash-line-chart",
                             "attributes": {
-                                "lat": 43.116752956131826,
-                                "lng": 12.365259516889365,
-                                "zoom": 4,
-                                "layer-url": "./geojson/weather_station.geojson"
+                                "show-legend": true,
+                                "x-unit": "Date",
+                                "y-unit": "m",
+                                "label": "Porto Antico",
+                                "dataset-url": "./datasets/sealevel-portoantico.json",
+                                "date-unit": "x"
                             },
-                            "slots": [],
+                            "slots": [
+                                {
+                                    "name": "title",
+                                    "tag": "span",
+                                    "attributes": {},
+                                    "slots": [],
+                                    "content": "Livello del mare nel tempo"
+                                },
+                                {
+                                    "name": "desc",
+                                    "tag": "span",
+                                    "attributes": {},
+                                    "slots": [],
+                                    "content": "Grafico che mostra il livello del mare registrato alla stazione di rilevamento del Porto Antico negli ultimi due giorni."
+                                }
+                            ],
                             "content": ""
                         }
                     ]

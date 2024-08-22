@@ -492,7 +492,7 @@ export default class LineChartComponent extends HTMLElement {
                     .style('display', 'block')
                     .style('left', event.pageX + 8 + 'px')
                     .style('top', event.pageY + 8 + 'px')
-                    .text(`${this.xUnit}: ${isDateX ? new Date(d[0]).toDateString() : d[0]}, ${this.yUnit}: ${isDateY ? new Date(d[0]).toDateString() : d[1]}`);
+                    .text(`${this.xUnit}: ${isDateX ? this._formatDate(d[0]) : d[0]}, ${this.yUnit}: ${isDateY ? this._formatDate(d[0]) : d[1]}`);
             })
             .on('mouseout', function () {
                 d3.select('#d3-tooltip')
@@ -528,6 +528,19 @@ export default class LineChartComponent extends HTMLElement {
         } catch (error) {
             throw new Error(`Errore sconosciuto nel recupero dei dati da ${url}`);
         }
+    }
+
+    private _formatDate(timestamp: number): string {
+        const date: Date = new Date(timestamp);
+    
+        const day: string = String(date.getDate()).padStart(2, '0');
+        const month: string = String(date.getMonth() + 1).padStart(2, '0');
+        const year: string = String(date.getFullYear());
+    
+        const hours: string = String(date.getHours()).padStart(2, '0');
+        const minutes: string = String(date.getMinutes()).padStart(2, '0');
+    
+        return `${day}/${month}/${year} - ${hours}:${minutes}`;
     }
 }
 

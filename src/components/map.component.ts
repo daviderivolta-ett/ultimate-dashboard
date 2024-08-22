@@ -44,7 +44,9 @@ export default class MapComponent extends HTMLElement {
     public get center(): [number, number] { return this._center }
     public set center(value: [number, number]) {
         this._center = value;
-        if (this._map) this._map.setCenter(new LngLat(value[1], value[0]));
+        if (this._map) {
+            this._map.setCenter(new LngLat(value[1], value[0]));
+        }
     }
 
     public get zoom(): number { return this._zoom }
@@ -75,7 +77,7 @@ export default class MapComponent extends HTMLElement {
     }
 
     // Methods
-    private _initMap(): void {
+    private _initMap(): void {        
         const container: HTMLDivElement | null = this.shadowRoot.querySelector('#map');
         if (!container) return;
 

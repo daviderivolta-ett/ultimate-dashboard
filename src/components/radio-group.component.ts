@@ -31,6 +31,10 @@ style.innerHTML =
         align-items: start;
         gap: 16px;
     }
+
+    ::slotted(*) {
+        width: 100%;
+    }
     `
     ;
 

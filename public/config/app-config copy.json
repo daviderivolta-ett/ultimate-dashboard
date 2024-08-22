@@ -14,15 +14,27 @@
                     },
                     "wizard": [
                         {
+                            "input": "number",
+                            "label": "Scegliere la latitudine",
+                            "value": 44.4071,
+                            "attribute": "lat"
+                        },
+                        {
+                            "input": "number",
+                            "label": "Scegliere la longitudine",
+                            "value": 8.9347,
+                            "attribute": "lng"
+                        },
+                        {
                             "input": "select",
                             "label": "Scegliere un layer",
                             "value": [
                                 {
-                                    "label": "Stazione meteo Porto Antico",
-                                    "attribute": "./geojson/weather_station.geojson"
+                                    "label": "Stazione rilevamento qualità dell'aria",
+                                    "attribute": "./geojson/air_quality.geojson"
                                 },
                                 {
-                                    "label": "Stazione rilevamento livello del mare",
+                                    "label": "Stazione meteo",
                                     "attribute": "./geojson/sealevel.geojson"
                                 }
                             ],
@@ -37,11 +49,39 @@
                     "widgetAttributes": {},
                     "wizard": [
                         {
+                            "input": "text",
+                            "label": "Titolo del grafico",
+                            "value": "",
+                            "slot": "title"
+                        },
+                        {
+                            "input": "text",
+                            "label": "Descrizione del grafico",
+                            "value": "",
+                            "slot": "desc"
+                        },
+                        {
+                            "input": "text",
+                            "label": "Unità di misura ascisse",
+                            "value": "",
+                            "attribute": "x-unit"
+                        },
+                        {
+                            "input": "text",
+                            "label": "Unità di misura ordinate",
+                            "value": "",
+                            "attribute": "y-unit"
+                        },
+                        {
                             "input": "select",
                             "label": "Scegliere un dataset",
                             "value": [
                                 {
-                                    "label": "Temperatura Porto Antico",
+                                    "label": "Temperatura",
+                                    "attribute": "./datasets/temperature-portoantico.json"
+                                },
+                                {
+                                    "label": "TEST",
                                     "attribute": {
                                         "attributes": {
                                             "x-unit": "Date",
@@ -60,7 +100,7 @@
                                             },
                                             {
                                                 "attributes": {},
-                                                "content": "Grafico che mostra la temperatura nella centralina di rilevamento del Porto Antico negli ultimi due giorni.",
+                                                "content": "Grafico che mostra la temperatura nella centralina di rilevamento del Porto Antico negli ultimi sette giorni.",
                                                 "name": "desc",
                                                 "slots": [],
                                                 "tag": "span"
@@ -70,31 +110,7 @@
                                 },
                                 {
                                     "label": "Livello del mare",
-                                    "attribute": {
-                                        "attributes": {
-                                            "x-unit": "Date",
-                                            "y-unit": "m",
-                                            "label": "Porto Antico",
-                                            "dataset-url": "./datasets/sealevel-portoantico.json",
-                                            "date-unit": "x"
-                                        },
-                                        "slots": [
-                                            {
-                                                "attributes": {},
-                                                "content": "Livello del mare nel tempo",
-                                                "name": "title",
-                                                "slots": [],
-                                                "tag": "span"
-                                            },
-                                            {
-                                                "attributes": {},
-                                                "content": "Grafico che mostra il livello del mare registrato alla stazione di rilevamento del Porto Antico negli ultimi due giorni.",
-                                                "name": "desc",
-                                                "slots": [],
-                                                "tag": "span"
-                                            }
-                                        ]
-                                    }
+                                    "attribute": "./datasets/sealevel-portoantico.json"
                                 }
                             ],
                             "attribute": "chart-dataset"
