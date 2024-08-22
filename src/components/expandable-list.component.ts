@@ -119,6 +119,7 @@ export default class ExpandableListComponent extends HTMLElement {
     public disconnectedCallback(): void {
         const btn = this.shadowRoot.querySelector('.toggle');
         if (btn) btn.removeEventListener('click', this._onToggleClick);
+        document.removeEventListener('click', this._onDocumentClick);
     }
 
     static observedAttributes: string[] = ['show-arrow'];
@@ -131,12 +132,20 @@ export default class ExpandableListComponent extends HTMLElement {
     private _setup(): void {
         const btn = this.shadowRoot.querySelector('.toggle');
         if (btn) btn.addEventListener('click', this._onToggleClick);
+        document.addEventListener('click', this._onDocumentClick);
     }
 
     // Methods
     private _onToggleClick = (event: Event): void => {
         event.stopPropagation();
         this.isOpen = !this.isOpen;
+    }
+
+    private _onDocumentClick = (event: MouseEvent): void => { 
+        const component = this.shadowRoot.querySelector('.expandable-list');
+        if (component && !component.contains(event.target as Node)) {
+            this.isOpen = false;
+        }
     }
 
     private _openPanel(): void {
