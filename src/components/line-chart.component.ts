@@ -348,12 +348,12 @@ export default class LineChartComponent extends HTMLElement {
         //     .range([currentHeight - padding, padding]);
 
         const yScale = isDateY
-        ? d3.scaleTime()
-            .domain([new Date(d3.min(data, (d: [number, number]) => d[1])!), new Date(d3.max(data, (d: [number, number]) => d[1])!)])
-            .range([currentHeight - padding, padding])
-        : d3.scaleLinear()
-            .domain([yMin - yPadding, yMax + yPadding])
-            .range([currentHeight - padding, padding]);
+            ? d3.scaleTime()
+                .domain([new Date(d3.min(data, (d: [number, number]) => d[1])!), new Date(d3.max(data, (d: [number, number]) => d[1])!)])
+                .range([currentHeight - padding, padding])
+            : d3.scaleLinear()
+                .domain([yMin - yPadding, yMax + yPadding])
+                .range([currentHeight - padding, padding]);
 
         // svg
         const svg = d3.select(this.shadowRoot.querySelector('#line-chart'))
@@ -417,16 +417,32 @@ export default class LineChartComponent extends HTMLElement {
             .text(this.yUnit);
 
         // horizontal grid
-        // svg.append('g')
-        //     .attr('class', 'grid')
-        //     .selectAll('line')
-        //     .data(yScale.ticks())
-        //     .join('line')
-        //     .attr('y1', d => yScale(d))
-        //     .attr('y2', d => yScale(d))
-        //     .attr('x1', padding)
-        //     .attr('x2', currentWidth - padding)
-        //     .attr('stroke', 'var(--chart-line-color)');
+        if (yScale.ticks().length > 0 && typeof yScale.ticks()[0] === 'number') {
+            svg.append('g')
+                .attr('class', 'grid')
+                .selectAll('line')
+                .data(yScale.ticks() as number[])
+                .join('line')
+                .attr('y1', d => yScale(d))
+                .attr('y2', d => yScale(d))
+                .attr('x1', padding)
+                .attr('x2', currentWidth - padding)
+                .attr('stroke', 'var(--chart-line-color)');
+        }
+
+        if (yScale.ticks().length > 0 && yScale.ticks()[0] instanceof Date) {
+            svg.append('g')
+                .attr('class', 'grid')
+                .selectAll('line')
+                .data(yScale.ticks() as Date[])
+                .join('line')
+                .attr('y1', d => yScale(d))
+                .attr('y2', d => yScale(d))
+                .attr('x1', padding)
+                .attr('x2', currentWidth - padding)
+                .attr('stroke', 'var(--chart-line-color)');
+        }
+
 
         // Chart
         const color: string = this._colors[0];
